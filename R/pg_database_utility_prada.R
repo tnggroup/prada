@@ -94,3 +94,29 @@ PradaPgDatabaseUtilityClass$methods(
     if(length(res)>0) return(res[[1]]) else return(NA_character_)
   }
 )
+
+
+
+PradaPgDatabaseUtilityClass$methods(
+  getPradaChromosome=function(){
+    q <- dbSendQuery(connection,
+                     "SELECT * FROM prada.chromosome")
+    res<-dbFetch(q)
+    dbClearResult(q)
+    if(length(res)>0) return(res[[1]]) else return(NA_character_)
+  }
+)
+
+
+#should be used with care as it passes the data by value rather than reference
+PradaPgDatabaseUtilityClass$methods(
+  importDataAsTable=function(name,df,temporary = T){
+
+    if(!is.null(df)){
+      if(dbExistsTable(conn = connection, name = name)) dbRemoveTable(conn = connection, name = name, temporary= temporary)
+      dbCreateTable(conn = connection, name = name, fields = df, temporary = temporary)
+      dbAppendTable(conn = connection, name = name, value = df)
+    }
+
+  }
+)

@@ -1,7 +1,7 @@
-#library(tm)
-#library(DBI)
-#library(RPostgres)
-#library(data.table)
+# library(tm)
+# library(DBI)
+# library(RPostgres)
+# library(data.table)
 
 #general shared package utilities
 pradaPackageVersion.major<-0
@@ -9,20 +9,9 @@ pradaPackageVersion.minor<-1
 pradaPackageVersion.patch<-0
 
 pradaApplicationDAO<-NULL
-pradaCentralDBDefaultHost <- "postgresql-cluster.cluster-cjghupwohy3q.eu-west-2.rds.amazonaws.com"
-pradaCentralDBDefaultDBname <- "prada_central"
-
-#this is standardised and hard-coded - replace the dao with another for a custom connection
-#connectPradaDatabase("tng_prada_system")
-connectPradaDatabase<-function(usernameToUse, portToUse=65432){
-  cinfo <- c()
-  cinfo$pw <- rstudioapi::askForPassword(prompt = c("Enter database password for user: ",usernameToUse))
-  cinfo$host <- pradaCentralDBDefaultHost
-  cinfo$dbname <- pradaCentralDBDefaultDBname
-  cinfo$user <- usernameToUse
-  cinfo$port <- 65432 #65432 for remote
-  pradaApplicationDAO <- PradaPgDatabaseUtilityClass(host=cinfo$host, dbname=cinfo$dbname, user=cinfo$user, port=cinfo$port, password= cinfo$pw)
-}
+pradaCentralDBDefaultHost <- "localhost"
+pradaCentralDBDefaultDbName <- "prada_central"
+pradaCentralDBDefaultPort <- 65432
 
 #TODO this does not quite remove duplicates? Is this still a problem? Needs more testing.
 #parses and formats the provided column names to the database standard
