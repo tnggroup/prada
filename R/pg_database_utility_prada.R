@@ -110,12 +110,20 @@ PradaPgDatabaseUtilityClass$methods(
 
 #should be used with care as it passes the data by value rather than reference
 PradaPgDatabaseUtilityClass$methods(
-  importDataAsTable=function(name,df,temporary = T){
+  importDataAsTable=function(schema_name, table_name, df, temporary = T, replace=F){
+
+    if(is.null(schema_name) | temporary==T){
+      consensus_name<-table_name
+    } else {
+      consensus_name<-Id(schema = schema_name, table = table_name)
+    }
+
+    if(dbExistsTable(conn = connection, name = consensus_name) & replace==T) dbRemoveTable(conn = connection, name = consensus_name, temporary= temporary)
 
     if(!is.null(df)){
-      if(dbExistsTable(conn = connection, name = name)) dbRemoveTable(conn = connection, name = name, temporary= temporary)
-      dbCreateTable(conn = connection, name = name, fields = df, temporary = temporary)
-      dbAppendTable(conn = connection, name = name, value = df)
+      if(!dbExistsTable(conn = connection, name = consensus_name)) dbCreateTable(conn = connection, name = consensus_name, fields = df, temporary = temporary)
+
+      dbAppendTable(conn = connection, name = consensus_name, value = df)
     }
 
   }
