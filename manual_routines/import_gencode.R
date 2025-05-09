@@ -30,7 +30,7 @@ gencode$gene_id<-lapply(
 
 data.table::setDT(gencode)
 gencode<-as.data.frame(gencode[,.(V1,V4,V5,gene_name,gene_id,gene_id0)])
-colnames(gencode)<-c("CHR","BP1","BP2","gene_name","gene_id","gene_id0")
+colnames(gencode)<-c("chr","bp1","bp2","gene_name","gene_id","gene_id0")
 
 gencode$gene_name<-trimws(gencode$gene_name) #not sure why we have to do this a second time
 gencode$gene_id<-trimws(gencode$gene_id)

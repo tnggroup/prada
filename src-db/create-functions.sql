@@ -64,10 +64,10 @@ DECLARE
 BEGIN
 	--use $ -notation if there is a collision between argument names and column names
 	
-	WITH SELECT gcg.gene_name, gcg.gene_id, gcg.bp1, gcg.bp2 
-	FROM prada.gencode_gene gcg 
-	ORDER BY 
-	LIMIT nPrioritisedGenes
+	WITH SELECT DISTINCT gcg.gene_name, gcg.gene_id, gcg.bp1, gcg.bp2, cpiclevel, pgkbcalevel, in_dpwg, in_twist, in_pharmvar, in_cmrg, in_pharmcat
+	FROM prada.gencode_gene gcg FULL JOIN prada.combined_pgx px ON px.chr=gcg.chr AND px.ensemblid=gcg.gene_id
+	ORDER BY cpiclevel, pgkbcalevel, in_dpwg, in_twist, in_pharmvar, in_cmrg, in_pharmcat
+	LIMIT nPrioritisedGenes;
 	
 	RETURN nid;
 END;
