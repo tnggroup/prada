@@ -22,5 +22,18 @@ INSERT INTO prada.chromosome(number, sizebp) VALUES (19,58617616);
 INSERT INTO prada.chromosome(number, sizebp) VALUES (20,64444167);
 INSERT INTO prada.chromosome(number, sizebp) VALUES (21,46709983);
 INSERT INTO prada.chromosome(number, sizebp) VALUES (22,50818468);
-INSERT INTO prada.chromosome(number, sizebp) VALUES (23,156040895);
-INSERT INTO prada.chromosome(number, sizebp) VALUES (24,57227415);
+INSERT INTO prada.chromosome(number, sizebp) VALUES (23,156040895); --X
+INSERT INTO prada.chromosome(number, sizebp) VALUES (24,57227415); --Y
+--INSERT INTO prada.chromosome(number, sizebp) VALUES (25,NULL); --XY
+--INSERT INTO prada.chromosome(number, sizebp) VALUES (26,NULL); --MT
+
+/*
+INSERT INTO prada.chromosome(name) SELECT CASE
+WHEN c.number <23 THEN 'chr'||c.number
+WHEN c.number =23 THEN 'chrX'
+WHEN c.number =24 THEN 'chrY'
+WHEN c.number =25 THEN 'chrXY'
+WHEN c.number =26 THEN 'chrMT'
+END
+FROM prada.chromosome c;
+*/
