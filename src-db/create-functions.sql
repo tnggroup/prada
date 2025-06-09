@@ -31,13 +31,18 @@ CREATE OR REPLACE FUNCTION prada.get_application_recommendation() RETURNS TABLE(
 name text,
 genesymbol text,
 result text,
-consultationtext text
+consultationtext text,
+prada_cpiclevel_num numeric,
+prada_pgkbcalevel_num numeric,
+prada_ehrpriority_num numeric
 ) AS $$
 	
-	SELECT pg.name, pg.genesymbol, pg.result, pg.consultationtext FROM prada.cpic_pgx pg --pg.*
-	INNER JOIN (SELECT t_gene_diplotype_input.*, t_gene_diplotype_input.a1 || '/'|| t_gene_diplotype_input.a2 AS diplotype FROM t_gene_diplotype_input) hcdata ON hcdata.gene = pg.genesymbol AND hcdata.diplotype = pg.diplotype
+	SELECT pg.drug_name, pg.gene_name, pg.result, pg.consultationtext, pg.prada_cpiclevel_num, pg.prada_pgkbcalevel_num, pg.prada_ehrpriority_num
+	FROM prada.combined_pgx pg --pg.*
+	INNER JOIN (SELECT t_gene_diplotype_input.*, t_gene_diplotype_input.a1 || '/'|| t_gene_diplotype_input.a2 AS diplotype FROM t_gene_diplotype_input) hcdata ON hcdata.gene = pg.gene_name AND hcdata.diplotype = pg.diplotype
 	--INNER JOIN t_drug_input d ON d.drugid=pg.drugid
-	WHERE pgkbcalevel = '1A' OR pgkbcalevel = '1B' OR pgkbcalevel = '2A' OR pgkbcalevel = '2B';
+	WHERE prada_cpiclevel_num > 0 OR prada_pgkbcalevel_num > 0 OR prada_ehrpriority_num > 1
+	AND (pgkbcalevel = '1A' OR pgkbcalevel = '1B' OR pgkbcalevel = '2A' OR pgkbcalevel = '2B');
 	-- AND cpiclevel = 'A'
 	-- AND ehrpriority != 'none';
 
@@ -64,9 +69,11 @@ DECLARE
 BEGIN
 	--use $ -notation if there is a collision between argument names and column names
 	
-	WITH SELECT DISTINCT gcg.gene_name, gcg.gene_id, gcg.bp1, gcg.bp2, cpiclevel, pgkbcalevel, in_dpwg, in_twist, in_pharmvar, in_cmrg, in_pharmcat
-	FROM prada.gencode_gene gcg FULL JOIN prada.combined_pgx px ON px.chr=gcg.chr AND px.ensemblid=gcg.gene_id
-	ORDER BY cpiclevel, pgkbcalevel, in_dpwg, in_twist, in_pharmvar, in_cmrg, in_pharmcat
+	DROP TABLE IF EXISTS t_coverage_genes;
+	CREATE TEMP TABLE IF NOT EXISTS t_coverage_genes AS SELECT DISTINCT px.gene_name, px.gene_id, px.chr, px.bp1, px.bp2, prada_cpiclevel_num, prada_pgkbcalevel_num, prada_ehrpriority_num
+	FROM prada.combined_pgx px
+	WHERE prada_cpiclevel_num > 0 OR prada_pgkbcalevel_num > 0 OR prada_ehrpriority_num > 0 
+	ORDER BY prada_cpiclevel_num DESC, prada_pgkbcalevel_num DESC, prada_ehrpriority_num DESC
 	LIMIT nPrioritisedGenes;
 	
 	RETURN nid;

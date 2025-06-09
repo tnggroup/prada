@@ -27,13 +27,17 @@ INSERT INTO prada.chromosome(number, sizebp) VALUES (24,57227415); --Y
 --INSERT INTO prada.chromosome(number, sizebp) VALUES (25,NULL); --XY
 --INSERT INTO prada.chromosome(number, sizebp) VALUES (26,NULL); --MT
 
-/*
-INSERT INTO prada.chromosome(name) SELECT CASE
+WITH prev_chrom AS (SELECT CASE
 WHEN c.number <23 THEN 'chr'||c.number
 WHEN c.number =23 THEN 'chrX'
 WHEN c.number =24 THEN 'chrY'
 WHEN c.number =25 THEN 'chrXY'
 WHEN c.number =26 THEN 'chrMT'
-END
-FROM prada.chromosome c;
-*/
+END AS name, c.number
+FROM prada.chromosome c
+)
+UPDATE prada.chromosome SET name=p.name FROM prev_chrom p WHERE chromosome.number=p.number;
+
+--Harmonise the pgx_gene custom data with gencode gene codes
+UPDATE prada.pgx_gene pg SET "Gene"='GBA1' WHERE "Gene"='GBA';
+
