@@ -95,15 +95,28 @@ PradaPgDatabaseUtilityClass$methods(
   }
 )
 
-
+# PradaPgDatabaseUtilityClass$methods(
+#   getPradaChromosome=function(){
+#     q <- dbSendQuery(connection,
+#                      "SELECT * FROM prada.chromosome")
+#     res<-dbFetch(q)
+#     dbClearResult(q)
+#     if(length(res)>0) return(res[[1]]) else return(NA_character_)
+#   }
+# )
 
 PradaPgDatabaseUtilityClass$methods(
-  getPradaChromosome=function(){
+  selectApplicationCoverageRegions=function(){
     q <- dbSendQuery(connection,
-                     "SELECT * FROM prada.chromosome")
+                     "SELECT * FROM prada.get_application_coverage_regions()")
     res<-dbFetch(q)
     dbClearResult(q)
-    if(length(res)>0) return(res[[1]]) else return(NA_character_)
+
+    q <- dbSendQuery(connection,
+                     "SELECT * FROM t_coverage_genes")
+    res<-dbFetch(q)
+    dbClearResult(q)
+    return(res)
   }
 )
 

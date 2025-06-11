@@ -213,6 +213,7 @@ SELECT DISTINCT genesymbol,ensemblid,chr
 	AND g.chr=cpic.chr
 	)
 LEFT OUTER JOIN prada.pgx_gene pgx ON g.gene_name=pgx."Gene" --OR cpicg.genesymbol=pgx."Gene" --AND g.chr=pgx.chr -- we don't have chr data here
+INNER JOIN prada.chromosome c ON g.chr = c.name OR cpicg.chr = c.name
 ;
 
 CREATE UNIQUE INDEX harmonised_gene_u ON prada.harmonised_gene (chr,gene_id); -- chr,gene_name is not unique 
@@ -227,6 +228,7 @@ CREATE UNIQUE INDEX harmonised_gene_i ON prada.harmonised_gene (chr,bp1,bp2,gene
 --SELECT * FROM prada.harmonised_gene WHERE bp1 IS NULL;
 --SELECT * FROM prada.gencode_gene gg WHERE gg.gene_name = 'SOD2';
 --SELECT * FROM prada.harmonised_gene WHERE gene_name= 'Metazoa_SRP';
+--SELECT DISTINCT chr FROM prada.harmonised_gene;
 
 --DROP VIEW prada.harmonised_combined_pgx;
 CREATE OR REPLACE VIEW prada.harmonised_combined_pgx
@@ -254,6 +256,13 @@ p.umlscui,
 p.flowchart,
 p.version,
 p.guidelineid,
+d.type drug_type,
+(
+CASE
+	WHEN d.weight IS NULL THEN 1.0
+	ELSE d.weight
+END
+) AS drug_weight,
 p.cpiclevel,
 p.pgkbcalevel,
 p.usedforrecommendation,
@@ -274,7 +283,9 @@ prada.harmonised_gene g
 LEFT OUTER JOIN prada.harmonised_cpic_pgx p ON --we trust the ensemblid and chr mapping because of the harmonised cpic pgx view
 	p.ensemblid=g.gene_id
 	AND g.chr=p.chr
+LEFT OUTER JOIN prada.drug d ON (p.rxnormid=d.rxnormid OR (d.rxnormid IS NULL AND p.drug_name=d.name))
 WHERE g.in_pgx=TRUE OR g.in_cpic=TRUE OR g.has_cpiclevel=TRUE OR g.in_dpwg=TRUE OR g.in_twist=TRUE OR g.in_pharmvar=TRUE OR g.in_cmrg=TRUE OR g.in_pharmcat=TRUE OR p.ensemblid IS NOT NULL
+--AND d.type !='cancer'
 ;
 
 --SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='azathioprine' ORDER by drug_name;
@@ -287,9 +298,9 @@ LIMIT 100;*/
 --DROP MATERIALIZED VIEW prada.harmonised_combined_pgx_gene;
 CREATE MATERIALIZED VIEW prada.harmonised_combined_pgx_gene
 AS
+WITH a AS (
 SELECT
 p.gene_name, p.gene_id, p.chr,
-
 avg(p.bp1) bp1,
 avg(p.bp2) bp2,
 max(p.in_pgx::int) in_pgx_num,
@@ -304,13 +315,23 @@ avg(prada_ehrpriority_num) prada_ehrpriority_avg,
 avg(prada_cpiclevel_num) prada_cpiclevel_avg,
 avg(prada_pgkbcalevel_num) prada_pgkbcalevel_avg,
 avg(prada_usedforrecommendation_num) prada_usedforrecommendation_avg,
+avg(p.drug_weight) prada_drug_weight_avg,
 count(*) num_diplotype
 FROM prada.harmonised_combined_pgx p
-GROUP BY p.gene_name, p.gene_id, p.chr;
+GROUP BY p.gene_name, p.gene_id, p.chr
+) 
+SELECT
+a.*,
+--prada gene prioritissation business rule score
+(1 + COALESCE(in_pgx_num,0)+COALESCE(in_cpic_num,0)+COALESCE(has_cpiclevel_num,0)+COALESCE(in_dpwg_num,0)+COALESCE(in_twist_num,0)+COALESCE(in_pharmvar_num,0)+COALESCE(in_cmrg_num,0)+COALESCE(in_pharmcat_num,0)) --coverage across databases
+*COALESCE(prada_ehrpriority_avg,1)*COALESCE(prada_cpiclevel_avg,1)*COALESCE(prada_pgkbcalevel_avg,1)*COALESCE(prada_usedforrecommendation_avg,1) --database information level
+*COALESCE(prada_drug_weight_avg,1) --Drug weight - less priority on cancer drugs etc
+prada_gene_score
+FROM a;
 
 CREATE UNIQUE INDEX harmonised_combined_pgx_gene_u ON prada.harmonised_combined_pgx_gene (chr,gene_id); -- chr,gene_name is not unique 
-CREATE UNIQUE INDEX harmonised_combined_pgx_gene_i ON prada.harmonised_combined_pgx_gene (chr,bp1,bp2,gene_name,gene_id);
+CREATE UNIQUE INDEX harmonised_combined_pgx_gene_i ON prada.harmonised_combined_pgx_gene (prada_gene_score,chr,bp1,bp2,gene_name,gene_id);
 
 --REFRESH MATERIALIZED VIEW prada.harmonised_combined_pgx_gene;
 
---SELECT * FROM prada.harmonised_combined_pgx_gene;
+--SELECT * FROM prada.harmonised_combined_pgx_gene ORDER BY prada_gene_score DESC;

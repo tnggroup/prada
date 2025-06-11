@@ -32,5 +32,17 @@ CREATE TABLE prada.variant
 );
 COMMENT ON TABLE prada.variant IS 'Custom project data on variants. To hold for example anchor information';
 
+-- DROP TABLE prada.drug;
+CREATE TABLE prada.drug
+(
+	rxnormid varchar(20), --should match the cpic rxnormid
+	name varchar(100), --in case we don't have the id
+    type text DEFAULT 'generic',
+    weight double precision DEFAULT 1.0
+    --CONSTRAINT drug_pkey PRIMARY KEY (rxnormid,name)
+);
+COMMENT ON TABLE prada.drug IS 'Custom project data on drugs. To prioritise drugs to include in the analyses.';
+CREATE UNIQUE INDEX drug_u ON prada.drug (rxnormid,name);
+
 
 COMMIT;

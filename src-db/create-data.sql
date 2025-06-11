@@ -41,3 +41,8 @@ UPDATE prada.chromosome SET name=p.name FROM prev_chrom p WHERE chromosome.numbe
 --Harmonise the pgx_gene custom data with gencode gene codes
 UPDATE prada.pgx_gene pg SET "Gene"='GBA1' WHERE "Gene"='GBA';
 
+
+--insert drug data
+--pharmgkb cancer - cancer_drugs_pharmgkb.tsv
+INSERT INTO prada.drug(name,type,weight) SELECT cdp.drug, 'cancer',0.5 FROM prada.cancer_drugs_pharmgkb cdp;
+
