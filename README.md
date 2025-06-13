@@ -2,10 +2,10 @@
 An R package or scripts for the PRADA project
 
 ## Project Structure
-prada/
-├── data/       # Raw and/or processed datasets
-├── scripts/    # R and Python scripts for data analysis and processing
-├── README.md   # Project description and structure
+prada/  
+├── data/       # Raw and/or processed datasets  
+├── scripts/    # R and Python scripts for data analysis and processing  
+└── README.md   # Project description and structure 
 
 ## Requirements
 - python 3.11.1
