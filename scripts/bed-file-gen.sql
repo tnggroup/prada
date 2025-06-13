@@ -202,3 +202,6 @@ SELECT
 --       ON u.pgx_gene = pgx."Gene"
 --WHERE  u.pgx_gene IS NULL
 --ORDER  BY pgx."Gene";
+
+
+--  BED file: extended columns -----------------------------------------------------------------
