@@ -24,13 +24,20 @@ CREATE INDEX pgx_gene_i ON prada.pgx_gene ("Gene"); --Let's keep this non-unique
 -- DROP TABLE prada.variant;
 CREATE TABLE prada.variant
 (
-	type text NOT NULL,
-    CHR integer NOT NULL,
-    BP integer NOT NULL,
-    W double precision,
-    CONSTRAINT variant_pkey PRIMARY KEY (type,CHR,BP)
+	type smallint NOT NULL, --1: GWAS, 2: CNV
+	snp text NOT NULL,
+    chr smallint NOT NULL,
+    bp integer NOT NULL,
+    bp2 integer,
+    mdd_p numeric,
+    mdd_beta numeric,
+    mdd_beta_se numeric,
+    mdd_beta_n numeric,
+    CONSTRAINT variant_pkey PRIMARY KEY (type,snp)
 );
 COMMENT ON TABLE prada.variant IS 'Custom project data on variants. To hold for example anchor information';
+CREATE INDEX variant_i ON prada.variant (type,snp,chr,bp,bp2);
+CREATE INDEX variant_i2 ON prada.variant (mdd_p,mdd_beta,mdd_beta_n,mdd_beta_se);
 
 -- DROP TABLE prada.drug;
 CREATE TABLE prada.drug
