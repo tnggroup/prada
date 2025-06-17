@@ -49,3 +49,5 @@ INSERT INTO prada.drug(name,type,weight) SELECT cdp.drug, 'cancer',0.5 FROM prad
 --insert IDP GWAS data
 INSERT INTO prada.variant(type,snp,chr,bp,bp2,mdd_p,mdd_beta,mdd_beta_se,mdd_beta_n) SELECT d.type, d.snp, d.chr, d.bp, d.bp2, d.mdd_p, d.mdd_beta, d.mdd_beta_se, d.mdd_n FROM prada.idp38_import d;
 
+--insert MDD CNV Data
+INSERT INTO prada.variant(type,snp,chr,bp,bp2,mdd_p) SELECT d.type, d.snp, d.chr, d.bp, d.bp2, d.mdd_p FROM prada."mmddcnv0index.b38.bed" d;
