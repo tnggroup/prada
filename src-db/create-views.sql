@@ -179,6 +179,7 @@ SELECT
 --cpicg.chr cpicchr,
 --pgx."Gene",
 g.chr,
+c.number AS chrn,
 g.bp1,
 g.bp2,
 g.gene_name,
@@ -216,8 +217,8 @@ LEFT OUTER JOIN prada.pgx_gene pgx ON g.gene_name=pgx."Gene" --OR cpicg.genesymb
 INNER JOIN prada.chromosome c ON g.chr = c.name OR cpicg.chr = c.name
 ;
 
-CREATE UNIQUE INDEX harmonised_gene_u ON prada.harmonised_gene (chr,gene_id); -- chr,gene_name is not unique 
-CREATE UNIQUE INDEX harmonised_gene_i ON prada.harmonised_gene (chr,bp1,bp2,gene_name,gene_id);
+CREATE UNIQUE INDEX harmonised_gene_u ON prada.harmonised_gene (chrn,gene_id); -- chr,gene_name is not unique 
+CREATE UNIQUE INDEX harmonised_gene_i ON prada.harmonised_gene (chrn,bp1,bp2,gene_name,gene_id);
 
 --REFRESH MATERIALIZED VIEW prada.harmonised_gene;
 
@@ -234,6 +235,7 @@ CREATE UNIQUE INDEX harmonised_gene_i ON prada.harmonised_gene (chr,bp1,bp2,gene
 CREATE OR REPLACE VIEW prada.harmonised_combined_pgx
 AS SELECT
 g.chr,
+g.chrn,
 g.bp1,
 g.bp2,
 g.gene_name,
@@ -300,7 +302,7 @@ CREATE MATERIALIZED VIEW prada.harmonised_combined_pgx_gene
 AS
 WITH a AS (
 SELECT
-p.gene_name, p.gene_id, p.chr,
+p.gene_name, p.gene_id, (p.chrn::integer) AS chr,
 avg(p.bp1) bp1,
 avg(p.bp2) bp2,
 max(p.in_pgx::int) in_pgx_num,
@@ -318,7 +320,7 @@ avg(prada_usedforrecommendation_num) prada_usedforrecommendation_avg,
 avg(p.drug_weight) prada_drug_weight_avg,
 count(*) num_diplotype
 FROM prada.harmonised_combined_pgx p
-GROUP BY p.gene_name, p.gene_id, p.chr
+GROUP BY p.gene_name, p.gene_id, p.chrn
 ) 
 SELECT
 a.*,

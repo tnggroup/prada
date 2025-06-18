@@ -6,35 +6,108 @@
 
 -- The BED format: https://genome.ucsc.edu/FAQ/FAQformat.html#format1
 
---DROP FUNCTION prada.get_application_coverage_regions;
+--DROP FUNCTION prada.get_coverage_regions;
 
-CREATE OR REPLACE FUNCTION prada.get_application_coverage_regions
+CREATE OR REPLACE FUNCTION prada.get_coverage_regions
 (
-	nPrioritisedGenes integer DEFAULT 300,
 	paddingGeneBp integer DEFAULT 10000,
-	paddingPRSAnchorBp integer DEFAULT 10000,
-	anchorTypes text[] DEFAULT NULL --not used yet
+	paddingVariantCnvBp integer DEFAULT 10000,
+	paddingVariantSnpBp integer DEFAULT 5000,
+	nPrioritisedGene integer DEFAULT 300,
+	nPrioritisedCnv integer DEFAULT 100,
+	nPrioritisedSnp integer DEFAULT 200000,
+	nPrioritisedTotal integer DEFAULT 25000,
+	wGene double precision DEFAULT 1e20,
+	wVariantCnv double precision DEFAULT 1e6,
+	wVariantSnp double precision DEFAULT 1
 ) RETURNS int AS $$
 DECLARE
     nid int = NULL;
 BEGIN
 	--use $ -notation if there is a collision between argument names and column names
 	
-	DROP TABLE IF EXISTS t_coverage_genes;
-	CREATE TEMP TABLE IF NOT EXISTS t_coverage_genes AS
-	WITH g AS 
+	--attempt at unified handling of regions/variants
+	DROP TABLE IF EXISTS t_coverage_region;
+	CREATE TEMP TABLE IF NOT EXISTS t_coverage_region AS
+	WITH v AS 
 	(
 		SELECT 
-		g.*,
-		
-		(g.bp1-paddingGeneBp) abp1,
-		(g.bp2+paddingGeneBp) abp2,
+		v.type,
+		v.label,
+		v.id,
+		v.chr,
+		c.name chr_name,
+		v.bp1,
+		v.bp2,
+		v.p,
+		v.w,
+		CASE 
+			WHEN v.type=0 THEN (v.bp1-paddingGeneBp) --paddingGeneBp
+			WHEN v.type=2 THEN (v.bp1-paddingVariantCnvBp) --paddingVariantCnvBp
+			ELSE (v.bp1-paddingVariantSnpBp) --paddingVariantSnpBp
+		END abp1,
+		CASE 
+			WHEN v.type=0 THEN (v.bp2+paddingGeneBp) --paddingGeneBp
+			WHEN v.type=2 THEN (v.bp2+paddingVariantCnvBp) --paddingVariantCnvBp
+			ELSE (v.bp2+paddingVariantSnpBp) --paddingVariantSnpBp
+		END abp2,
 		c.sizebp chromosome_sizebp
-		FROM prada.harmonised_combined_pgx_gene g
-		INNER JOIN prada.chromosome c ON g.chr=c.name
-	), g2 AS (
+		FROM (
+			(
+				SELECT 
+				0 AS type,
+				g.gene_name AS label,
+				g.gene_id AS id,
+				(g.chr::integer) AS chr,
+				g.bp1,
+				g.bp2,
+				NULL AS p,
+				(wGene/1.0)::double precision AS w  --wGene
+				FROM prada.harmonised_combined_pgx_gene g
+				ORDER BY prada_gene_score DESC, (g.bp2-g.bp1) DESC, gene_name
+				LIMIT nPrioritisedGene --nPrioritisedGene
+			)
+			UNION
+			(
+				SELECT 
+				2 AS type,
+				vcnv.snp AS label,
+				NULL AS id,
+				vcnv.chr,
+				vcnv.bp AS bp1,
+				vcnv.bp2,
+				vcnv.mdd_p AS p,
+				(wVariantCnv/vcnv.mdd_p)::double precision AS w  --wVariantCnv
+				FROM prada.variant vcnv
+				WHERE vcnv.type=2
+				ORDER BY mdd_p ASC, (vcnv.bp2-vcnv.bp) DESC, snp
+				LIMIT nPrioritisedGene --nPrioritisedGene
+			)
+			UNION
+			(
+				SELECT 
+				1 AS type,
+				vsnp.snp AS label,
+				vsnp.snp AS id,
+				vsnp.chr,
+				vsnp.bp AS bp1,
+				CASE 
+					WHEN vsnp.bp2 IS NULL THEN vsnp.bp
+					ELSE vsnp.bp2
+				END AS bp2,
+				vsnp.mdd_p AS p,
+				(wVariantSnp/vsnp.mdd_p)::double precision AS w  --wVariantSnp
+				FROM prada.variant vsnp
+				WHERE vsnp.type=1
+				ORDER BY mdd_p ASC, chr, snp
+				LIMIT nPrioritisedSnp --nPrioritisedSnp
+			)
+			
+		) v
+		INNER JOIN prada.chromosome c ON v.chr=c.number
+	), v2 AS (
 		SELECT 
-		g.*,
+		v.*,
 		(
 		CASE
 			WHEN abp1<0 THEN 0
@@ -47,28 +120,52 @@ BEGIN
 			ELSE abp2
 		END
 		) abp2_trimmed
-		FROM g
+		FROM v
 	)
 	SELECT 
-	g2.*,
-	(g2.abp2_trimmed-g2.abp1_trimmed) coveragebp,
-	((g2.abp2_trimmed-g2.abp1_trimmed)/chromosome_sizebp) coveragecf
-	FROM g2
-	ORDER BY prada_gene_score DESC
-	LIMIT nPrioritisedGenes;
+	v2.*,
+	(v2.abp2_trimmed-v2.abp1_trimmed)::double precision coveragebp,
+	((v2.abp2_trimmed-v2.abp1_trimmed)::double precision/(chromosome_sizebp::double precision)) coveragecf
+	FROM v2
+	ORDER BY w DESC, coveragebp DESC, chr, label
+	LIMIT nPrioritisedTotal; --nPrioritisedTotal
 
 	RETURN nid;
 END;
 $$ LANGUAGE plpgsql;
 
---SELECT * FROM prada.get_application_coverage_regions();
---SELECT * FROM t_coverage_genes;
---SELECT g.chr, sum(g.coveragecf), sum(g.coveragebp) FROM t_coverage_genes g GROUP BY g.chr; -- per chromosome
+--SELECT * FROM prada.get_coverage_regions(nPrioritisedTotal=>20000);
+--SELECT * FROM t_coverage_region;
+--SELECT * FROM t_coverage_region WHERE type=2;
+--SELECT g.chr, sum(g.coveragecf), sum(g.coveragebp) FROM t_coverage_region g GROUP BY g.chr; -- per chromosome
+--WITH c AS (SELECT sum(sizebp) gsize FROM prada.chromosome c)
+--SELECT sum(g.coveragebp) totalbp, sum(g.coveragebp::double precision)/c.gsize totalf
+--FROM t_coverage_region g INNER JOIN c ON TRUE
+--GROUP BY c.gsize
+--;
+
+--SELECT * FROM prada.get_coverage_regions();
+--SELECT * FROM t_coverage_gene;
+--SELECT g.chr, sum(g.coveragecf), sum(g.coveragebp) FROM t_coverage_gene g GROUP BY g.chr; -- per chromosome
 --WITH c AS (SELECT sum(sizebp) gsize FROM prada.chromosome c)
 --SELECT sum(g.coveragebp) totalbp, sum(g.coveragebp)/c.gsize totalf
---FROM t_coverage_genes g INNER JOIN c ON TRUE
+--FROM t_coverage_gene g INNER JOIN c ON TRUE
 --GROUP BY c.gsize --gsize = 3088269832
 --; --20541620bp, 0.00665149780215189435
+
+--SELECT * FROM prada.get_coverage_regions();
+--SELECT * FROM t_coverage_variant_cnv;
+--SELECT g.chr, sum(g.coveragecf), sum(g.coveragebp) FROM t_coverage_variant_cnv g GROUP BY g.chr; -- per chromosome
+--WITH c AS (SELECT sum(sizebp) gsize FROM prada.chromosome c)
+--SELECT sum(g.coveragebp) totalbp, sum(g.coveragebp::double precision)/c.gsize totalf
+--FROM t_coverage_variant_cnv g INNER JOIN c ON TRUE
+--GROUP BY c.gsize --gsize = 3088269832
+--; --46356338bp, 0.0150104558609696
+
+
+
+
+
 
 --SELECT * FROM t_coverage_genes a INNER JOIN t_coverage_genes b ON a.chr=b.chr AND 
 --(

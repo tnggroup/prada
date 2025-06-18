@@ -106,14 +106,60 @@ PradaPgDatabaseUtilityClass$methods(
 # )
 
 PradaPgDatabaseUtilityClass$methods(
-  selectApplicationCoverageRegions=function(){
-    q <- dbSendQuery(connection,
-                     "SELECT * FROM prada.get_application_coverage_regions()")
+  selectApplicationCoverageRegions=function(
+    paddingGeneBp=10000,
+    paddingVariantCnvBp=10000,
+    paddingVariantSnpBp=5000,
+    nPrioritisedGene=300,
+    nPrioritisedCnv=100,
+    nPrioritisedSnp=200000,
+    nPrioritisedTotal=25000,
+    wGene=1e20,
+    wVariantCnv=1e6,
+    wVariantSnp=1
+    ){
+
+    # paddingGeneBp integer DEFAULT 10000,
+    # paddingVariantCnvBp integer DEFAULT 10000,
+    # paddingVariantSnpBp integer DEFAULT 5000,
+    # nPrioritisedGene integer DEFAULT 300,
+    # nPrioritisedCnv integer DEFAULT 100,
+    # nPrioritisedSnp integer DEFAULT 200000,
+    # nPrioritisedTotal integer DEFAULT 100000,
+    # wGene double precision DEFAULT 1e20,
+    # wVariantCnv double precision DEFAULT 1e6,
+    # wVariantSnp double precision DEFAULT 1
+
+    qString <- "SELECT * FROM prada.get_coverage_regions(
+                        paddingGeneBp=>$1,
+                        paddingVariantCnvBp=>$2,
+                        paddingVariantSnpBp=>$3,
+                        nPrioritisedGene=>$4,
+                        nPrioritisedCnv=>$5,
+                        nPrioritisedSnp=>$6,
+                        nPrioritisedTotal=>$7,
+                        wGene=>$8,
+                        wVariantCnv=>$9,
+                        wVariantSnp=>$10
+                     )"
+    lQArguments<-list(
+      paddingGeneBp,
+      paddingVariantCnvBp,
+      paddingVariantSnpBp,
+      nPrioritisedGene,
+      nPrioritisedCnv,
+      nPrioritisedSnp,
+      nPrioritisedTotal,
+      wGene,
+      wVariantCnv,
+      wVariantSnp
+      )
+    q <- dbSendQuery(connection,qString,lQArguments)
     res<-dbFetch(q)
     dbClearResult(q)
 
     q <- dbSendQuery(connection,
-                     "SELECT * FROM t_coverage_genes")
+                     "SELECT * FROM t_coverage_regions") #CHANGE THIS AFTER FILTERING ADDON!
     res<-dbFetch(q)
     dbClearResult(q)
     return(res)
