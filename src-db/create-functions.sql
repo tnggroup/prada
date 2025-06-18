@@ -72,7 +72,7 @@ BEGIN
 				SELECT 
 				2 AS type,
 				vcnv.snp AS label,
-				NULL AS id,
+				vcnv.snp AS id,
 				vcnv.chr,
 				vcnv.bp AS bp1,
 				vcnv.bp2,
@@ -107,34 +107,52 @@ BEGIN
 		INNER JOIN prada.chromosome c ON v.chr=c.number
 	), v2 AS (
 		SELECT 
-		v.*,
+		v.type,
+		v.label,
+		v.id,
+		v.chr,
+		v.chr_name,
+		v.bp1,
+		v.bp2,
+		v.p,
+		v.w,
 		(
 		CASE
 			WHEN abp1<0 THEN 0
 			ELSE abp1
 		END
-		) abp1_trimmed,
+		) abp1, --trimmed version
 		(
 		CASE
 			WHEN abp2>chromosome_sizebp THEN chromosome_sizebp
 			ELSE abp2
 		END
-		) abp2_trimmed
+		) abp2, --trimmed version
+		v.chromosome_sizebp
 		FROM v
 	)
-	SELECT 
+	SELECT
+	ROW_NUMBER() OVER (ORDER BY w DESC, (v2.abp2-v2.abp1)::double precision DESC, chr, label) cid, 
 	v2.*,
-	(v2.abp2_trimmed-v2.abp1_trimmed)::double precision coveragebp,
-	((v2.abp2_trimmed-v2.abp1_trimmed)::double precision/(chromosome_sizebp::double precision)) coveragecf
+	(v2.abp2-v2.abp1)::double precision coveragebp,
+	((v2.abp2-v2.abp1)::double precision/(chromosome_sizebp::double precision)) coveragecf
 	FROM v2
 	ORDER BY w DESC, coveragebp DESC, chr, label
 	LIMIT nPrioritisedTotal; --nPrioritisedTotal
+
+
+	UPDATE t_coverage_region 
+	SET id= chr_name||':'||bp1||'-'||bp2
+	WHERE id IS NULL;
 
 	RETURN nid;
 END;
 $$ LANGUAGE plpgsql;
 
---SELECT * FROM prada.get_coverage_regions(nPrioritisedTotal=>20000);
+
+--SELECT DISTINCT r.id FROM t_coverage_region r;
+
+--SELECT * FROM prada.get_coverage_regions(nPrioritisedTotal=>25000);
 --SELECT * FROM t_coverage_region;
 --SELECT * FROM t_coverage_region WHERE type=2;
 --SELECT g.chr, sum(g.coveragecf), sum(g.coveragebp) FROM t_coverage_region g GROUP BY g.chr; -- per chromosome
@@ -164,7 +182,175 @@ $$ LANGUAGE plpgsql;
 
 
 
+--SELECT * FROM prada.get_coverage_regions(nPrioritisedTotal=>500);
+--SELECT * FROM t_coverage_region;
+CREATE OR REPLACE FUNCTION prada.filter_coverage_regions() RETURNS int AS $$
+DECLARE
+    nid int = NULL;
+	overlap_record RECORD = NULL;
+BEGIN
 
+	DROP TABLE IF EXISTS t_coverage_region_filtered;
+	CREATE TEMP TABLE IF NOT EXISTS t_coverage_region_filtered AS
+	SELECT 
+	--ROW_NUMBER() OVER (ORDER BY w DESC, coveragebp DESC, chr, label) cid,
+	t_coverage_region.* 
+	FROM t_coverage_region;
+
+	--compltely inclusive overlaps (typical of snps?)
+	DELETE FROM t_coverage_region_filtered
+	USING (
+			SELECT
+				r1.cid r1_id,
+				r1.abp1 r1_abp1,
+				r1.abp2 r1_abp2,
+				r1.coveragebp r1_coveragebp,
+				r2.cid r2_id,
+				r2.abp1 r2_abp1,
+				r2.abp2 r2_abp2,
+				r2.coveragebp r2_coveragebp
+--				CASE
+--					WHEN r1.coveragebp>r2.coveragebp THEN r1.coveragebp
+--					ELSE r2.coveragebp
+--				END max_coveragebp
+			FROM
+			t_coverage_region_filtered r1 INNER JOIN t_coverage_region_filtered r2 
+			ON r1.chr=r2.chr AND r1.abp2>r2.abp1 AND r1.abp1>r2.abp1 AND r1.abp2<r2.abp2 AND r1.cid!=r2.cid
+		) o
+	WHERE cid=o.r1_id;
+
+
+	-- difficult overlaps
+	LOOP
+		DROP TABLE IF EXISTS t_coverage_region_difficult_overlaps;
+		CREATE TEMP TABLE IF NOT EXISTS t_coverage_region_difficult_overlaps AS
+		SELECT
+			r1.chr,
+			r1.cid r1_cid,
+			r1.abp1 r1_abp1,
+			r1.abp2 r1_abp2,
+			r1.coveragebp r1_coveragebp,
+			r2.cid r2_cid,
+			r2.abp1 r2_abp1,
+			r2.abp2 r2_abp2,
+			r2.coveragebp r2_coveragebp,
+			CASE
+				WHEN r1.coveragebp>r2.coveragebp THEN r1.coveragebp
+				ELSE r2.coveragebp
+			END max_coveragebp
+		FROM
+		t_coverage_region_filtered r1 INNER JOIN t_coverage_region_filtered r2 ON r1.chr=r2.chr AND r1.abp2>r2.abp1 AND r1.abp1<=r2.abp1 AND r1.abp2<=r2.abp2 AND r1.cid!=r2.cid
+		ORDER BY max_coveragebp DESC;
+
+		--SELECT * FROM t_coverage_region_difficult_overlaps;
+		--SELECT * FROM t_coverage_region_difficult_overlaps WHERE r1_cid=477 OR r2_cid=477;
+		
+		SELECT INTO overlap_record * FROM
+		(
+			SELECT * FROM t_coverage_region_difficult_overlaps
+			LIMIT 1
+		) s;
+
+		IF NOT FOUND
+		THEN
+			EXIT; -- exit loop
+		END IF;
+
+
+		IF overlap_record.r1_cid IS NULL
+		THEN
+			EXIT;
+		END IF;
+
+		--RAISE NOTICE '>%', overlap_record.r1_id;
+
+		--SELECT * FROM t_coverage_region_difficult_overlaps;
+		--SELECT * FROM t_coverage_region_filtered;
+
+		RAISE NOTICE '>%', (SELECT COUNT(*) FROM t_coverage_region_filtered);
+
+		--region 1 is large: set bp2 as region 2
+
+		DROP TABLE IF EXISTS t_difficult_overlap_updates;
+		CREATE TEMP TABLE IF NOT EXISTS t_difficult_overlap_updates AS
+		WITH u AS (
+		UPDATE t_coverage_region_filtered f
+		SET abp2=o.r2_abp2
+		FROM (
+				SELECT chr, r1_cid, r1_abp1, r1_abp2, r1_coveragebp, MAX(r2_abp2) r2_abp2
+				FROM t_coverage_region_difficult_overlaps o
+				WHERE o.r1_coveragebp >= o.r2_coveragebp
+				GROUP BY o.chr, o.r1_cid, o.r1_abp1, o.r1_abp2, o.r1_coveragebp
+			) AS o
+		WHERE f.chr=o.chr AND f.cid=o.r1_cid
+		RETURNING f.chr, f.cid)
+		SELECT * FROM u;
+
+		--SELECT * FROM t_difficult_overlap_updates;
+	
+		DELETE FROM t_coverage_region_filtered f
+		USING t_coverage_region_difficult_overlaps o, t_difficult_overlap_updates u
+		WHERE f.chr=o.chr AND u.cid=o.r1_cid AND f.cid=o.r2_cid;
+		--SELECT * FROM t_coverage_region_filtered;
+
+--		SELECT f.* FROM t_coverage_region_difficult_overlaps o, t_coverage_region_filtered f, t_difficult_overlap_updates u
+--		WHERE f.chr=o.chr AND u.cid=o.r1_cid AND f.cid=o.r2_cid;
+
+--		SELECT o.* FROM t_coverage_region_difficult_overlaps o, t_coverage_region_filtered f, t_difficult_overlap_updates u
+--		WHERE f.chr=o.chr AND u.cid=o.r1_cid AND f.cid=o.r2_cid
+--		AND f.cid=477;
+	
+		--region 2 is large: set bp1 as region 1
+		DROP TABLE IF EXISTS t_difficult_overlap_updates;
+		CREATE TEMP TABLE IF NOT EXISTS t_difficult_overlap_updates AS
+		WITH u AS (
+		UPDATE t_coverage_region_filtered f
+		SET abp1=o.r1_abp1
+		FROM (
+				SELECT chr, r2_cid, r2_abp1, r2_abp2, r2_coveragebp, MAX(r1_abp1) r1_abp1
+				FROM t_coverage_region_difficult_overlaps o
+				WHERE o.r1_coveragebp < o.r2_coveragebp
+				GROUP BY o.chr, o.r2_cid, o.r2_abp1, o.r2_abp2, o.r2_coveragebp
+			) AS o
+		WHERE f.chr=o.chr AND f.cid=o.r2_cid
+		RETURNING f.chr, f.cid)
+		SELECT * FROM u;
+
+		--SELECT * FROM t_difficult_overlap_updates;
+	
+		DELETE FROM t_coverage_region_filtered f
+		USING t_coverage_region_difficult_overlaps o, t_difficult_overlap_updates u
+		WHERE f.chr=o.chr AND u.cid=o.r2_cid AND f.cid=o.r1_cid;
+		--SELECT * FROM t_coverage_region_filtered;
+
+--		SELECT o.* FROM t_coverage_region_difficult_overlaps o, t_coverage_region_filtered f
+--		WHERE o.r1_coveragebp < o.r2_coveragebp AND f.id=o.r1_id;
+		
+		UPDATE t_coverage_region_filtered
+		SET coveragebp = (abp2-abp1)::double precision,coveragecf = ((abp2-abp1)::double precision/(chromosome_sizebp::double precision)); 
+
+		--SELECT * FROM t_coverage_region_filtered;
+	
+	END LOOP;
+
+	RETURN nid;
+
+END;
+$$ LANGUAGE plpgsql;
+
+--SELECT * FROM prada.filter_coverage_regions();
+--SELECT * FROM t_coverage_region_filtered;
+--
+--
+--SELECT r.cid,r.chr,r.id,r.abp1,r.abp2,r.coveragebp,f.cid,f.abp1,f.abp2,f.coveragebp
+--FROM t_coverage_region r LEFT OUTER JOIN t_coverage_region_filtered f 
+--ON r.chr=f.chr AND ((r.abp1 > (f.abp1-1) AND r.abp1<(f.abp2+1)) OR (r.abp2 > (f.abp1-1) AND r.abp2<(f.abp2+1)))
+--ORDER BY r.coveragebp DESC;
+
+
+
+
+--AND f.id IS NULL;
 
 
 --SELECT * FROM t_coverage_genes a INNER JOIN t_coverage_genes b ON a.chr=b.chr AND 
