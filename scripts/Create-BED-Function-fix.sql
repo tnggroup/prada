@@ -1,8 +1,6 @@
 -- The BED format: https://genome.ucsc.edu/FAQ/FAQformat.html#format1
 -- Pharmgkb score => clinical annotation levels: https://www.pharmgkb.org/page/clinAnnLevels
 
---ALTER FUNCTION prada.get_coverage_regions() OWNER TO tng2501;
-
 CREATE OR REPLACE FUNCTION prada."get_coverage_regions-test"
 (
         paddingGeneBp integer DEFAULT 10000,
@@ -238,10 +236,8 @@ $$ LANGUAGE plpgsql;
 
 
 
--- Use the name of the function you successfully created
 SELECT prada."get_coverage_regions-test"(); 
 
--- This shows you all the calculated coverage regions and their details
 SELECT * FROM t_coverage_region;
 SELECT
     chr_name,   -- The chromosome name
@@ -252,4 +248,4 @@ FROM
     t_coverage_region
 ORDER BY
     chr,        -- Sort by the numeric chromosome number for correct order (1, 2, ... 10)
-    abp1;       -- Then sort by the start position
+    abp1;       -- sort by the start position
