@@ -113,54 +113,174 @@ ORDER  BY chr, start0;
 --  BED file: four columns + comment column (match rule)
 WITH sym_match AS (
   SELECT DISTINCT ON (pgx."Gene")
-         pgx."Gene"                 AS pgx_gene,
+         pgx."Gene"        AS pgx_gene,
          g.chr,
-         g.bp1 - 1                  AS start0,          -- BED 0-based
-         g.bp2                      AS end1,            -- BED end
+         g.bp1 - 1         AS start0,  -- BED 0-based
+         g.bp2             AS end1,    -- BED end
          g.gene_name,
          g.gene_id,
-         'symbol'::text             AS match_rule
+         'symbol'::text    AS match_rule
   FROM   prada.pgx_gene      pgx
   JOIN   prada.gencode_gene  g
          ON LOWER(g.gene_name) = LOWER(pgx."Gene")
-  WHERE  g.chr LIKE 'chr%'                             -- primary assembly
+  WHERE  g.chr LIKE 'chr%'   -- primary assembly
   ORDER  BY pgx."Gene", g.bp1
-), id_match AS (
+), 
+id_match AS (
   SELECT DISTINCT ON (pgx."Gene")
-         pgx."Gene"                 AS pgx_gene,
+         pgx."Gene"        AS pgx_gene,
          g.chr,
-         g.bp1 - 1                  AS start0,
-         g.bp2                      AS end1,
+         g.bp1 - 1         AS start0,
+         g.bp2             AS end1,
          g.gene_name,
          g.gene_id,
-         'ensembl'::text            AS match_rule
+         'ensembl'::text   AS match_rule
   FROM   prada.pgx_gene      pgx
-  JOIN   cpic.gene           c  ON  c.symbol   = pgx."Gene"
-  JOIN   prada.gencode_gene  g  ON  g.gene_id  = c.ensemblid
-  WHERE  pgx."Gene" NOT IN (SELECT pgx_gene FROM sym_match)   -- fallback only
+  JOIN   cpic.gene           c  ON  c.symbol = pgx."Gene"
+  JOIN   prada.gencode_gene  g  ON  g.gene_id = c.ensemblid
+  WHERE  pgx."Gene" NOT IN (SELECT pgx_gene FROM sym_match) -- fallback only
     AND  g.chr LIKE 'chr%'
   ORDER  BY pgx."Gene", g.bp1
-), union_matches AS (
+), 
+union_matches AS (
   SELECT * FROM sym_match
   UNION ALL
   SELECT * FROM id_match
+), 
+gene_overlaps AS (
+  SELECT
+      a.pgx_gene  AS gene1,
+      b.pgx_gene  AS gene2,
+      a.chr,
+      a.start0    AS gene1_start,
+      a.end1      AS gene1_end,
+      b.start0    AS gene2_start,
+      b.end1      AS gene2_end
+  FROM union_matches a
+  JOIN union_matches b
+    ON a.chr = b.chr
+   AND a.pgx_gene <> b.pgx_gene
+   AND a.start0 < b.end1
+   AND b.start0 < a.end1
 )
 SELECT
-      chr,
-      start0 as chromStart ,
-      end1 as chromEnd ,
-      pgx_gene AS name   -- 4th BED column
-  FROM   union_matches
-  ORDER  BY
-      /* numeric chr 1-22 → 1-22,   chrX=23, chrY=24, chrM/chrMT=25 */
-      CASE
-          WHEN chr = 'chrX'                   THEN 23
-          WHEN chr = 'chrY'                   THEN 24
-          WHEN chr IN ('chrM','chrMT')        THEN 25
-          WHEN chr ~ '^chr[0-9]+$'            THEN CAST(substr(chr,4) AS int)
-          ELSE 99
-      END,
-      start0;
+    um.chr,
+    um.start0 AS chromStart,
+    um.end1   AS chromEnd,
+    um.pgx_gene AS name,  -- 4th BED column
+    EXISTS (
+        SELECT 1
+        FROM gene_overlaps go
+        WHERE go.gene1 = um.pgx_gene
+    ) AS has_overlap
+FROM union_matches um
+ORDER BY
+    CASE
+        WHEN um.chr = 'chrX' THEN 23
+        WHEN um.chr = 'chrY' THEN 24
+        WHEN um.chr IN ('chrM','chrMT') THEN 25
+        WHEN um.chr ~ '^chr[0-9]+$' THEN CAST(substr(um.chr, 4) AS int)
+        ELSE 99
+    END,
+    um.start0;
+
+
+----Experimental comma seperated genes ------
+WITH sym_match AS (
+  SELECT DISTINCT ON (pgx."Gene")
+         pgx."Gene"        AS pgx_gene,
+         g.chr,
+         g.bp1 - 1         AS start0,  -- BED 0-based
+         g.bp2             AS end1,    -- BED end
+         g.gene_name,
+         g.gene_id,
+         'symbol'::text    AS match_rule
+  FROM   prada.pgx_gene      pgx
+  JOIN   prada.gencode_gene  g
+         ON LOWER(g.gene_name) = LOWER(pgx."Gene")
+  WHERE  g.chr LIKE 'chr%'
+  ORDER  BY pgx."Gene", g.bp1
+),
+id_match AS (
+  SELECT DISTINCT ON (pgx."Gene")
+         pgx."Gene"        AS pgx_gene,
+         g.chr,
+         g.bp1 - 1         AS start0,
+         g.bp2             AS end1,
+         g.gene_name,
+         g.gene_id,
+         'ensembl'::text   AS match_rule
+  FROM   prada.pgx_gene      pgx
+  JOIN   cpic.gene           c  ON  c.symbol = pgx."Gene"
+  JOIN   prada.gencode_gene  g  ON  g.gene_id = c.ensemblid
+  WHERE  pgx."Gene" NOT IN (SELECT pgx_gene FROM sym_match)
+    AND  g.chr LIKE 'chr%'
+  ORDER  BY pgx."Gene", g.bp1
+),
+union_matches AS (           -- chr, start0, end1, pgx_gene
+     SELECT * FROM sym_match
+     UNION ALL
+     SELECT * FROM id_match
+),
+ordered AS (
+    SELECT
+        chr,
+        start0,
+        end1,
+        pgx_gene,
+        MAX(end1) OVER (PARTITION BY chr
+                        ORDER BY start0
+                        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+            AS running_end
+    FROM union_matches
+),
+flagged AS (
+    SELECT
+        chr,
+        start0,
+        end1,
+        pgx_gene,
+        CASE
+            WHEN LAG(running_end) OVER (PARTITION BY chr ORDER BY start0)
+                 IS NULL                                -- very first row
+                 OR
+                 start0 >
+                 LAG(running_end) OVER (PARTITION BY chr ORDER BY start0)
+            THEN 1                                      -- new cluster
+            ELSE 0
+        END AS new_cluster_flag
+    FROM ordered
+),
+clustered AS (
+    SELECT
+        chr,
+        start0,
+        end1,
+        pgx_gene,
+        SUM(new_cluster_flag)
+          OVER (PARTITION BY chr ORDER BY start0
+                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cluster_id
+    FROM flagged
+)SELECT
+    chr,
+    MIN(start0)                                  AS chromStart,
+    MAX(end1)                                    AS chromEnd,
+    STRING_AGG(DISTINCT pgx_gene, ',' ORDER BY pgx_gene) AS name
+FROM   clustered
+GROUP  BY chr, cluster_id
+ORDER  BY
+    CASE                                         -- nice chromosome order
+        WHEN chr = 'chrX'                    THEN  23
+        WHEN chr = 'chrY'                    THEN  24
+        WHEN chr IN ('chrM','chrMT')         THEN  25
+        WHEN chr ~  '^chr[0-9]+$'            THEN  CAST(substr(chr,4) AS int)
+        ELSE  99
+    END,
+    chromStart;
+
+
+
+
 
 /* list pharmacogenes still without any GENCODE hit -- NULL!! */
 --WITH sym_match AS (
@@ -202,3 +322,6 @@ SELECT
 --       ON u.pgx_gene = pgx."Gene"
 --WHERE  u.pgx_gene IS NULL
 --ORDER  BY pgx."Gene";
+
+
+--  BED file: extended columns -----------------------------------------------------------------
