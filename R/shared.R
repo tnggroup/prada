@@ -2,16 +2,28 @@
 # library(DBI)
 # library(RPostgres)
 # library(data.table)
+# library(seqinr)
 
 #general shared package utilities
 pradaPackageVersion.major<-0
 pradaPackageVersion.minor<-1
 pradaPackageVersion.patch<-0
 
-pradaApplicationDAO<-NULL
 pradaCentralDBDefaultHost <- "localhost"
-pradaCentralDBDefaultDbName <- "prada_central"
+pradaCentralDBDefaultUsername <- "tng_prada_system"
+pradaCentralDBDefaultDbName <- "prada_local"
 pradaCentralDBDefaultPort <- 65432
+
+filePathBed<-file.path("..","data","grch38.5k.1p3percent.bed")
+filePathFasta=file.path("..","data","GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz")
+createAdaptedFastaReferenceForCustomBed=function(
+    filePathBed,
+    filePathFasta=file.path("data","GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz")
+){
+  ref <- seqinr::read.fasta(file = filePathFasta)
+  bed <- fread(file = filePathBed, sep = "\t",header = T)
+
+}
 
 #TODO this does not quite remove duplicates? Is this still a problem? Needs more testing.
 #parses and formats the provided column names to the database standard

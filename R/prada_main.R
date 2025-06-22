@@ -24,15 +24,13 @@ PradaClass <- setRefClass("Prada",
 #this is standardised and hard-coded - replace the dao with another for a custom connection
 #connectPradaDatabase("tng_prada_system")
 PradaClass$methods(
-  connectPradaDatabase=function(usernameToUse){
-    #usernameToUse<-"tng_prada_system"
-    cinfo <- c()
-    cinfo$pw <- rstudioapi::askForPassword(prompt = c("Enter database password for user: ",usernameToUse))
-    cinfo$host <- pradaCentralDBDefaultHost
-    cinfo$dbname <- pradaCentralDBDefaultDbName
-    cinfo$user <- usernameToUse
-    cinfo$port <- pradaCentralDBDefaultPort
-    pradaApplicationDAO <<- prada::PradaPgDatabaseUtilityClass(host=cinfo$host, dbname=cinfo$dbname, user=cinfo$user, port=cinfo$port, password= cinfo$pw)
+  connectPradaDatabase=function(hostToUse=NULL,usernameToUse=NULL,passwordToUse=NULL,dbnameToUse=NULL,portToUse=NULL){
+    if(is.null(passwordToUse)) passwordToUse <- rstudioapi::askForPassword(prompt = c("Enter database password for user: ",usernameToUse))
+    if(is.null(hostToUse)) hostToUse <- pradaCentralDBDefaultHost
+    if(is.null(dbnameToUse)) dbnameToUse <- pradaCentralDBDefaultDbName
+    if(is.null(usernameToUse)) usernameToUse <- pradaCentralDBDefaultUsername
+    if(is.null(portToUse)) portToUse <- pradaCentralDBDefaultPort
+    pradaApplicationDAO <<- prada::PradaPgDatabaseUtilityClass(host=hostToUse, dbname=dbnameToUse, user=usernameToUse, port=portToUse, password= passwordToUse)
   }
 )
 
