@@ -5,7 +5,9 @@ PradaClass <- setRefClass("Prada",
                                            fields = list(
                                              pradaApplicationDAO = "ANY",
                                              paddingPRSAnchorBp = "numeric",
-                                             paddingGeneBp = "numeric"
+                                             paddingGeneBp = "numeric",
+                                             applicationCoverageRegions = 'ANY',
+                                             applicationCoverageRegionsFiltered = 'ANY'
                                            ),
                                            methods = list
                                            (

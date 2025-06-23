@@ -18,7 +18,7 @@ CREATE OR REPLACE FUNCTION prada.get_coverage_regions
 	nPrioritisedSnp integer DEFAULT 200000,
 	nPrioritisedTotal integer DEFAULT 25000,
 	wGene double precision DEFAULT 1e20,
-	wVariantCnv double precision DEFAULT 1e6,
+	wVariantCnv double precision DEFAULT 1e7,
 	wVariantSnp double precision DEFAULT 1
 ) RETURNS int AS $$
 DECLARE
@@ -81,7 +81,7 @@ BEGIN
 				FROM prada.variant vcnv
 				WHERE vcnv.type=2
 				ORDER BY mdd_p ASC, (vcnv.bp2-vcnv.bp) DESC, snp
-				LIMIT nPrioritisedGene --nPrioritisedGene
+				LIMIT nPrioritisedCnv --nPrioritisedCnv
 			)
 			UNION
 			(
