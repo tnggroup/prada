@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION prada.get_coverage_regions
 (
 	paddingGeneBp integer DEFAULT 10000,
 	paddingVariantCnvBp integer DEFAULT 10000,
-	paddingVariantSnpBp integer DEFAULT 5000,
+	paddingVariantSnpBp integer DEFAULT 10000,
 	nPrioritisedGene integer DEFAULT 300,
 	nPrioritisedCnv integer DEFAULT 100,
 	nPrioritisedSnp integer DEFAULT 200000,

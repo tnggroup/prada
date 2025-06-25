@@ -19,7 +19,7 @@ computeGenomeCoverage=function(
     writeToThisBedPath=NULL,
     paddingGeneBp=10000,
     paddingVariantCnvBp=10000,
-    paddingVariantSnpBp=5000,
+    paddingVariantSnpBp=10000,
     paddingGroupFinal=10000,
     nPrioritisedGene=300,
     nPrioritisedCnv=100,
@@ -85,9 +85,11 @@ computeGenomeCoverage=function(
 # pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx.grch38.5k.0p7percent.bed",nPrioritisedCnv=0, nPrioritisedSnp=0, nPrioritisedTotal = 5000)
 # pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv.grch38.5k.2p1percent.bed",nPrioritisedSnp=0, nPrioritisedTotal = 5000)
 # #pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.5k.1p3percent.bed",nPrioritisedTotal = 5000) #1e6 CNV weighting
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.5k.2p5percent.bed",nPrioritisedTotal = 5000)
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.50k.5p9percent.bed",nPrioritisedTotal = 50000)
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.100k.9p8percent.bed",nPrioritisedTotal = 100000)
+# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.5k.2p6percent.bed",nPrioritisedTotal = 5000)
+# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.25k.4p5percent.bed",nPrioritisedTotal = 25000)
+# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.50k.7p3percent.bed",nPrioritisedTotal = 50000)
+# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.75k.10p0percent.bed",nPrioritisedTotal = 75000)
+# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.100k.12p8percent.bed",nPrioritisedTotal = 100000)
 
 
 #
@@ -95,9 +97,11 @@ computeGenomeCoverage=function(
 #
 # View(pradaO$applicationCoverageRegionsFiltered)
 
-#PGX: The coverage of the current selection is  20296834 bp or  0.006572235
-#PGX + CNV: The coverage of the current selection is  66340186 bp or  0.02148134
-#nPrioritisedTotal = 5000 :The coverage of the current selection is  38946202 bp or  0.01261101
-#nPrioritisedTotal = 5000 (include all CNV's) : The coverage of the current selection is  76631628 bp or  0.02481377
-#nPrioritisedTotal = 50000 : The coverage of the current selection is  182576580 bp or  0.05911937
-#nPrioritisedTotal = 100000 : The coverage of the current selection is  302578649 bp or  0.09797675
+#PGX:                                   The coverage of the current selection is  20296834 bp or  0.006572235
+#PGX + CNV:                             The coverage of the current selection is  66340186 bp or  0.02148134
+#nPrioritisedTotal = 5000 (no CNV's) :  The coverage of the current selection is  38946202 bp or  0.01261101
+#nPrioritisedTotal = 5000 :             The coverage of the current selection is  79617339 bp or  0.02578056
+#nPrioritisedTotal = 25000 :            The coverage of the current selection is  139605404 bp or  0.04520505
+#nPrioritisedTotal = 50000 :            The coverage of the current selection is  224963114 bp or  0.07284438
+#nPrioritisedTotal = 75000 :            The coverage of the current selection is  309284802 bp or  0.1001482
+#nPrioritisedTotal = 100000 :           The coverage of the current selection is  394041240 bp or  0.1275929
