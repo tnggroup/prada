@@ -182,7 +182,7 @@ $$ LANGUAGE plpgsql;
 
 
 
---SELECT * FROM prada.get_coverage_regions(nPrioritisedTotal=>25000);
+--SELECT * FROM prada.get_coverage_regions(nPrioritisedTotal=>5000);
 --SELECT * FROM t_coverage_region;
 CREATE OR REPLACE FUNCTION prada.filter_coverage_regions() RETURNS int AS $$
 DECLARE
@@ -207,10 +207,14 @@ BEGIN
 		SELECT
 			r1.chr,
 			r1.cid r1_cid,
+			r1.bp1 r1_bp1,
+			r1.bp2 r1_bp2,
 			r1.abp1 r1_abp1,
 			r1.abp2 r1_abp2,
 			r1.coveragebp r1_coveragebp,
 			r2.cid r2_cid,
+			r2.bp1 r2_bp1,
+			r2.bp2 r2_bp2,
 			r2.abp1 r2_abp1,
 			r2.abp2 r2_abp2,
 			r2.coveragebp r2_coveragebp,
@@ -265,6 +269,14 @@ BEGIN
 		WITH u AS (
 		UPDATE t_coverage_region_filtered f
 		SET
+		bp1 =	CASE 
+					WHEN min_r2_bp1 < bp1 THEN min_r2_bp1
+					ELSE bp1
+				END,
+		bp2 =	CASE 
+					WHEN max_r2_bp2 > bp2 THEN max_r2_bp2
+					ELSE bp2
+				END,
 		abp1 =	CASE 
 					WHEN min_r2_abp1 < abp1 THEN min_r2_abp1
 					ELSE abp1
@@ -274,7 +286,7 @@ BEGIN
 					ELSE abp2
 				END
 		FROM (
-				SELECT chr, r1_cid, MIN(r2_abp1) min_r2_abp1, MAX(r2_abp2) max_r2_abp2  --r1_abp1, r1_abp2, r1_coveragebp
+				SELECT chr, r1_cid, MIN(r2_bp1) min_r2_bp1, MAX(r2_bp2) max_r2_bp2, MIN(r2_abp1) min_r2_abp1, MAX(r2_abp2) max_r2_abp2  --r1_abp1, r1_abp2, r1_coveragebp
 				FROM t_coverage_region_difficult_overlaps o
 				--WHERE o.r1_coveragebp > o.r2_coveragebp OR (o.r1_coveragebp = o.r2_coveragebp AND o.r1_cid<o.r2_cid)
 				GROUP BY o.chr, o.r1_cid --, o.r1_abp1, o.r1_abp2, o.r1_coveragebp

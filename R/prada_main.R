@@ -7,7 +7,8 @@ PradaClass <- setRefClass("Prada",
                                              paddingPRSAnchorBp = "numeric",
                                              paddingGeneBp = "numeric",
                                              applicationCoverageRegions = 'ANY',
-                                             applicationCoverageRegionsFiltered = 'ANY'
+                                             applicationCoverageRegionsFiltered = 'ANY',
+                                             applicationCoverageRegionsFilteredPaddedStrands = 'ANY'
                                            ),
                                            methods = list
                                            (
