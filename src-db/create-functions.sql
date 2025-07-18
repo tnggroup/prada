@@ -151,10 +151,10 @@ $$ LANGUAGE plpgsql;
 
 
 --SELECT DISTINCT r.id FROM t_coverage_region r;
-
---SELECT * FROM prada.get_coverage_regions(nPrioritisedTotal=>25000);
+--SELECT * FROM prada.variant WHERE type = 2;
+--SELECT * FROM prada.get_coverage_regions(nPrioritisedTotal=>100000);
 --SELECT * FROM t_coverage_region;
---SELECT * FROM t_coverage_region WHERE type=2;
+--SELECT * FROM t_coverage_region WHERE type=1 AND p<5e-5;
 --SELECT g.chr, sum(g.coveragecf), sum(g.coveragebp) FROM t_coverage_region g GROUP BY g.chr; -- per chromosome
 --WITH c AS (SELECT sum(sizebp) gsize FROM prada.chromosome c)
 --SELECT sum(g.coveragebp) totalbp, sum(g.coveragebp::double precision)/c.gsize totalf

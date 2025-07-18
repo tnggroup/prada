@@ -1,0 +1,70 @@
+# Command wrappers
+
+```sh
+
+srun -p cpu --time 4:00:00 --ntasks 1 --cpus-per-task 6 --mem 32G --pty /bin/bash
+
+```
+
+## PGS feasibility check across region coverages
+
+We measure the performance of PGS with the coverace of polygenic regions. We compare to the genome-wide case, using GLAD+ genotyped data.
+
+```sh
+
+sbatch --time 3:00:00 --partition cpu --job-name="munge" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R MDDIDP" --output "prs.munge.cojo.MDDIDP.$(date +%Y%m%d).out.txt"
+sbatch --time 3:00:00 --partition cpu --job-name="munge" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R BIPO03" --output "prs.munge.cojo.BIPO03.$(date +%Y%m%d).out.txt"
+sbatch --time 3:00:00 --partition cpu --job-name="munge" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R ADHD06" --output "prs.munge.cojo.ADHD06.$(date +%Y%m%d).out.txt"
+sbatch --time 3:00:00 --partition cpu --job-name="munge" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R SCHI06" --output "prs.munge.cojo.SCHI06.$(date +%Y%m%d).out.txt"
+sbatch --time 3:00:00 --partition cpu --job-name="munge" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R SMOK11" --output "prs.munge.cojo.SMOK11.$(date +%Y%m%d).out.txt"
+
+
+sbatch --time 2-00:00:00 --partition cpu --job-name="MDDIDP" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R MDDIDP" --output "sbayesrc.tidyimpute.MDDIDP.$(date +%Y%m%d).out.txt"
+sbatch --time 2-00:00:00 --partition cpu --job-name="BIPO03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R BIPO03" --output "sbayesrc.tidyimpute.BIPO03.$(date +%Y%m%d).out.txt"
+sbatch --time 2-00:00:00 --partition cpu --job-name="ADHD06" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R ADHD06" --output "sbayesrc.tidyimpute.ADHD06.$(date +%Y%m%d).out.txt"
+sbatch --time 2-00:00:00 --partition cpu --job-name="SCHI06" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R SCHI06" --output "sbayesrc.tidyimpute.SCHI06.$(date +%Y%m%d).out.txt"
+sbatch --time 2-00:00:00 --partition cpu --job-name="SMOK11" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R SMOK11" --output "sbayesrc.tidyimpute.SMOK11.$(date +%Y%m%d).out.txt"
+
+
+sbatch --time 2-00:00:00 --partition cpu --job-name="MDDIDP" --ntasks 1 --cpus-per-task 8 --mem 32G --wrap="Rscript ../manual_routines/prs-check-gladp.R MDDIDP" --output "sbayesrc.score.MDDIDP.$(date +%Y%m%d).out.txt"
+sbatch --time 2-00:00:00 --partition cpu --job-name="BIPO03" --ntasks 1 --cpus-per-task 8 --mem 32G --wrap="Rscript ../manual_routines/prs-check-gladp.R BIPO03" --output "sbayesrc.score.BIPO03.$(date +%Y%m%d).out.txt"
+sbatch --time 2-00:00:00 --partition cpu --job-name="ADHD06" --ntasks 1 --cpus-per-task 8 --mem 32G --wrap="Rscript ../manual_routines/prs-check-gladp.R ADHD06" --output "sbayesrc.score.ADHD06.$(date +%Y%m%d).out.txt"
+sbatch --time 2-00:00:00 --partition cpu --job-name="SCHI06" --ntasks 1 --cpus-per-task 8 --mem 32G --wrap="Rscript ../manual_routines/prs-check-gladp.R SCHI06" --output "sbayesrc.score.SCHI06.$(date +%Y%m%d).out.txt"
+sbatch --time 2-00:00:00 --partition cpu --job-name="SMOK11" --ntasks 1 --cpus-per-task 8 --mem 32G --wrap="Rscript ../manual_routines/prs-check-gladp.R SMOK11" --output "sbayesrc.score.SMOK11.$(date +%Y%m%d).out.txt"
+
+
+sbatch --time 4:00:00 --partition cpu --job-name="scoring" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R" --output "sbayesrc.scoring.baseline.$(date +%Y%m%d).out.txt"
+#needs plink2
+sbatch --time 4:00:00 --partition cpu --job-name="scoring" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R" --output "sbayesrc.scoring.allPolygenic.$(date +%Y%m%d).out.txt"
+
+```
+
+## ONT human variation workflow
+
+### Installation and configuration
+
+```sh
+
+export JAVA_HOME='/scratch/prj/ppn_tng/software/java/jdk-24.0.1'
+export JAVA_CMD='/scratch/prj/ppn_tng/software/java/jdk-24.0.1/bin/java'
+
+export NEXTFLOW_CMD='/scratch/prj/ppn_tng/software/nextflow/nextflow-25.04.4-dist'
+
+$NEXTFLOW_CMD pull epi2me-labs/wf-human-variation
+
+$NEXTFLOW_CMD run epi2me-labs/wf-human-variation --help
+
+```
+
+### test
+```sh
+
+sbatch ../manual_routines/ont_hw_test_jz.sh
+
+```
+
+
+
+
+
+
