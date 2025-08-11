@@ -16,8 +16,8 @@ PradaClass <- setRefClass("Prada",
                                              initialize=function()
                                              {
                                                #defaults
-                                               paddingPRSAnchorBp=10000
-                                               paddingGeneBp=10000
+                                               paddingPRSAnchorBp<<-10000
+                                               paddingGeneBp<<-10000
                                              }
                                            )
 )

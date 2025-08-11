@@ -1,7 +1,8 @@
 #Functions to compute the genome coverage
 #
-
+#
 # writeToThisBedPath=NULL
+# writePaddedStrands=FALSE
 # paddingGeneBp=10000
 # paddingVariantCnvBp=10000
 # paddingVariantSnpBp=5000
@@ -17,6 +18,7 @@
 PradaClass$methods(
 computeGenomeCoverage=function(
     writeToThisBedPath=NULL,
+    writePaddedStrands=FALSE,
     paddingGeneBp=10000,
     paddingVariantCnvBp=10000,
     paddingVariantSnpBp=10000,
@@ -49,6 +51,12 @@ computeGenomeCoverage=function(
 
 
   applicationCoverageRegionsFiltered[,score:=0]
+
+  #create safe IDs
+  applicationCoverageRegionsFiltered[,id:=gsub(pattern = " ",replacement = "_", x = id, fixed = T)]
+  #grep(pattern = " ",x = applicationCoverageRegionsFiltered$id, fixed = T)
+
+
   rPos<-as.data.frame(applicationCoverageRegionsFiltered)
   setDT(rPos)
   rPos[,strand:='+'][,abp1_final:=bp1-eval(paddingGroupFinal)][,abp2_final:=bp2]
@@ -65,21 +73,31 @@ computeGenomeCoverage=function(
 
   if(!is.null(writeToThisBedPath)){
 
-    bedDf<-applicationCoverageRegionsFilteredPaddedStrands
-    data.table::setorderv(bedDf,
-                          cols = c("chr","bp1","id","strand","bp2"),
-                          order =c(1,1,1,1,1)
-    )
-    bedDf<-bedDf[,.(chr_name,abp1_final,abp2_final,id,score,strand)][,abp1_final:=abp1_final-1] #includes fix of bp1 indexing for BED
+    if(writePaddedStrands){
+      bedDf<-applicationCoverageRegionsFilteredPaddedStrands
+      data.table::setorderv(bedDf,
+                            cols = c("chr","bp1","id","strand","bp2"),
+                            order =c(1,1,1,1,1)
+      )
+      bedDf<-bedDf[,.(chr_name,abp1_final,abp2_final,id,score,strand)][,abp1_final:=abp1_final-1] #includes fix of bp1 indexing for BED
 
-    #bedDf<-applicationCoverageRegionsFiltered[,.(chr_name,start=abp1,end=abp2,id=paste0("\"",id,"\""))]
-
+      #bedDf<-applicationCoverageRegionsFiltered[,.(chr_name,start=abp1,end=abp2,id=paste0("\"",id,"\""))]
+    } else {
+      bedDf<-applicationCoverageRegionsFiltered
+      data.table::setorderv(bedDf,
+                            cols = c("chr","bp1","id","bp2"),
+                            order =c(1,1,1,1)
+      )
+      bedDf<-bedDf[,.(chr_name,bp1,bp2,id,score)][,bp1:=bp1-1] #includes fix of bp1 indexing for BED
+    }
 
     fwrite(bedDf,file = writeToThisBedPath,append = F,sep = "\t",encoding = "UTF-8",col.names = F)
   }
 }
 )
 
+#library(prada)
+#library(data.table)
 # pradaO<-PradaClass()
 # pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
 # pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx.grch38.5k.0p7percent.bed",nPrioritisedCnv=0, nPrioritisedSnp=0, nPrioritisedTotal = 5000)
