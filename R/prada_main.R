@@ -8,7 +8,12 @@ PradaClass <- setRefClass("Prada",
                                              paddingGeneBp = "numeric",
                                              applicationCoverageRegions = 'ANY',
                                              applicationCoverageRegionsFiltered = 'ANY',
-                                             applicationCoverageRegionsFilteredPaddedStrands = 'ANY'
+                                             applicationCoverageRegionsFilteredPaddedStrands = 'ANY',
+
+                                             #analysis settings
+                                             analysisSettingsList = 'ANY',
+                                             analysisMeta = 'ANY',
+                                             sampleMeta = 'ANY'
                                            ),
                                            methods = list
                                            (
@@ -18,6 +23,10 @@ PradaClass <- setRefClass("Prada",
                                                #defaults
                                                paddingPRSAnchorBp<<-10000
                                                paddingGeneBp<<-10000
+
+                                               analysisSettingsList<<-c()
+                                               analysisMeta<<-as.data.frame(matrix(data = NA,nrow = 0,ncol = 0))
+                                               sampleMeta<<-as.data.frame(matrix(data = NA,nrow = 0,ncol = 0))
                                              }
                                            )
 )

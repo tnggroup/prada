@@ -6,7 +6,7 @@
 
 #general shared package utilities
 pradaPackageVersion.major<-0
-pradaPackageVersion.minor<-1
+pradaPackageVersion.minor<-2
 pradaPackageVersion.patch<-0
 
 pradaCentralDBDefaultHost <- "localhost"
@@ -16,12 +16,45 @@ pradaCentralDBDefaultPort <- 65432
 
 filePathBed<-file.path("..","data","grch38.5k.1p3percent.bed")
 filePathFasta=file.path("..","data","GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz")
+
+
+#this is WIP?
 createAdaptedFastaReferenceForCustomBed=function(
     filePathBed,
     filePathFasta=file.path("data","GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz")
 ){
   ref <- seqinr::read.fasta(file = filePathFasta)
   bed <- fread(file = filePathBed, sep = "\t",header = T)
+
+}
+
+#re-used from the gwas_sumstats genetic correlations project
+readMetadata <- function(filePath,labelValueSeparator='='){
+  toReturn<-c()
+  #filePath <- file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameSummaryMetadata)
+  f <- readLines(con = file(filePath,open="r"),encoding = "UTF-8")
+  for(iLine in 1:length(f)){
+    if(nchar(f[iLine])>2){
+      #iLine<-1
+      #strsplit(x = f[iLine], split = "\\s")
+      m<-gregexpr(pattern = paste0("\\s*\\w*",labelValueSeparator,"\\w*\\s*"),text = f[iLine])
+      k<-NA
+      v<-NA
+      if(length(m)>0){
+        if(length(m[[1]])>0) {
+          fullString <- trimws(substr(x =f[iLine], start = m[[1]][[1]],  stop = m[[1]][[1]]+(attr(x = m[[1]], which = "match.length")[[1]]-1)),which = "both")
+          fullString.split<-strsplit(fullString,split = labelValueSeparator)
+          k<-trimws(fullString.split[[1]][[1]], which = "both")
+          v<-trimws(fullString.split[[1]][[2]], which= "both")
+        }
+      }
+
+      if(!is.na(k) & !is.na(v)) toReturn[k]<-v
+
+    }
+  }
+
+  return(toReturn)
 
 }
 
