@@ -32,7 +32,8 @@ createAdaptedFastaReferenceForCustomBed=function(
 readMetadata <- function(filePath,labelValueSeparator='='){
   toReturn<-c()
   #filePath <- file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameSummaryMetadata)
-  f <- readLines(con = file(filePath,open="r"),encoding = "UTF-8")
+  con = file(filePath,open="r")
+  f <- readLines(con = con,encoding = "UTF-8")
   for(iLine in 1:length(f)){
     if(nchar(f[iLine])>2){
       #iLine<-1
@@ -53,7 +54,7 @@ readMetadata <- function(filePath,labelValueSeparator='='){
 
     }
   }
-
+  close(con)
   return(toReturn)
 
 }
