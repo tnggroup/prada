@@ -56,13 +56,6 @@ $NEXTFLOW_CMD run epi2me-labs/wf-human-variation --help
 
 ```
 
-### test
-```sh
-
-sbatch ../manual_routines/ont_hw_test_jz.sh
-
-```
-
 
 
 

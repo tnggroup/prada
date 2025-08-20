@@ -3,12 +3,12 @@ Run this before connecting to the database
 CHANGE TO YOUR SETTINGS, ESPECIALLY THE SSH USER (second part of the command)
 
 ##Linux version
-TODO - add -L 127.0.0.1:port:etc.... to force localhost connections only
 -f Go to background
 -L local connection - Specifies that connections to the given TCP port or Unix socket on the local (client) host are to be forwarded to the given host and port, or Unix socket, on the remote side.
 -N Do not execute a remote command, for forwarding port only
 
     ssh -f -L 65432:postgresql-cluster.cluster-cjghupwohy3q.eu-west-2.rds.amazonaws.com:5432 user2@vpn.bredcap.org.uk -N
+    ssh -f -L 127.0.0.1:65432:postgresql-cluster.cluster-cjghupwohy3q.eu-west-2.rds.amazonaws.com:5432 user2@vpn.bredcap.org.uk -N #force localhost only
 
 with auto-close - untested! from: http://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
     
