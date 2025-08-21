@@ -12,6 +12,7 @@ PradaClass <- setRefClass("Prada",
 
                                              #analysis settings
                                              analysisSettingsList = 'ANY',
+                                             sampleSettingsList = 'ANY',
                                              analysisMeta = 'ANY',
                                              sampleMeta = 'ANY'
                                            ),
@@ -25,6 +26,8 @@ PradaClass <- setRefClass("Prada",
                                                paddingGeneBp<<-10000
 
                                                analysisSettingsList<<-c()
+                                               sampleSettingsList<<-c()
+
                                                analysisMeta<<-as.data.frame(matrix(data = NA,nrow = 0,ncol = 0))
                                                sampleMeta<<-as.data.frame(matrix(data = NA,nrow = 0,ncol = 0))
 

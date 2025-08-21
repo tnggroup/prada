@@ -29,8 +29,9 @@ collectSettingCallData=function(settingLabel){
   # settingLabel <- "pilot2_nogtube"
   # pradaApplicationDAO<-pradaO$pradaApplicationDAO
   # analysisSettingsList<-pradaO$analysisSettingsList
+  # sampleSettingsList<-pradaO$sampleSettingsList
   # analysisMeta<-pradaO$analysisMeta
-
+  # sampleMeta<-pradaO$sampleMeta
 
   # #read file content of sequencing folder
   # analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList<-list.files(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw)
@@ -224,9 +225,68 @@ collectSettingCallData=function(settingLabel){
   #analysisMeta[settingLabel,"wfpgx_softwareVersions"]<-jsonlite::toJSON(softwareVersionData)
   analysisMeta[settingLabel,"wfpgx_softwareVersions"]<<-jsonlite::toJSON(softwareVersionData)
 
-  #output/software.versions.txt
+  ##output/barcodeXX folders
+
+  outputFiles <- list.files(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"output"))
+  barcodeFolders<-grep(pattern = "^barcode\\d\\d",x = outputFiles,value = T)
+
+  if(length(barcodeFolders)>0){
+    for(iBarcode in 1:length(barcodeFolders)){
+      #iBarcode<-1
+      cUniqueSampleLabel <- paste0(settingLabel,"_",barcodeFolders[iBarcode])
+      cBarcodeFolderpath<-file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"output",barcodeFolders[iBarcode])
+
+      #sampleMeta[cUniqueSampleLabel,c("analysis","barcode")]<-c(settingLabel,barcodeFolders[iBarcode])
+      sampleMeta[cUniqueSampleLabel,c("analysis","barcode")]<<-c(settingLabel,barcodeFolders[iBarcode])
+
+      ##barcode match.json
+      con = file(file.path(cBarcodeFolderpath,paste0(barcodeFolders[iBarcode],".match.json")),open="r")
+      dString <- paste0(readLines(con = con,encoding = "UTF-8"),collapse = "\n")
+      close(con)
+      dJson<-jsonlite::fromJSON(dString,simplifyDataFrame=FALSE) #this otherwise reverts to true for some reason and creates data frames
+
+      #cyp2d6 call from chinook
+      d<-as.data.frame(data.table::fread(file = file.path(cBarcodeFolderpath,"CYP2D6","report.tsv"), fill = T, header = T,strip.white = T))
+
+      nd <- list(
+        source="CHINOOK",
+        version="2025-08-20",
+        chromosome="chr22",
+        gene="CYP2D6",
+        diplotypes = list(
+          list(name=d[d$Sample=="CYP2D6",c(barcodeFolders[iBarcode])])
+        )
+      )
+      nd$source<-jsonlite::unbox(nd$source)
+      nd$version<-jsonlite::unbox(nd$version)
+      nd$chromosome<-jsonlite::unbox(nd$chromosome)
+      nd$gene<-jsonlite::unbox(nd$gene)
+      #ndJson <- jsonlite::toJSON(x = nd,pretty = TRUE)
+
+      dJson$results[[length(dJson$results)+1]]<- nd #update with cyp2d6 call
+      #View(dJson$results)
+      #length(dJson$results)
 
 
+      # dString2 <- jsonlite::toJSON(x = dJson,pretty = TRUE)
+      # con = file(file.path("updated.match.json"),open="w")
+      # writeLines(con = con,text = dString2,sep = "\n")
+      # close(con)
+
+      #sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls<-dJson
+      sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls<<-dJson
+
+      # #sampleMeta[cUniqueSampleLabel,c("analysis","barcode","pgx_calls")]<-c(settingLabel,barcodeFolders[iBarcode],jsonlite::toJSON(dJson,pretty = TRUE))
+      # sampleMeta[cUniqueSampleLabel,c("analysis","barcode","pgx_calls")]<<-c(settingLabel,barcodeFolders[iBarcode],jsonlite::toJSON(dJson,pretty = TRUE))
+
+      ## XX.pharmcat.tsv
+      d<-as.data.frame(data.table::fread(file = file.path(cBarcodeFolderpath,paste0(barcodeFolders[iBarcode],".pharmcat.tsv")), fill = T, header = T,strip.white = T))
+
+      #sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table<-d
+      sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table<<-d
+
+    }
+  }
 
   }
 )
