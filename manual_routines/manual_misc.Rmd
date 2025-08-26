@@ -56,6 +56,78 @@ $NEXTFLOW_CMD run epi2me-labs/wf-human-variation --help
 
 ```
 
+## Singularity
+
+Install singularity. Singularity can't build containers on MacOS currently. You can use a virtual machine (f.ex. using VirtualBox) to run Linux and then build Singularity that can build containers from definitions.
+https://github.com/sylabs/singularity/blob/main/INSTALL.md
+https://docs.sylabs.io/guides/3.0/user-guide/installation.html
+
+
+Install prerequisites
+```sh
+sudo pacman -Syu
+sudo pacman -Sy autoconf automake cryptsetup crun fuse2fs git fuse3 libseccomp libtool pkgconf shadow squashfs-tools wget zlib conmon go base-devel
+
+#base-devel includes gcc and make
+
+```
+
+After restart, this is the rouine of the installation.
+```sh
+#in projects directory
+git clone --recurse-submodules https://github.com/sylabs/singularity.git
+cd singularity
+#git submodule update --init #only if you don't already have the submodules
+./mconfig
+make -C builddir
+sudo make -C builddir install
+
+```
+
+
+Env. variable configuration, as tested in Archlinux (Manjaro)
+```sh
+
+SINGULARITY_TMPDIR="/path/to/tmpdir" #edit this to whichever path you want to use!
+
+```
+
+
+# Building a mosdepth container/image
+
+This only worked outside the virtual machine shared folder (i.e. on the VM hard drive).
+
+```sh
+
+#this was run historically - using a slimmed down version of mosdepth_c2.def to identify build errors
+#sudo singularity build --sandbox mosdepth_c2 /media/sf_mylinux_shared/mosdepth_c2.def
+
+sudo singularity build mosdepth_c2.sif /media/sf_mylinux_shared/mosdepth_c2.def
+#singularity build --fakeroot mosdepth_c2.sif /media/sf_mylinux_shared/mosdepth_c2.def #this did not work
+
+
+```
+
+
+#Manual mosdepths runs
+
+```sh
+
+#interactive test
+#singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode01/barcode01.haplotagged.bam
+
+sbatch --time 24:00:00 --partition cpu --job-name="md01" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode01/barcode01.haplotagged.bam" --output "mdepth.barcode01.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md02" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode02 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode02/barcode02.haplotagged.bam" --output "mdepth.barcode02.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.barcode03.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.barcode04.$(date +%Y%m%d).out.txt"
+
+```
+
+
+
 
 
 

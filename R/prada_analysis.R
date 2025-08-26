@@ -28,6 +28,7 @@ PradaClass$methods(
 collectSettingCallData=function(settingLabel){
   # settingLabel <- "pilot2_nogtube"
   # pradaApplicationDAO<-pradaO$pradaApplicationDAO
+  # nThread<-pradaO$nThread
   # analysisSettingsList<-pradaO$analysisSettingsList
   # sampleSettingsList<-pradaO$sampleSettingsList
   # analysisMeta<-pradaO$analysisMeta
@@ -182,6 +183,13 @@ collectSettingCallData=function(settingLabel){
   }
 
 
+  ##sequencing_summary_XXXXX.txt #massive size!!! ~47GB
+  ## Let's not read this until we know what to use it for
+
+  # filenameSequencingSummary<-grep(pattern = "^sequencing_summary.+\\.txt$",x = analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList, value = T)
+  # sequencingSummaryData<-data.table::fread(file = file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameSequencingSummary), fill = T, header = T, strip.white = T,nThread = nThread)
+
+
 
   #wf-pgx data
 
@@ -202,6 +210,7 @@ collectSettingCallData=function(settingLabel){
 
   #analysisMeta[settingLabel,"wfpgx_instanceid"]<-callLaunchData$instanceId
   analysisMeta[settingLabel,"wfpgx_instanceid"]<<-callLaunchData$instanceId #only saves instance ID for now
+
 
   #output/params.json
   con = file(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"output","params.json"),open="r")

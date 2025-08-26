@@ -11,6 +11,7 @@ PradaClass <- setRefClass("Prada",
                                              applicationCoverageRegionsFilteredPaddedStrands = 'ANY',
 
                                              #analysis settings
+                                             nThread = "numeric",
                                              analysisSettingsList = 'ANY',
                                              sampleSettingsList = 'ANY',
                                              analysisMeta = 'ANY',
@@ -25,6 +26,7 @@ PradaClass <- setRefClass("Prada",
                                                paddingPRSAnchorBp<<-10000
                                                paddingGeneBp<<-10000
 
+                                               nThread <<- 6
                                                analysisSettingsList<<-c()
                                                sampleSettingsList<<-c()
 
