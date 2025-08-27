@@ -70,6 +70,8 @@ sudo pacman -Sy autoconf automake cryptsetup crun fuse2fs git fuse3 libseccomp l
 
 #base-devel includes gcc and make
 
+
+
 ```
 
 After restart, this is the rouine of the installation.
@@ -85,19 +87,11 @@ sudo make -C builddir install
 ```
 
 
-Env. variable configuration, as tested in Archlinux (Manjaro)
-```sh
-
-SINGULARITY_TMPDIR="/path/to/tmpdir" #edit this to whichever path you want to use!
-
-```
-
-
 # Building a mosdepth container/image
 
-This only worked outside the virtual machine shared folder (i.e. on the VM hard drive).
-
 ```sh
+
+
 
 #this was run historically - using a slimmed down version of mosdepth_c2.def to identify build errors
 #sudo singularity build --sandbox mosdepth_c2 /media/sf_mylinux_shared/mosdepth_c2.def
@@ -105,6 +99,27 @@ This only worked outside the virtual machine shared folder (i.e. on the VM hard 
 sudo singularity build mosdepth_c2.sif /media/sf_mylinux_shared/mosdepth_c2.def
 #singularity build --fakeroot mosdepth_c2.sif /media/sf_mylinux_shared/mosdepth_c2.def #this did not work
 
+#test of using shared folder for cache and tempdir - THIS DOES NOT WORK CURRENTLY!
+#if required - set the group permission for the user (q)
+sudo usermod -aG vboxsf q
+#sudo -E required in archlinux according to https://github.com/apptainer/singularity/issues/5791
+#enable symlinks in the shared folder (virtualbox mylinux and share mylinux_shared)
+VBoxManage setextradata mylinux VBoxInternal2/SharedFoldersEnableSymlinksCreate/mylinux_shared 1
+export SINGULARITY_TMPDIR="/media/sf_mylinux_shared/singularity_tmp"
+export SINGULARITY_CACHEDIR="/media/sf_mylinux_shared/singularity_cache"
+sudo -E singularity build prada_c2.sif prada_c2.def #as root, in /media/sf_mylinux_shared/singularity_tmp
+#singularity build --fakeroot prada_c2.sif prada_c2.def #does not work still
+
+#clean environment
+sudo pacman -Sc
+sudo pacman -Scc
+singularity cache clean
+
+#running in larger vmachine
+export SINGULARITY_TMPDIR="/home/q/Documents/work/sing_temp"
+export SINGULARITY_CACHEDIR="/home/q/Documents/work/sing_cache"
+sudo -E singularity build prada_c2.sif /media/sf_mylinux_shared/prada_c2.def
+#this works. not sure if it is the change in disk or the use of -E.
 
 ```
 
@@ -116,18 +131,33 @@ sudo singularity build mosdepth_c2.sif /media/sf_mylinux_shared/mosdepth_c2.def
 #interactive test
 #singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode01/barcode01.haplotagged.bam
 
-sbatch --time 24:00:00 --partition cpu --job-name="md01" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode01/barcode01.haplotagged.bam" --output "mdepth.barcode01.$(date +%Y%m%d).out.txt"
+sbatch --time 24:00:00 --partition cpu --job-name="md01" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode01/barcode01.haplotagged.bam" --output "mdepth.barcode01.$(date +%Y%m%d).out.txt"
 
-sbatch --time 24:00:00 --partition cpu --job-name="md02" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode02 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode02/barcode02.haplotagged.bam" --output "mdepth.barcode02.$(date +%Y%m%d).out.txt"
+sbatch --time 24:00:00 --partition cpu --job-name="md02" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode02 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode02/barcode02.haplotagged.bam" --output "mdepth.barcode02.$(date +%Y%m%d).out.txt"
 
-sbatch --time 24:00:00 --partition cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.barcode03.$(date +%Y%m%d).out.txt"
+sbatch --time 24:00:00 --partition cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.barcode03.$(date +%Y%m%d).out.txt"
 
-sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.barcode04.$(date +%Y%m%d).out.txt"
+sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.barcode04.$(date +%Y%m%d).out.txt"
 
 ```
 
 
+#Creating IGV graphs
 
+
+
+```sh
+
+#gunzip -c barcode01.regions.bed.gz | awk '{print $1, $2, $3, $5}' > barcode01.regions.bedgraph
+gunzip -c barcode01.per-base.bed.gz | awk '{print $1, $2, $3, $4}' > barcode01.per-base.bedgraph
+
+#interactive
+singularity shell --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz /scratch/prj/sgdp_nanopore/Projects/prada_jz/venv/prada_c2.sif
+
+igvtools toTDF /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/mosdepth/pilot2/p2-nogtube-nobedtest/barcode01.regions.bedgraph barcode01.regions.tdf hg38
+
+
+```
 
 
 
