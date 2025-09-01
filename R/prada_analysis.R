@@ -1,31 +1,56 @@
 #Functions to apply our custom analysis and qc routines after running previous standardised calling and qc pipelines
 #
-
+#
 # library(prada)
 # library(data.table)
-
+#
 # pradaO<-PradaClass()
 # pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
-# pradaO$addAnalysisSetting(label = "pilot2_nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-b1")
-# pradaO$collectSettingCallData("pilot2_nogtube")
+# pradaO$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
+# pradaO$addAnalysisSetting(settingLabel = "pilot2_nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-b1",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
+# pradaO$collectAnalysisCallData("pilot2_nogtube")
+# pradaO$collectAnalysisDepthData("pilot2_nogtube")
+# pradaO$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed")
+# pradaO$printData()
 
 PradaClass$methods(
   addAnalysisSetting=function(
-    label,
+    settingLabel,
     folderPathAnalysisSequencingRaw=NA,
-    folderPathAnalysisOutputRaw=NA
+    folderPathAnalysisOutputRaw=NA,
+    folderPathDepthAnalysisOutputRaw=NA
   ){
+
+    # settingLabel = "pilot2_nogtube"
+    # folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/No_Gtube/20250724_1536_3C_PAY03690_092497cc"
+    # folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-b1"
+
+    #application settings
+    # analysisMeta[settingLabel,"code"]<-settingLabel
+    # analysisMeta[settingLabel,"pradaPackageVersion"]<-paste(pradaPackageVersion.major.minor.patch,collapse = '.')
+    # analysisMeta[settingLabel,"folderPathAnalysisSequencingRaw"]<-analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw
+    # analysisMeta[settingLabel,"folderPathAnalysisOutputRaw"]<-analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw
+
+
+    analysisMeta[settingLabel,"code"]<<-settingLabel
+    analysisMeta[settingLabel,"pradaPackageVersion"]<<-paste(pradaPackageVersion.major.minor.patch,collapse = '.')
+    analysisMeta[settingLabel,"folderPathAnalysisSequencingRaw"]<<-folderPathAnalysisSequencingRaw
+    analysisMeta[settingLabel,"folderPathAnalysisOutputRaw"]<<-folderPathAnalysisOutputRaw
+    analysisMeta[settingLabel,"folderPathDepthAnalysisOutputRaw"]<<-folderPathDepthAnalysisOutputRaw
+
     #analysisSettingsList<-c()
-    analysisSettingsList[label][[1]]<<-list(
+    analysisSettingsList[settingLabel][[1]]<<-list(
       folderPathAnalysisSequencingRaw=folderPathAnalysisSequencingRaw,
-      folderPathAnalysisOutputRaw=folderPathAnalysisOutputRaw
+      folderPathAnalysisOutputRaw=folderPathAnalysisOutputRaw,
+      folderPathDepthAnalysisOutputRaw=folderPathDepthAnalysisOutputRaw
       )
   }
 )
 
 #this function reads metadata and small size data. large data has to be handled using the existing file formats.
+#Identifies list of barcodes
 PradaClass$methods(
-collectSettingCallData=function(settingLabel){
+collectAnalysisCallData=function(settingLabel){
   # settingLabel <- "pilot2_nogtube"
   # pradaApplicationDAO<-pradaO$pradaApplicationDAO
   # nThread<-pradaO$nThread
@@ -45,19 +70,6 @@ collectSettingCallData=function(settingLabel){
 
   #read file content of calling folder
   analysisSettingsList[[settingLabel]]$analysisOutputFilenameList<<-list.files(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw)
-
-
-  #application settings
-  # analysisMeta[settingLabel,"code"]<-settingLabel
-  # analysisMeta[settingLabel,"pradaPackageVersion"]<-paste(pradaPackageVersion.major.minor.patch,collapse = '.')
-  # analysisMeta[settingLabel,"folderPathAnalysisSequencingRaw"]<-analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw
-  # analysisMeta[settingLabel,"folderPathAnalysisOutputRaw"]<-analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw
-
-
-  analysisMeta[settingLabel,"code"]<<-settingLabel
-  analysisMeta[settingLabel,"pradaPackageVersion"]<<-paste(pradaPackageVersion.major.minor.patch,collapse = '.')
-  analysisMeta[settingLabel,"folderPathAnalysisSequencingRaw"]<<-analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw
-  analysisMeta[settingLabel,"folderPathAnalysisOutputRaw"]<<-analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw
 
 
 
@@ -296,6 +308,225 @@ collectSettingCallData=function(settingLabel){
 
     }
   }
+
+  }
+)
+
+
+PradaClass$methods(
+  collectAnalysisDepthData=function(
+    settingLabel
+  ){
+    # settingLabel <- "pilot2_nogtube"
+    # pradaApplicationDAO<-pradaO$pradaApplicationDAO
+    # nThread<-pradaO$nThread
+    # analysisSettingsList<-pradaO$analysisSettingsList
+    # sampleSettingsList<-pradaO$sampleSettingsList
+    # analysisMeta<-pradaO$analysisMeta
+    # sampleMeta<-pradaO$sampleMeta
+
+    if(nrow(sampleMeta>0)){
+      for(iBarcode in 1:nrow(sampleMeta)){
+        #iBarcode<-1
+        if(!sampleMeta[iBarcode,c("analysis")]==settingLabel) next
+        cBarcode<-sampleMeta[iBarcode,c("barcode")]
+        cUniqueSampleLabel <- paste0(settingLabel,"_",cBarcode)
+
+        #per-base bed
+        d<-as.data.frame(data.table::fread(file = file.path(analysisMeta[settingLabel,c("folderPathDepthAnalysisOutputRaw")],paste0(cBarcode,".per-base.bed.gz"))))
+        #sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthTable<-d
+        sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthTable<<-d
+
+        cFile<-file.path(analysisMeta[settingLabel,c("folderPathDepthAnalysisOutputRaw")],paste0(cBarcode,".regions.bed.gz"))
+        if(file.exists(cFile)){
+          #regions bed
+          d<-as.data.frame(data.table::fread(file = cFile))
+          #sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTable<-d
+          sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTable<<-d
+        }
+      }
+    }
+
+  }
+)
+
+#requires applicationCoverageRegions loaded from db or file
+#pradaO$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000)
+PradaClass$methods(
+  computeDepthDataStatistics=function(
+    filePathBed
+    ){
+    # pradaApplicationDAO<-pradaO$pradaApplicationDAO
+    # nThread<-pradaO$nThread
+    # analysisSettingsList<-pradaO$analysisSettingsList
+    # sampleSettingsList<-pradaO$sampleSettingsList
+    # analysisMeta<-pradaO$analysisMeta
+    # sampleMeta<-pradaO$sampleMeta
+    # applicationCoverageRegions<-pradaO$applicationCoverageRegions
+    #
+    # filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed"
+
+
+    dApplicationCoverageRegions<-applicationCoverageRegions
+    colnames(dApplicationCoverageRegions)<-paste0(colnames(dApplicationCoverageRegions),"_region")
+    setDT(dApplicationCoverageRegions)
+    setkeyv(dApplicationCoverageRegions,cols = c("chr_name_region","bp1_region","bp2_region"))
+
+    dBed<-data.table::fread(file = filePathBed)
+    colnames(dBed)<-c("chr_bed","bp1_bed","bp2_bed","label","v")
+    setDT(dBed)
+    setkeyv(dBed,cols = c("chr_bed","bp1_bed","bp2_bed"))
+
+    #unique(dBed$chr_bed)
+
+
+    if(nrow(sampleMeta)>0){
+      for(iSample in 1:nrow(sampleMeta)){
+        #iSample<-1
+        cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
+        cBarcode<-sampleMeta[iSample,c("barcode")]
+        cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
+
+        dDepth<-sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthTable
+        colnames(dDepth)<-c("chr","bp1","bp2","v")
+        setDT(dDepth)
+        setkeyv(dDepth,cols = c("chr","bp1","bp2"))
+
+        #unique(dDepth$chr)
+
+        dDepth[dBed,on=.(chr=chr_bed,bp1<bp2_bed, bp1>=bp1_bed), c('bp1InBed','bp1_bedlabel') := list(1,i.label)]
+        dDepth[dBed,on=.(chr=chr_bed,bp2<=bp2_bed, bp2>bp1_bed), c('bp2InBed','bp2_bedlabel') := list(1,i.label)]
+        dDepth[bp1InBed==1 & bp2InBed==1 & bp1_bedlabel==bp2_bedlabel, bpInBed:=1]
+
+        dDepth[dApplicationCoverageRegions,on=.(chr=chr_name_region,bp1<bp2_region, bp1>=bp1_region), c('bp1InRegion','bp1_regionlabel') := list(1,i.label_region)]
+        dDepth[dApplicationCoverageRegions,on=.(chr=chr_name_region,bp2<=bp2_region, bp2>bp1_region), c('bp2InRegion','bp2_regionlabel') := list(1,i.label_region)]
+        dDepth[(bp1InRegion==1 | bp2InRegion==1) & bp1_regionlabel==bp2_regionlabel, overlappingRegion:=1]
+
+        dDepth[,length:=bp2-bp1]
+
+        #View(dDepth[bpInBed==1,])
+        #View(dDepth[bpInBed!=1 | is.na(bpInBed),])
+        #stats
+
+        #sequening depth stratified by in bed region and not in bed region
+        dDepth.inBed<-dDepth[bpInBed==1,]
+        qInBed<-ggstats::weighted.quantile(x = unlist(dDepth.inBed$v), w = unlist(dDepth.inBed$length), probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)
+        dDepth.notInBed<-dDepth[bpInBed!=1 | is.na(bpInBed),]
+        qNotInBed<-ggstats::weighted.quantile(x = unlist(dDepth.notInBed$v), w = unlist(dDepth.notInBed$length), probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)
+
+        # sampleMeta[cUniqueSampleLabel,c("sdepth_q000_bed","sdepth_q002_bed","sdepth_q025_bed","sdepth_q050_bed","sdepth_q075_bed","sdepth_q098_bed","sdepth_q100_bed","sdepth_q000_nobed","sdepth_q002_nobed","sdepth_q025_nobed","sdepth_q050_nobed","sdepth_q075_nobed","sdepth_q098_nobed","sdepth_q100_nobed")]<-c(
+        #   qInBed[1],qInBed[2],qInBed[3],qInBed[4],qInBed[5],qInBed[6],qInBed[7],qNotInBed[1],qNotInBed[2],qNotInBed[3],qNotInBed[4],qNotInBed[5],qNotInBed[6],qNotInBed[7]
+        #   )
+        sampleMeta[cUniqueSampleLabel,c("sdepth_q000_bed","sdepth_q002_bed","sdepth_q025_bed","sdepth_q050_bed","sdepth_q075_bed","sdepth_q098_bed","sdepth_q100_bed","sdepth_q000_nobed","sdepth_q002_nobed","sdepth_q025_nobed","sdepth_q050_nobed","sdepth_q075_nobed","sdepth_q098_nobed","sdepth_q100_nobed")]<<-c(
+          qInBed[1],qInBed[2],qInBed[3],qInBed[4],qInBed[5],qInBed[6],qInBed[7],qNotInBed[1],qNotInBed[2],qNotInBed[3],qNotInBed[4],qNotInBed[5],qNotInBed[6],qNotInBed[7]
+        )
+
+        #per original region statistics
+
+        dApplicationCoverageRegions.sample<-dApplicationCoverageRegions
+
+        dDepth.overlappingRegion<-dDepth[overlappingRegion==1,]
+
+        dDepth.overlappingRegion.aggstats<-dDepth.overlappingRegion[, .(
+          count = .N,
+          q002 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2],
+          q025 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[3],
+          q050 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[4],
+          q075 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[5],
+          q098 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[6]
+          ), by = bp1_regionlabel]
+
+        dApplicationCoverageRegions.sample[dDepth.overlappingRegion.aggstats,on=c(label_region='bp1_regionlabel'),c('sdepth_q002','sdepth_q025','sdepth_q050','sdepth_q075','sdepth_q098') := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
+
+        #sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom<-as.data.frame(dApplicationCoverageRegions.sample)
+        sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom<<-as.data.frame(dApplicationCoverageRegions.sample)
+
+
+        #per bed region statistics
+
+        dBed.sample<-dBed
+        dBed.sample[,v:=NULL]
+
+        #dDepth.inBed.aggstats<-dDepth.inBed[, .(count = .N, var = median(v)), by = bp1_bedlabel]
+
+        dDepth.inBed.aggstats<-dDepth.inBed[, .(
+          count = .N,
+          q002 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2],
+          q025 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[3],
+          q050 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[4],
+          q075 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[5],
+          q098 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[6]
+        ), by = bp1_bedlabel]
+
+        dBed.sample[dDepth.inBed.aggstats,on=c(label='bp1_bedlabel'),c('sdepth_q002','sdepth_q025','sdepth_q050','sdepth_q075','sdepth_q098') := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
+
+        #sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom<-as.data.frame(dBed.sample)
+        sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom<<-as.data.frame(dBed.sample)
+
+        #View(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTable)
+        #View(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom)
+
+      }
+    }
+
+
+  }
+)
+
+PradaClass$methods(
+  printData=function(
+  ){
+    # pradaApplicationDAO<-pradaO$pradaApplicationDAO
+    # nThread<-pradaO$nThread
+    # analysisSettingsList<-pradaO$analysisSettingsList
+    # sampleSettingsList<-pradaO$sampleSettingsList
+    # analysisMeta<-pradaO$analysisMeta
+    # sampleMeta<-pradaO$sampleMeta
+    # applicationCoverageRegions<-pradaO$applicationCoverageRegions
+
+
+    #original regions (as loaded)
+    if(!is.null(applicationCoverageRegions)){
+      applicationCoverageRegions.filepath<-"applicationCoverageRegions.tsv"
+      fwrite(applicationCoverageRegions,file = applicationCoverageRegions.filepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+    }
+
+    analysisMeta.filepath<-"analysisMeta.tsv"
+    fwrite(analysisMeta,file = analysisMeta.filepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+
+    sampleMeta.filepath<-"sampleMeta.tsv"
+    fwrite(sampleMeta,file = sampleMeta.filepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+
+
+    #nothing here yet - most data in sample settings list etc
+    # if(nrow(analysisMeta)>0){
+    #   for(iAnalysis in 1:nrow(analysisMeta)){
+    #     #iAnalysis<-1
+    #     cAnalysisLabel<-analysisMeta[iAnalysis,c("code")]
+    #
+    #     #nrow(analysisSettingsList[[cAnalysisLabel]]$dutyTimeData)
+    #     #nrow(analysisSettingsList[[cAnalysisLabel]]$throughputData)
+    #
+    #
+    #   }
+    # }
+
+    if(nrow(sampleMeta)>0){
+      for(iSample in 1:nrow(sampleMeta)){
+        #iSample<-1
+        cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
+        cBarcode<-sampleMeta[iSample,c("barcode")]
+        cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
+
+        cfilepath<-paste0("sampleSequencingDepthRegionsTableCustom_",cUniqueSampleLabel,".tsv")
+        fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+
+        cfilepath<-paste0("sequencingDepthOriginalRegionsTableCustom_",cUniqueSampleLabel,".tsv")
+        fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+
+      }
+    }
+
 
   }
 )

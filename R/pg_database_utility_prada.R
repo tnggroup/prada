@@ -127,7 +127,7 @@ PradaPgDatabaseUtilityClass$methods(
     nPrioritisedSnp=200000,
     nPrioritisedTotal=25000,
     wGene=1e20,
-    wVariantCnv=1e6,
+    wVariantCnv=1e7,
     wVariantSnp=1
   ){
 
@@ -139,7 +139,7 @@ PradaPgDatabaseUtilityClass$methods(
     # nPrioritisedSnp integer DEFAULT 200000,
     # nPrioritisedTotal integer DEFAULT 25000,
     # wGene double precision DEFAULT 1e20,
-    # wVariantCnv double precision DEFAULT 1e6,
+    # wVariantCnv double precision DEFAULT 1e7,
     # wVariantSnp double precision DEFAULT 1
 
     qString <- "SELECT * FROM prada.get_coverage_regions(

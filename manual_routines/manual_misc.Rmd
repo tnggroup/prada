@@ -70,8 +70,6 @@ sudo pacman -Sy autoconf automake cryptsetup crun fuse2fs git fuse3 libseccomp l
 
 #base-devel includes gcc and make
 
-
-
 ```
 
 After restart, this is the rouine of the installation.
@@ -145,16 +143,25 @@ sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-t
 #Creating IGV graphs
 
 
-
 ```sh
 
-#gunzip -c barcode01.regions.bed.gz | awk '{print $1, $2, $3, $5}' > barcode01.regions.bedgraph
+gunzip -c barcode01.regions.bed.gz | awk '{print $1, $2, $3, $5}' > barcode01.regions.bedgraph
 gunzip -c barcode01.per-base.bed.gz | awk '{print $1, $2, $3, $4}' > barcode01.per-base.bedgraph
 
+gunzip -c barcode02.regions.bed.gz | awk '{print $1, $2, $3, $5}' > barcode02.regions.bedgraph
+gunzip -c barcode02.per-base.bed.gz | awk '{print $1, $2, $3, $4}' > barcode02.per-base.bedgraph
+
+gunzip -c barcode03.regions.bed.gz | awk '{print $1, $2, $3, $5}' > barcode03.regions.bedgraph
+gunzip -c barcode03.per-base.bed.gz | awk '{print $1, $2, $3, $4}' > barcode03.per-base.bedgraph
+
+gunzip -c barcode04.regions.bed.gz | awk '{print $1, $2, $3, $5}' > barcode04.regions.bedgraph
+gunzip -c barcode04.per-base.bed.gz | awk '{print $1, $2, $3, $4}' > barcode04.per-base.bedgraph
+
 #interactive
+#test of automated igvtools conversion to tdf
 singularity shell --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz /scratch/prj/sgdp_nanopore/Projects/prada_jz/venv/prada_c2.sif
 
-igvtools toTDF /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/mosdepth/pilot2/p2-nogtube-nobedtest/barcode01.regions.bedgraph barcode01.regions.tdf hg38
+igvtools toTDF /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/mosdepth/pilot2/p2-nogtube-nobedtest/barcode01.regions.bedgraph barcode01.regions.tdf hg38 #this throws an error
 
 
 ```
