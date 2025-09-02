@@ -129,6 +129,8 @@ sudo -E singularity build prada_c2.sif /media/sf_mylinux_shared/prada_c2.def
 #interactive test
 #singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode01/barcode01.haplotagged.bam
 
+#my nogtube-nobed test run
+
 sbatch --time 24:00:00 --partition cpu --job-name="md01" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode01/barcode01.haplotagged.bam" --output "mdepth.barcode01.$(date +%Y%m%d).out.txt"
 
 sbatch --time 24:00:00 --partition cpu --job-name="md02" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode02 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode02/barcode02.haplotagged.bam" --output "mdepth.barcode02.$(date +%Y%m%d).out.txt"
@@ -136,6 +138,28 @@ sbatch --time 24:00:00 --partition cpu --job-name="md02" --ntasks 1 --cpus-per-t
 sbatch --time 24:00:00 --partition cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.barcode03.$(date +%Y%m%d).out.txt"
 
 sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.barcode04.$(date +%Y%m%d).out.txt"
+
+
+#Bhakti's nogtube run
+
+sbatch --time 24:00:00 --partition cpu --job-name="md01" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-b1/output/barcode01/barcode01.haplotagged.bam" --output "mdepth.barcode01.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md02" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode02 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-b2/output/barcode02/barcode02.haplotagged.bam" --output "mdepth.barcode02.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-b3/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.barcode03.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-b4/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.barcode04.$(date +%Y%m%d).out.txt"
+
+#Bhakti's gtube run
+
+sbatch --time 24:00:00 --partition cpu --job-name="md01" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-gtube-b1/output/barcode01/barcode01.haplotagged.bam" --output "mdepth.barcode01.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md02" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode02 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-gtube-b2/output/barcode02/barcode02.haplotagged.bam" --output "mdepth.barcode02.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-gtube-b3/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.barcode03.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-gtube-b4/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.barcode04.$(date +%Y%m%d).out.txt"
+
 
 ```
 
@@ -162,6 +186,16 @@ gunzip -c barcode04.per-base.bed.gz | awk '{print $1, $2, $3, $4}' > barcode04.p
 singularity shell --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz /scratch/prj/sgdp_nanopore/Projects/prada_jz/venv/prada_c2.sif
 
 igvtools toTDF /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/mosdepth/pilot2/p2-nogtube-nobedtest/barcode01.regions.bedgraph barcode01.regions.tdf hg38 #this throws an error
+
+
+```
+
+
+#Analysing existing pilot runs on Create
+
+Run in work/
+
+```R
 
 
 ```

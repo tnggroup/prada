@@ -1,5 +1,7 @@
 
-
+#install package with
+#devtools::install_github("tnggroup/prada")
+#devtools::install_github("tnggroup/prada",ref = 'jz_dev')
 
 PradaClass <- setRefClass("Prada",
                                            fields = list(

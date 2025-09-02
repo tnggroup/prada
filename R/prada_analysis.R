@@ -7,11 +7,26 @@
 # pradaO<-PradaClass()
 # pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
 # pradaO$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
-# pradaO$addAnalysisSetting(settingLabel = "pilot2_nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-b1",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
-# pradaO$collectAnalysisCallData("pilot2_nogtube")
-# pradaO$collectAnalysisDepthData("pilot2_nogtube")
+# # pradaO$addAnalysisSetting(settingLabel = "p2-nogtube-nobedtest",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-nobedtest",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
+# pradaO$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
+# pradaO$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube")
+# #pradaO$collectAnalysisCallData("p2-nogtube-nobedtest")
+# pradaO$collectAnalysisCallData("p2-gtube")
+# pradaO$collectAnalysisCallData("p2-nogtube")
+#
+# #pradaO$sampleMeta<-pradaO$sampleMeta[pradaO$sampleMeta$barcode=='barcode01',] #filter to barcode01 only
+#
+# #pradaO$collectAnalysisDepthData("p2-nogtube-nobedtest")
+# pradaO$collectAnalysisDepthData("p2-gtube")
+# pradaO$collectAnalysisDepthData("p2-nogtube")
 # pradaO$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed")
 # pradaO$printData()
+
+#check pgx calls
+#View(pradaO$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls_table)
+#View(pradaO$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls_table)
+# View(pradaO$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls$results)
+# View(pradaO$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls$results)
 
 PradaClass$methods(
   addAnalysisSetting=function(
@@ -21,7 +36,7 @@ PradaClass$methods(
     folderPathDepthAnalysisOutputRaw=NA
   ){
 
-    # settingLabel = "pilot2_nogtube"
+    # settingLabel = "p2-nogtube-nobedtest"
     # folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/No_Gtube/20250724_1536_3C_PAY03690_092497cc"
     # folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-b1"
 
@@ -51,7 +66,7 @@ PradaClass$methods(
 #Identifies list of barcodes
 PradaClass$methods(
 collectAnalysisCallData=function(settingLabel){
-  # settingLabel <- "pilot2_nogtube"
+  # settingLabel <- "p2-gtube"
   # pradaApplicationDAO<-pradaO$pradaApplicationDAO
   # nThread<-pradaO$nThread
   # analysisSettingsList<-pradaO$analysisSettingsList
@@ -317,7 +332,7 @@ PradaClass$methods(
   collectAnalysisDepthData=function(
     settingLabel
   ){
-    # settingLabel <- "pilot2_nogtube"
+    # settingLabel <- "p2-nogtube-nobedtest"
     # pradaApplicationDAO<-pradaO$pradaApplicationDAO
     # nThread<-pradaO$nThread
     # analysisSettingsList<-pradaO$analysisSettingsList
@@ -396,11 +411,11 @@ PradaClass$methods(
 
         dDepth[dBed,on=.(chr=chr_bed,bp1<bp2_bed, bp1>=bp1_bed), c('bp1InBed','bp1_bedlabel') := list(1,i.label)]
         dDepth[dBed,on=.(chr=chr_bed,bp2<=bp2_bed, bp2>bp1_bed), c('bp2InBed','bp2_bedlabel') := list(1,i.label)]
-        dDepth[bp1InBed==1 & bp2InBed==1 & bp1_bedlabel==bp2_bedlabel, bpInBed:=1]
+        dDepth[(bp1InBed==1 | bp2InBed==1) & bp1_bedlabel==bp2_bedlabel, bpInBed:=1] #changed to code for overlap with region rather than encompassed in region
 
         dDepth[dApplicationCoverageRegions,on=.(chr=chr_name_region,bp1<bp2_region, bp1>=bp1_region), c('bp1InRegion','bp1_regionlabel') := list(1,i.label_region)]
         dDepth[dApplicationCoverageRegions,on=.(chr=chr_name_region,bp2<=bp2_region, bp2>bp1_region), c('bp2InRegion','bp2_regionlabel') := list(1,i.label_region)]
-        dDepth[(bp1InRegion==1 | bp2InRegion==1) & bp1_regionlabel==bp2_regionlabel, overlappingRegion:=1]
+        dDepth[(bp1InRegion==1 | bp2InRegion==1) & bp1_regionlabel==bp2_regionlabel, overlappingRegion:=1] #codes for overlap with region rather than encompassed in region
 
         dDepth[,length:=bp2-bp1]
 
@@ -523,6 +538,28 @@ PradaClass$methods(
 
         cfilepath<-paste0("sequencingDepthOriginalRegionsTableCustom_",cUniqueSampleLabel,".tsv")
         fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+
+
+
+        #IGV graphs
+
+        ##per-base
+        cFPath<-file.path(analysisMeta[cAnalysisLabel,c("folderPathDepthAnalysisOutputRaw")],paste0(cBarcode,".per-base.bed.gz"))
+        cFPathOut<-file.path(analysisMeta[cAnalysisLabel,c("folderPathDepthAnalysisOutputRaw")],paste0(cBarcode,".per-base.bedgraph.gz"))
+        if(file.exists(cFPath)){
+          dF<-fread(cFPath,header = F,nThread = nThread)
+          fwrite(dF[,c("V1","V2","V3","V4")],file = cFPathOut,sep = "\t",row.names = F,col.names = F, append = F, nThread = nThread)
+        }
+
+        ##regions
+        cFPath<-file.path(analysisMeta[cAnalysisLabel,c("folderPathDepthAnalysisOutputRaw")],paste0(cBarcode,".regions.bed.gz"))
+        cFPathOut<-file.path(analysisMeta[cAnalysisLabel,c("folderPathDepthAnalysisOutputRaw")],paste0(cBarcode,".regions.bedgraph.gz"))
+        if(file.exists(cFPath)){
+          dF<-fread(cFPath,header = F,nThread = nThread)
+          fwrite(dF[,c("V1","V2","V3","V5")],file = cFPathOut,sep = "\t",row.names = F,col.names = F, append = F, nThread = nThread)
+        }
+
+
 
       }
     }
