@@ -8,16 +8,16 @@
 # pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
 # pradaO$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
 # # pradaO$addAnalysisSetting(settingLabel = "p2-nogtube-nobedtest",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-nobedtest",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
-# pradaO$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
+# #pradaO$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
 # pradaO$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube")
 # #pradaO$collectAnalysisCallData("p2-nogtube-nobedtest")
-# pradaO$collectAnalysisCallData("p2-gtube")
+# #pradaO$collectAnalysisCallData("p2-gtube")
 # pradaO$collectAnalysisCallData("p2-nogtube")
 #
 # #pradaO$sampleMeta<-pradaO$sampleMeta[pradaO$sampleMeta$barcode=='barcode01',] #filter to barcode01 only
 #
 # #pradaO$collectAnalysisDepthData("p2-nogtube-nobedtest")
-# pradaO$collectAnalysisDepthData("p2-gtube")
+# #pradaO$collectAnalysisDepthData("p2-gtube")
 # pradaO$collectAnalysisDepthData("p2-nogtube")
 # pradaO$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed")
 # pradaO$printData()
@@ -369,7 +369,8 @@ PradaClass$methods(
 #pradaO$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000)
 PradaClass$methods(
   computeDepthDataStatistics=function(
-    filePathBed
+    filePathBed=NULL,
+    filePathApplicationCoverageRegions=NULL
     ){
     # pradaApplicationDAO<-pradaO$pradaApplicationDAO
     # nThread<-pradaO$nThread
@@ -380,14 +381,19 @@ PradaClass$methods(
     # applicationCoverageRegions<-pradaO$applicationCoverageRegions
     #
     # filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed"
+    # filePathApplicationCoverageRegions=NULL
 
+    if(!is.null(filePathApplicationCoverageRegions)){
+      dApplicationCoverageRegions<-data.table::fread(file = filePathApplicationCoverageRegions)
+    } else dApplicationCoverageRegions<-applicationCoverageRegions #fall back to internal
 
-    dApplicationCoverageRegions<-applicationCoverageRegions
     colnames(dApplicationCoverageRegions)<-paste0(colnames(dApplicationCoverageRegions),"_region")
     setDT(dApplicationCoverageRegions)
     setkeyv(dApplicationCoverageRegions,cols = c("chr_name_region","bp1_region","bp2_region"))
 
-    dBed<-data.table::fread(file = filePathBed)
+    if(!is.null(filePathApplicationCoverageRegions)){
+      dBed<-data.table::fread(file = filePathBed)
+    } else dBed<- as.data.frame(matrix(data = NA, nrow=0, ncol=5)) #fall back to empty data frame
     colnames(dBed)<-c("chr_bed","bp1_bed","bp2_bed","label","v")
     setDT(dBed)
     setkeyv(dBed,cols = c("chr_bed","bp1_bed","bp2_bed"))
@@ -425,7 +431,7 @@ PradaClass$methods(
 
         #sequening depth stratified by in bed region and not in bed region
         dDepth.inBed<-dDepth[bpInBed==1,]
-        qInBed<-ggstats::weighted.quantile(x = unlist(dDepth.inBed$v), w = unlist(dDepth.inBed$length), probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)
+        if(nrow(dDepth.inBed)>0) qInBed<-ggstats::weighted.quantile(x = unlist(dDepth.inBed$v), w = unlist(dDepth.inBed$length), probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T) else qInBed<-rep(NA_real_,7)
         dDepth.notInBed<-dDepth[bpInBed!=1 | is.na(bpInBed),]
         qNotInBed<-ggstats::weighted.quantile(x = unlist(dDepth.notInBed$v), w = unlist(dDepth.notInBed$length), probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)
 
@@ -436,26 +442,6 @@ PradaClass$methods(
           qInBed[1],qInBed[2],qInBed[3],qInBed[4],qInBed[5],qInBed[6],qInBed[7],qNotInBed[1],qNotInBed[2],qNotInBed[3],qNotInBed[4],qNotInBed[5],qNotInBed[6],qNotInBed[7]
         )
 
-        #per original region statistics
-
-        dApplicationCoverageRegions.sample<-dApplicationCoverageRegions
-
-        dDepth.overlappingRegion<-dDepth[overlappingRegion==1,]
-
-        dDepth.overlappingRegion.aggstats<-dDepth.overlappingRegion[, .(
-          count = .N,
-          q002 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2],
-          q025 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[3],
-          q050 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[4],
-          q075 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[5],
-          q098 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[6]
-          ), by = bp1_regionlabel]
-
-        dApplicationCoverageRegions.sample[dDepth.overlappingRegion.aggstats,on=c(label_region='bp1_regionlabel'),c('sdepth_q002','sdepth_q025','sdepth_q050','sdepth_q075','sdepth_q098') := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
-
-        #sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom<-as.data.frame(dApplicationCoverageRegions.sample)
-        sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom<<-as.data.frame(dApplicationCoverageRegions.sample)
-
 
         #per bed region statistics
 
@@ -463,20 +449,63 @@ PradaClass$methods(
         dBed.sample[,v:=NULL]
 
         #dDepth.inBed.aggstats<-dDepth.inBed[, .(count = .N, var = median(v)), by = bp1_bedlabel]
+        if(nrow(dBed.sample)>0){
+          dDepth.inBed.aggstats<-dDepth.inBed[, .(
+            count = .N,
+            q002 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2],
+            q025 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[3],
+            q050 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[4],
+            q075 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[5],
+            q098 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[6]
+          ), by = bp1_bedlabel]
 
-        dDepth.inBed.aggstats<-dDepth.inBed[, .(
-          count = .N,
-          q002 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2],
-          q025 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[3],
-          q050 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[4],
-          q075 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[5],
-          q098 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[6]
-        ), by = bp1_bedlabel]
+          dBed.sample[dDepth.inBed.aggstats,on=c(label='bp1_bedlabel'),c('sdepth_q002','sdepth_q025','sdepth_q050','sdepth_q075','sdepth_q098') := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
 
-        dBed.sample[dDepth.inBed.aggstats,on=c(label='bp1_bedlabel'),c('sdepth_q002','sdepth_q025','sdepth_q050','sdepth_q075','sdepth_q098') := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
+        }
 
         #sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom<-as.data.frame(dBed.sample)
         sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom<<-as.data.frame(dBed.sample)
+
+
+        #per original region statistics
+
+        dApplicationCoverageRegions.sample<-dApplicationCoverageRegions
+
+        dDepth.overlappingRegion.multi<-dApplicationCoverageRegions.sample[dDepth,on=.(chr_name_region=chr,bp2_region>bp1, bp1_region<=bp1, bp2_region>=bp2, bp1_region<bp2),]
+        #dDepth.overlappingRegion.multi<-dDepth[dApplicationCoverageRegions.sample,on=.(chr=chr_name_region,bp1<bp2_region, bp1>=bp1_region, bp2<=bp2_region, bp2>bp1_region),] #allow.cartesian = TRUE
+
+        # dDepth.overlappingRegion.multi<-as.data.frame(dDepth.overlappingRegion.multi)
+        # setDT(dDepth.overlappingRegion.multi)
+
+        if(nrow(dDepth.overlappingRegion.multi)>0){
+
+          #ggstats::weighted.quantile(x = dDepth.overlappingRegion.multi$v,w = dDepth.overlappingRegion.multi$length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)
+          dDepth.overlappingRegion.aggstats<-dDepth.overlappingRegion.multi[, .(
+            count = .N,
+            #q002 = quantile(x = v, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2]
+            q002 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2],
+            q025 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[3],
+            q050 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[4],
+            q075 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[5],
+            q098 = ggstats::weighted.quantile(x = v,w = length, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[6]
+          ), by = label_region]
+
+          # dDepth.overlappingRegion.aggstats<-dDepth.overlappingRegion.multi[, .(
+          #   count = .N,
+          #   #q002 = quantile(x = v, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2]
+          #   q002 = quantile(x = v, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2],
+          #   q025 = quantile(x = v, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[3],
+          #   q050 = quantile(x = v, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[4],
+          #   q075 = quantile(x = v, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[5],
+          #   q098 = quantile(x = v, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[6]
+          # ), by = label_region]
+
+          dApplicationCoverageRegions.sample[dDepth.overlappingRegion.aggstats,on=c(label_region='label_region'),c('sdepth_q002','sdepth_q025','sdepth_q050','sdepth_q075','sdepth_q098') := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
+        }
+        #sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom<-as.data.frame(dApplicationCoverageRegions.sample)
+        sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom<<-as.data.frame(dApplicationCoverageRegions.sample)
+
+
 
         #View(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTable)
         #View(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom)
@@ -487,6 +516,135 @@ PradaClass$methods(
 
   }
 )
+
+
+
+#this requires the vcf-files
+PradaClass$methods(
+  computeCallStatistics=function(
+    filePathApplicationCoverageRegions=NULL
+  ){
+    # pradaApplicationDAO<-pradaO$pradaApplicationDAO
+    # nThread<-pradaO$nThread
+    # analysisSettingsList<-pradaO$analysisSettingsList
+    # sampleSettingsList<-pradaO$sampleSettingsList
+    # analysisMeta<-pradaO$analysisMeta
+    # sampleMeta<-pradaO$sampleMeta
+    # applicationCoverageRegions<-pradaO$applicationCoverageRegions
+    # filePathApplicationCoverageRegions=NULL
+
+    if(!is.null(filePathApplicationCoverageRegions)){
+      dApplicationCoverageRegions<-data.table::fread(file = filePathApplicationCoverageRegions)
+    } else dApplicationCoverageRegions<-applicationCoverageRegions #fall back to internal
+    colnames(dApplicationCoverageRegions)<-paste0(colnames(dApplicationCoverageRegions),"_region")
+    setDT(dApplicationCoverageRegions)
+    setkeyv(dApplicationCoverageRegions,cols = c("chr_name_region","bp1_region","bp2_region"))
+
+    if(nrow(sampleMeta)>0){
+      for(iSample in 1:nrow(sampleMeta)){
+        #iSample<-1
+        cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
+        cBarcode<-sampleMeta[iSample,c("barcode")]
+        cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
+
+        dDepth<-sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthTable
+        colnames(dDepth)<-c("chr","bp1","bp2","v")
+        setDT(dDepth)
+        setkeyv(dDepth,cols = c("chr","bp1","bp2"))
+
+        #unique(dDepth$chr)
+
+        filePathVcf<-file.path(analysisMeta[cAnalysisLabel,c("folderPathAnalysisOutputRaw")],"output",cBarcode,paste0(cBarcode,".filtered.vcf.gz"))
+
+        if(file.exists(filePathVcf)){
+          #fCon<-gzfile(filePathVcf,"rt")
+          #dVcf<-readLines(con = fCon,n = -1,encoding = "UTF-8")
+          dVcf<-fread(file = filePathVcf, na.strings =c(".",NA,"NA",""), encoding = "UTF-8", fill = T, blank.lines.skip = T, data.table = T,showProgress = T, nThread=nThread, header = T,  sep="\t",skip = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO",
+                      nrows = 1000000 #DELETE THIS!!!!
+                      )
+
+          colnames(dVcf)[1]<-"CHR"
+          dVcf<-dVcf[,c("CHR","POS","ID","REF","ALT","QUAL","FORMAT","SAMPLE")]
+          setkeyv(dVcf,cols = c("CHR","POS","ID"))
+
+          #parse the sample data - not complete!
+          # #assume the GT:GQ:DP:AD:AF:PL format
+          # #dVcf[FORMAT=='GT:GQ:DP:AD:AF:PL',c('GT','GQ','DP','AD','AF','PL'):=unlist(strsplit(SAMPLE,split = ":",fixed = T))] #this does not work
+          #
+          # dVcf<-as.data.frame(dVcf)
+          # dVcf[dVcf$FORMAT=='GT:GQ:DP:AD:AF:PL',]$GT<-lapply(X = dVcf[dVcf$FORMAT=='GT:GQ:DP:AD:AF:PL',]$SAMPLE,FUN = function(x){
+          #   unlist(strsplit(x,split = ":",fixed = T))[1]
+          # })
+
+
+
+          dVcf[,QUALACC:=1-10^(-QUAL/10)]
+          dVcf[dDepth,on=.(CHR=chr,POS<bp2, POS>=bp1), c('xdepth') := list(i.v)]
+
+
+          dVcf[dApplicationCoverageRegions,on=.(CHR=chr_name_region,POS<bp2_region, POS>=bp1_region),inRegion:=1]
+
+          #variant counts
+          sampleMeta[cUniqueSampleLabel,c("nvar","nvar_region","nvar_noregion")]<-c(nrow(dVcf), nrow(dVcf[!is.na(inRegion),]), nrow(dVcf[is.na(inRegion),]))
+          sampleMeta[cUniqueSampleLabel,c("nvarq","nvarq_region","nvarq_noregion")]<-c(nrow(dVcf[QUAL>=20,]), nrow(dVcf[!is.na(inRegion) & QUAL>=20,]), nrow(dVcf[is.na(inRegion) & QUAL>=20,]))
+
+          #snp call accuracy stratified by in original! region vs not in
+          dVcf.inRegion<-dVcf[!is.na(inRegion),]
+          qQualaccInRegion<-quantile(x = unlist(dVcf.inRegion$QUALACC), probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T) #we do not use weighted quantiles here!
+          dVcf.notInRegion<-dVcf[is.na(inRegion),]
+          qQualaccNotInRegion<-quantile(x = unlist(dVcf.notInRegion$QUALACC), probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T) #we do not use weighted quantiles here!
+
+
+          #
+          # sampleMeta[cUniqueSampleLabel,c("vcallacc_q000_region","vcallacc_q002_region","vcallacc_q025_region","vcallacc_q050_region","vcallacc_q075_region","vcallacc_q098_region","vcallacc_q100_region","vcallacc_q000_noregion","vcallacc_q002_noregion","vcallacc_q025_noregion","vcallacc_q050_noregion","vcallacc_q075_noregion","vcallacc_q098_noregion","vcallacc_q100_noregion")]<-c(
+          #   qQualaccInRegion[1],qQualaccInRegion[2],qQualaccInRegion[3],qQualaccInRegion[4],qQualaccInRegion[5],qQualaccInRegion[6],qQualaccInRegion[7],qQualaccNotInRegion[1],qQualaccNotInRegion[2],qQualaccNotInRegion[3],qQualaccNotInRegion[4],qQualaccNotInRegion[5],qQualaccNotInRegion[6],qQualaccNotInRegion[7]
+          # )
+          sampleMeta[cUniqueSampleLabel,c("vcallacc_q000_region","vcallacc_q002_region","vcallacc_q025_region","vcallacc_q050_region","vcallacc_q075_region","vcallacc_q098_region","vcallacc_q100_region","vcallacc_q000_noregion","vcallacc_q002_noregion","vcallacc_q025_noregion","vcallacc_q050_noregion","vcallacc_q075_noregion","vcallacc_q098_noregion","vcallacc_q100_noregion")]<<-c(
+            qQualaccInRegion[1],qQualaccInRegion[2],qQualaccInRegion[3],qQualaccInRegion[4],qQualaccInRegion[5],qQualaccInRegion[6],qQualaccInRegion[7],qQualaccNotInRegion[1],qQualaccNotInRegion[2],qQualaccNotInRegion[3],qQualaccNotInRegion[4],qQualaccNotInRegion[5],qQualaccNotInRegion[6],qQualaccNotInRegion[7]
+          )
+
+
+          dApplicationCoverageRegions.sample<-dApplicationCoverageRegions
+
+          dVcf.multi<-dApplicationCoverageRegions.sample[dVcf,on=.(chr_name_region=CHR,bp2_region>POS, bp1_region<=POS)]
+
+          if(nrow(dDepth.overlappingRegion.multi)>0){
+
+            #quantile(x = dVcf.multi$QUALACC, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)
+            dVcf.QUALACC.aggstats<-dVcf.multi[, .(
+              nvar = .N,
+              q002 = quantile(x = QUALACC, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[2],
+              q025 = quantile(x = QUALACC, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[3],
+              q050 = quantile(x = QUALACC, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[4],
+              q075 = quantile(x = QUALACC, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[5],
+              q098 = quantile(x = QUALACC, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)[6]
+            ), by = label_region] #includes normal count
+
+            dVcf.nvarq.aggstats<-dVcf.multi[QUAL>=20, .(
+              nvarq = .N
+            ), by = label_region]
+
+            dApplicationCoverageRegions.sample[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("vcallacc_q002","vcallacc_q025","vcallacc_q050","vcallacc_q075","vcallacc_q098") := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
+            dApplicationCoverageRegions.sample[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("nvar") := list(i.nvar)]
+            dApplicationCoverageRegions.sample[dVcf.nvarq.aggstats,on=c(label_region='label_region'),c("nvarq") := list(i.nvarq)]
+
+          }
+
+          #sampleSettingsList[[cUniqueSampleLabel]]$variantCallOriginalRegionsTableCustom<-as.data.frame(dApplicationCoverageRegions.sample)
+          sampleSettingsList[[cUniqueSampleLabel]]$variantCallOriginalRegionsTableCustom<<-as.data.frame(dApplicationCoverageRegions.sample)
+
+
+
+          #HERE!!! Read PGX calls
+
+        }
+      }
+    }
+
+
+  }
+)
+
 
 PradaClass$methods(
   printData=function(
@@ -567,5 +725,6 @@ PradaClass$methods(
 
   }
 )
+
 
 
