@@ -1,12 +1,13 @@
 #Functions to apply our custom analysis and qc routines after running previous standardised calling and qc pipelines
-#
+
 #
 # library(prada)
 # library(data.table)
 #
 # pradaO<-PradaClass()
-# pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
-# pradaO$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
+# #pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
+# #pradaO$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
+#
 # # pradaO$addAnalysisSetting(settingLabel = "p2-nogtube-nobedtest",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-nobedtest",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
 # #pradaO$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
 # pradaO$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube")
@@ -19,7 +20,7 @@
 # #pradaO$collectAnalysisDepthData("p2-nogtube-nobedtest")
 # #pradaO$collectAnalysisDepthData("p2-gtube")
 # pradaO$collectAnalysisDepthData("p2-nogtube")
-# pradaO$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed")
+# pradaO$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed",filePathApplicationCoverageRegions = "/Users/jakz/Documents/work_rstudio/prada/applicationCoverageRegions.tsv")
 # pradaO$printData()
 
 #check pgx calls

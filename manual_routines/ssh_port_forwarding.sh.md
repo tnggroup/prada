@@ -25,9 +25,3 @@ seemingly working
 The -g option:
 https://unix.stackexchange.com/questions/10428/simple-way-to-create-a-tunnel-from-one-local-port-to-another
 
-
-
-> 27.35/19.93
-[1] 1.372303
-> 1.372303*36.1
-[1] 49.54014
