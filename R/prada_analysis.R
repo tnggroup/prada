@@ -3,31 +3,32 @@
 #
 # library(prada)
 # library(data.table)
+# projectFolderPath<-"/Users/jakz/Documents/work_rstudio/prada"
 #
-# pradaO<-PradaClass()
-# #pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
-# #pradaO$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
+# pradaObj<-PradaClass()
+# #pradaObj$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
+# #pradaObj$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
 #
-# # pradaO$addAnalysisSetting(settingLabel = "p2-nogtube-nobedtest",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-nobedtest",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
-# #pradaO$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
-# pradaO$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube")
-# #pradaO$collectAnalysisCallData("p2-nogtube-nobedtest")
-# #pradaO$collectAnalysisCallData("p2-gtube")
-# pradaO$collectAnalysisCallData("p2-nogtube")
+# # pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube-nobedtest",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-nobedtest",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
+# #pradaObj$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
+# pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube")
+# #pradaObj$collectAnalysisCallData("p2-nogtube-nobedtest")
+# #pradaObj$collectAnalysisCallData("p2-gtube")
+# pradaObj$collectAnalysisCallData("p2-nogtube")
 #
-# #pradaO$sampleMeta<-pradaO$sampleMeta[pradaO$sampleMeta$barcode=='barcode01',] #filter to barcode01 only
+# #pradaObj$sampleMeta<-pradaObj$sampleMeta[pradaObj$sampleMeta$barcode=='barcode01',] #filter to barcode01 only
 #
-# #pradaO$collectAnalysisDepthData("p2-nogtube-nobedtest")
-# #pradaO$collectAnalysisDepthData("p2-gtube")
-# pradaO$collectAnalysisDepthData("p2-nogtube")
-# pradaO$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed",filePathApplicationCoverageRegions = "/Users/jakz/Documents/work_rstudio/prada/applicationCoverageRegions.tsv")
-# pradaO$printData()
+# #pradaObj$collectAnalysisDepthData("p2-nogtube-nobedtest")
+# #pradaObj$collectAnalysisDepthData("p2-gtube")
+# pradaObj$collectAnalysisDepthData("p2-nogtube")
+# pradaObj$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed",filePathApplicationCoverageRegions = "/Users/jakz/Documents/work_rstudio/prada/applicationCoverageRegions.tsv")
+# pradaObj$printData()
 
 #check pgx calls
-#View(pradaO$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls_table)
-#View(pradaO$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls_table)
-# View(pradaO$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls$results)
-# View(pradaO$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls$results)
+#View(pradaObj$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls_table)
+#View(pradaObj$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls_table)
+# View(pradaObj$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls$results)
+# View(pradaObj$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls$results)
 
 PradaClass$methods(
   addAnalysisSetting=function(
@@ -67,13 +68,13 @@ PradaClass$methods(
 #Identifies list of barcodes
 PradaClass$methods(
 collectAnalysisCallData=function(settingLabel){
-  # settingLabel <- "p2-gtube"
-  # pradaApplicationDAO<-pradaO$pradaApplicationDAO
-  # nThread<-pradaO$nThread
-  # analysisSettingsList<-pradaO$analysisSettingsList
-  # sampleSettingsList<-pradaO$sampleSettingsList
-  # analysisMeta<-pradaO$analysisMeta
-  # sampleMeta<-pradaO$sampleMeta
+  # settingLabel <- "p2-nogtube"
+  # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
+  # nThread<-pradaObj$nThread
+  # analysisSettingsList<-pradaObj$analysisSettingsList
+  # sampleSettingsList<-pradaObj$sampleSettingsList
+  # analysisMeta<-pradaObj$analysisMeta
+  # sampleMeta<-pradaObj$sampleMeta
 
   # #read file content of sequencing folder
   # analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList<-list.files(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw)
@@ -137,7 +138,7 @@ collectAnalysisCallData=function(settingLabel){
   filenameReportMetadata<-grep(pattern = "^report.+\\.md$",x = analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList, value = T)
 
   con = file(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameReportMetadata),open="r")
-  reportFileData <- readLines(con = con,encoding = "UTF-8")
+  reportFileData <- readLines(con = con,encoding = "UTF-8", warn = F)
   close(con)
 
   i1 <- grep("Tracking ID",x = reportFileData)
@@ -161,7 +162,7 @@ collectAnalysisCallData=function(settingLabel){
     iTrackingBracketEnd<-iTrackingBracketEnd[iTrackingBracketEnd<endRownr][1]
 
     trackingIdString<-paste(reportFileData[iTrackingBracketStart:iTrackingBracketEnd],sep = "\n",collapse = '')
-    trackingIdData<-jsonlite::fromJSON(trackingIdString)
+    trackingIdData<-unlist(jsonlite::fromJSON(trackingIdString)) #added unlist to assure plain list
 
     #analysisMeta[settingLabel,names(trackingIdData)]<-trackingIdData
     analysisMeta[settingLabel,names(trackingIdData)]<<-trackingIdData
@@ -230,7 +231,7 @@ collectAnalysisCallData=function(settingLabel){
   }
 
   con = file(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"launch.json"),open="r")
-  callLaunchDataString <- readLines(con = con,encoding = "UTF-8")
+  callLaunchDataString <- readLines(con = con,encoding = "UTF-8", warn = F)
   close(con)
   callLaunchData<-jsonlite::fromJSON(callLaunchDataString)
   #View(callLaunchData)
@@ -242,7 +243,7 @@ collectAnalysisCallData=function(settingLabel){
 
   #output/params.json
   con = file(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"output","params.json"),open="r")
-  callOutputParamsDataString <- readLines(con = con,encoding = "UTF-8")
+  callOutputParamsDataString <- readLines(con = con,encoding = "UTF-8", warn = F)
   close(con)
   callOutputParamsData<-jsonlite::fromJSON(callOutputParamsDataString)
   #View(callOutputParamsData)
@@ -269,7 +270,7 @@ collectAnalysisCallData=function(settingLabel){
 
   if(length(barcodeFolders)>0){
     for(iBarcode in 1:length(barcodeFolders)){
-      #iBarcode<-1
+      #iBarcode<-3
       cUniqueSampleLabel <- paste0(settingLabel,"_",barcodeFolders[iBarcode])
       cBarcodeFolderpath<-file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"output",barcodeFolders[iBarcode])
 
@@ -278,7 +279,7 @@ collectAnalysisCallData=function(settingLabel){
 
       ##barcode match.json
       con = file(file.path(cBarcodeFolderpath,paste0(barcodeFolders[iBarcode],".match.json")),open="r")
-      dString <- paste0(readLines(con = con,encoding = "UTF-8"),collapse = "\n")
+      dString <- paste0(readLines(con = con,encoding = "UTF-8",warn = F),collapse = "\n")
       close(con)
       dJson<-jsonlite::fromJSON(dString,simplifyDataFrame=FALSE) #this otherwise reverts to true for some reason and creates data frames
 
@@ -313,8 +314,69 @@ collectAnalysisCallData=function(settingLabel){
       #sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls<-dJson
       sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls<<-dJson
 
+
       # #sampleMeta[cUniqueSampleLabel,c("analysis","barcode","pgx_calls")]<-c(settingLabel,barcodeFolders[iBarcode],jsonlite::toJSON(dJson,pretty = TRUE))
       # sampleMeta[cUniqueSampleLabel,c("analysis","barcode","pgx_calls")]<<-c(settingLabel,barcodeFolders[iBarcode],jsonlite::toJSON(dJson,pretty = TRUE))
+
+
+      #PGX calls, from match.json
+      cPGXCalls<-as.data.frame(matrix(data = NA,nrow = 0, ncol = 0))
+
+      if(length(sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls$results)>0){
+        for(iRes in 1:length(sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls$results)){
+          #iRes<-1
+          cResult<-sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls$results[[iRes]]
+
+          for(iDip in 1:max(length(cResult$diplotypes),1)){
+            cLabel<-paste0(cResult$gene,"_",iDip)
+            cPGXCalls[cLabel,c("gene")]<-cResult$gene
+            cPGXCalls[cLabel,c("version")]<-cResult$version
+            cPGXCalls[cLabel,c("source")]<-cResult$source
+
+            #diplotypes
+            if(iDip<=length(cResult$diplotypes)) {
+              mainDiplotype<-cResult$diplotypes[[iDip]]
+
+              cPGXCalls[cLabel,c("diplotype_name")]<-nanull(mainDiplotype$name)
+              cPGXCalls[cLabel,c("diplotype_score")]<-nanull(mainDiplotype$score)
+              cPGXCalls[cLabel,c("haplotype1_name")]<-nanull(mainDiplotype$haplotype1$name)
+              cPGXCalls[cLabel,c("haplotype1_sequences")]<-nanull(mainDiplotype$haplotype1$sequences[1])
+              cPGXCalls[cLabel,c("haplotype1_id")]<-nanull(mainDiplotype$haplotype1$haplotype$id)
+              cPGXCalls[cLabel,c("haplotype1_alleles")]<-jsonlite::toJSON(mainDiplotype$haplotype1$haplotype$alleles)
+              cPGXCalls[cLabel,c("haplotype1_alleles_cpic")]<-jsonlite::toJSON(mainDiplotype$haplotype1$haplotype$cpicAlleles)
+              cPGXCalls[cLabel,c("haplotype1_reference")]<-nanull(mainDiplotype$haplotype1$haplotype$reference)
+              cPGXCalls[cLabel,c("haplotype1_structural")]<-nanull(mainDiplotype$haplotype1$haplotype$structuralVariant)
+              cPGXCalls[cLabel,c("haplotype1_combinations")]<-nanull(mainDiplotype$haplotype1$haplotype$numCombinations)
+              cPGXCalls[cLabel,c("haplotype1_partials")]<-nanull(mainDiplotype$haplotype1$haplotype$numPartials)
+              cPGXCalls[cLabel,c("haplotype2_name")]<-nanull(mainDiplotype$haplotype2$name)
+              cPGXCalls[cLabel,c("haplotype2_sequences")]<-nanull(mainDiplotype$haplotype2$sequences[1])
+              cPGXCalls[cLabel,c("haplotype2_id")]<-nanull(mainDiplotype$haplotype2$haplotype$id)
+              cPGXCalls[cLabel,c("haplotype2_alleles")]<-jsonlite::toJSON(mainDiplotype$haplotype2$haplotype$alleles)
+              cPGXCalls[cLabel,c("haplotype2_alleles_cpic")]<-jsonlite::toJSON(mainDiplotype$haplotype2$haplotype$cpicAlleles)
+              cPGXCalls[cLabel,c("haplotype2_reference")]<-nanull(mainDiplotype$haplotype2$haplotype$reference)
+              cPGXCalls[cLabel,c("haplotype2_structural")]<-nanull(mainDiplotype$haplotype2$haplotype$structuralVariant)
+              cPGXCalls[cLabel,c("haplotype2_combinations")]<-nanull(mainDiplotype$haplotype2$haplotype$numCombinations)
+              cPGXCalls[cLabel,c("haplotype2_partials")]<-nanull(mainDiplotype$haplotype2$haplotype$numPartials)
+            }
+
+            #variants
+            cPGXCalls[cLabel,c("nvariants")]<-length(cResult$variants)
+
+
+            #missing positions
+            cPGXCalls[cLabel,c("nmissingpos")]<-length(cResult$matchData$missingPositions)
+
+
+            #undocumented variation positions
+            cPGXCalls[cLabel,c("nundocpos")]<-length(cResult$matchData$positionsWithUndocumentedVariations)
+          }
+
+        }
+      }
+
+      #sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom<-cPGXCalls
+      sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom<<-cPGXCalls
+
 
       ## XX.pharmcat.tsv
       d<-as.data.frame(data.table::fread(file = file.path(cBarcodeFolderpath,paste0(barcodeFolders[iBarcode],".pharmcat.tsv")), fill = T, header = T,strip.white = T))
@@ -334,12 +396,12 @@ PradaClass$methods(
     settingLabel
   ){
     # settingLabel <- "p2-nogtube-nobedtest"
-    # pradaApplicationDAO<-pradaO$pradaApplicationDAO
-    # nThread<-pradaO$nThread
-    # analysisSettingsList<-pradaO$analysisSettingsList
-    # sampleSettingsList<-pradaO$sampleSettingsList
-    # analysisMeta<-pradaO$analysisMeta
-    # sampleMeta<-pradaO$sampleMeta
+    # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
+    # nThread<-pradaObj$nThread
+    # analysisSettingsList<-pradaObj$analysisSettingsList
+    # sampleSettingsList<-pradaObj$sampleSettingsList
+    # analysisMeta<-pradaObj$analysisMeta
+    # sampleMeta<-pradaObj$sampleMeta
 
     if(nrow(sampleMeta>0)){
       for(iBarcode in 1:nrow(sampleMeta)){
@@ -367,19 +429,19 @@ PradaClass$methods(
 )
 
 #requires applicationCoverageRegions loaded from db or file
-#pradaO$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000)
+#pradaObj$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000)
 PradaClass$methods(
   computeDepthDataStatistics=function(
     filePathBed=NULL,
     filePathApplicationCoverageRegions=NULL
     ){
-    # pradaApplicationDAO<-pradaO$pradaApplicationDAO
-    # nThread<-pradaO$nThread
-    # analysisSettingsList<-pradaO$analysisSettingsList
-    # sampleSettingsList<-pradaO$sampleSettingsList
-    # analysisMeta<-pradaO$analysisMeta
-    # sampleMeta<-pradaO$sampleMeta
-    # applicationCoverageRegions<-pradaO$applicationCoverageRegions
+    # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
+    # nThread<-pradaObj$nThread
+    # analysisSettingsList<-pradaObj$analysisSettingsList
+    # sampleSettingsList<-pradaObj$sampleSettingsList
+    # analysisMeta<-pradaObj$analysisMeta
+    # sampleMeta<-pradaObj$sampleMeta
+    # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
     #
     # filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed"
     # filePathApplicationCoverageRegions=NULL
@@ -503,13 +565,13 @@ PradaClass$methods(
 
           dApplicationCoverageRegions.sample[dDepth.overlappingRegion.aggstats,on=c(label_region='label_region'),c('sdepth_q002','sdepth_q025','sdepth_q050','sdepth_q075','sdepth_q098') := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
         }
-        #sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom<-as.data.frame(dApplicationCoverageRegions.sample)
-        sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom<<-as.data.frame(dApplicationCoverageRegions.sample)
+        #sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<-as.data.frame(dApplicationCoverageRegions.sample)
+        sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<<-as.data.frame(dApplicationCoverageRegions.sample)
 
 
 
         #View(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTable)
-        #View(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom)
+        #View(sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable)
 
       }
     }
@@ -525,14 +587,15 @@ PradaClass$methods(
   computeCallStatistics=function(
     filePathApplicationCoverageRegions=NULL
   ){
-    # pradaApplicationDAO<-pradaO$pradaApplicationDAO
-    # nThread<-pradaO$nThread
-    # analysisSettingsList<-pradaO$analysisSettingsList
-    # sampleSettingsList<-pradaO$sampleSettingsList
-    # analysisMeta<-pradaO$analysisMeta
-    # sampleMeta<-pradaO$sampleMeta
-    # applicationCoverageRegions<-pradaO$applicationCoverageRegions
+    # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
+    # nThread<-pradaObj$nThread
+    # analysisSettingsList<-pradaObj$analysisSettingsList
+    # sampleSettingsList<-pradaObj$sampleSettingsList
+    # analysisMeta<-pradaObj$analysisMeta
+    # sampleMeta<-pradaObj$sampleMeta
+    # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
     # filePathApplicationCoverageRegions=NULL
+    # #filePathApplicationCoverageRegions <- file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv")
 
     if(!is.null(filePathApplicationCoverageRegions)){
       dApplicationCoverageRegions<-data.table::fread(file = filePathApplicationCoverageRegions)
@@ -596,7 +659,7 @@ PradaClass$methods(
           qQualaccNotInRegion<-quantile(x = unlist(dVcf.notInRegion$QUALACC), probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T) #we do not use weighted quantiles here!
 
 
-          #
+#
           # sampleMeta[cUniqueSampleLabel,c("vcallacc_q000_region","vcallacc_q002_region","vcallacc_q025_region","vcallacc_q050_region","vcallacc_q075_region","vcallacc_q098_region","vcallacc_q100_region","vcallacc_q000_noregion","vcallacc_q002_noregion","vcallacc_q025_noregion","vcallacc_q050_noregion","vcallacc_q075_noregion","vcallacc_q098_noregion","vcallacc_q100_noregion")]<-c(
           #   qQualaccInRegion[1],qQualaccInRegion[2],qQualaccInRegion[3],qQualaccInRegion[4],qQualaccInRegion[5],qQualaccInRegion[6],qQualaccInRegion[7],qQualaccNotInRegion[1],qQualaccNotInRegion[2],qQualaccNotInRegion[3],qQualaccNotInRegion[4],qQualaccNotInRegion[5],qQualaccNotInRegion[6],qQualaccNotInRegion[7]
           # )
@@ -605,11 +668,11 @@ PradaClass$methods(
           )
 
 
-          dApplicationCoverageRegions.sample<-dApplicationCoverageRegions
 
-          dVcf.multi<-dApplicationCoverageRegions.sample[dVcf,on=.(chr_name_region=CHR,bp2_region>POS, bp1_region<=POS)]
 
-          if(nrow(dDepth.overlappingRegion.multi)>0){
+          dVcf.multi<-dApplicationCoverageRegions[dVcf,on=.(chr_name_region=CHR,bp2_region>POS, bp1_region<=POS)]
+
+          if(nrow(dVcf.multi)>0){
 
             #quantile(x = dVcf.multi$QUALACC, probs = c(0,0.02,0.25,0.5,0.75,0.98,1), na.rm = T)
             dVcf.QUALACC.aggstats<-dVcf.multi[, .(
@@ -625,18 +688,39 @@ PradaClass$methods(
               nvarq = .N
             ), by = label_region]
 
-            dApplicationCoverageRegions.sample[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("vcallacc_q002","vcallacc_q025","vcallacc_q050","vcallacc_q075","vcallacc_q098") := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
-            dApplicationCoverageRegions.sample[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("nvar") := list(i.nvar)]
-            dApplicationCoverageRegions.sample[dVcf.nvarq.aggstats,on=c(label_region='label_region'),c("nvarq") := list(i.nvarq)]
+            if(is.null(sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable)){
+              #sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<-as.data.frame(dApplicationCoverageRegions)
+              sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<<-as.data.frame(dApplicationCoverageRegions)
+            }
+
+            cSequencingStatsOriginalRegionsTable<-sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable
+            setDT(cSequencingStatsOriginalRegionsTable)
+
+            cSequencingStatsOriginalRegionsTable[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("vcallacc_q002","vcallacc_q025","vcallacc_q050","vcallacc_q075","vcallacc_q098") := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
+            cSequencingStatsOriginalRegionsTable[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("nvar") := list(i.nvar)]
+            cSequencingStatsOriginalRegionsTable[dVcf.nvarq.aggstats,on=c(label_region='label_region'),c("nvarq") := list(i.nvarq)]
+
+            # dApplicationCoverageRegions.sample[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("vcallacc_q002","vcallacc_q025","vcallacc_q050","vcallacc_q075","vcallacc_q098") := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
+            # dApplicationCoverageRegions.sample[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("nvar") := list(i.nvar)]
+            # dApplicationCoverageRegions.sample[dVcf.nvarq.aggstats,on=c(label_region='label_region'),c("nvarq") := list(i.nvarq)]
 
           }
 
-          #sampleSettingsList[[cUniqueSampleLabel]]$variantCallOriginalRegionsTableCustom<-as.data.frame(dApplicationCoverageRegions.sample)
-          sampleSettingsList[[cUniqueSampleLabel]]$variantCallOriginalRegionsTableCustom<<-as.data.frame(dApplicationCoverageRegions.sample)
+          #sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<-as.data.frame(cSequencingStatsOriginalRegionsTable)
+          sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<<-as.data.frame(cSequencingStatsOriginalRegionsTable)
 
 
 
-          #HERE!!! Read PGX calls
+          #combined pgx call statistics
+
+          #names(sampleSettingsList[[cUniqueSampleLabel]])
+          pgxCustom<-sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom
+          setDT(pgxCustom)
+          cSequencingStatsOriginalRegionsTable<-sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable
+          setDT(cSequencingStatsOriginalRegionsTable)
+
+          #pgxCustom[cSequencingStatsOriginalRegionsTable, on=.()] #HERE!!!!!
+
 
         }
       }
@@ -650,13 +734,13 @@ PradaClass$methods(
 PradaClass$methods(
   printData=function(
   ){
-    # pradaApplicationDAO<-pradaO$pradaApplicationDAO
-    # nThread<-pradaO$nThread
-    # analysisSettingsList<-pradaO$analysisSettingsList
-    # sampleSettingsList<-pradaO$sampleSettingsList
-    # analysisMeta<-pradaO$analysisMeta
-    # sampleMeta<-pradaO$sampleMeta
-    # applicationCoverageRegions<-pradaO$applicationCoverageRegions
+    # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
+    # nThread<-pradaObj$nThread
+    # analysisSettingsList<-pradaObj$analysisSettingsList
+    # sampleSettingsList<-pradaObj$sampleSettingsList
+    # analysisMeta<-pradaObj$analysisMeta
+    # sampleMeta<-pradaObj$sampleMeta
+    # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
 
 
     #original regions (as loaded)

@@ -20,15 +20,15 @@ filePathBed<-file.path("..","data","grch38.5k.1p3percent.bed")
 filePathFasta=file.path("..","data","GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz")
 
 
-#this is WIP?
-createAdaptedFastaReferenceForCustomBed=function(
-    filePathBed,
-    filePathFasta=file.path("data","GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz")
-){
-  ref <- seqinr::read.fasta(file = filePathFasta)
-  bed <- fread(file = filePathBed, sep = "\t",header = T)
-
-}
+# #this is WIP?
+# createAdaptedFastaReferenceForCustomBed=function(
+#     filePathBed,
+#     filePathFasta=file.path("data","GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz")
+# ){
+#   ref <- seqinr::read.fasta(file = filePathFasta)
+#   bed <- fread(file = filePathBed, sep = "\t",header = T)
+#
+# }
 
 #re-used from the gwas_sumstats genetic correlations project
 readMetadata <- function(filePath,labelValueSeparator='='){
@@ -198,4 +198,8 @@ padStringLeft <- function(s,padding,targetLength){
   if(pl>0) {paste0(c(rep(padding,pl),s),collapse = "")} else {s}
 }
 
+nanull <- function(x){
+x[is.null(x)]<-NA
+x
+}
 
