@@ -1,6 +1,6 @@
 exportPattern("^[[:alpha:]]+")
 import(tm)
-#import(DBI)
-#import(RPostgres)
+import(DBI)
+import(RPostgres)
 import(data.table)
 import(jsonlite)

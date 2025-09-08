@@ -22,6 +22,7 @@
 # #pradaObj$collectAnalysisDepthData("p2-gtube")
 # pradaObj$collectAnalysisDepthData("p2-nogtube")
 # pradaObj$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed",filePathApplicationCoverageRegions = "/Users/jakz/Documents/work_rstudio/prada/applicationCoverageRegions.tsv")
+# pradaObj$computeCallStatistics(filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv"))
 # pradaObj$printData()
 
 #check pgx calls
@@ -332,6 +333,7 @@ collectAnalysisCallData=function(settingLabel){
             cPGXCalls[cLabel,c("gene")]<-cResult$gene
             cPGXCalls[cLabel,c("version")]<-cResult$version
             cPGXCalls[cLabel,c("source")]<-cResult$source
+            cPGXCalls[cLabel,c("chromosome")]<-cResult$chromosome
 
             #diplotypes
             if(iDip<=length(cResult$diplotypes)) {
@@ -594,8 +596,8 @@ PradaClass$methods(
     # analysisMeta<-pradaObj$analysisMeta
     # sampleMeta<-pradaObj$sampleMeta
     # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
-    # filePathApplicationCoverageRegions=NULL
-    # #filePathApplicationCoverageRegions <- file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv")
+    # #filePathApplicationCoverageRegions=NULL
+    # filePathApplicationCoverageRegions <- file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv")
 
     if(!is.null(filePathApplicationCoverageRegions)){
       dApplicationCoverageRegions<-data.table::fread(file = filePathApplicationCoverageRegions)
@@ -606,7 +608,7 @@ PradaClass$methods(
 
     if(nrow(sampleMeta)>0){
       for(iSample in 1:nrow(sampleMeta)){
-        #iSample<-1
+        #iSample<-3
         cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
         cBarcode<-sampleMeta[iSample,c("barcode")]
         cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
@@ -624,7 +626,7 @@ PradaClass$methods(
           #fCon<-gzfile(filePathVcf,"rt")
           #dVcf<-readLines(con = fCon,n = -1,encoding = "UTF-8")
           dVcf<-fread(file = filePathVcf, na.strings =c(".",NA,"NA",""), encoding = "UTF-8", fill = T, blank.lines.skip = T, data.table = T,showProgress = T, nThread=nThread, header = T,  sep="\t",skip = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO",
-                      nrows = 1000000 #DELETE THIS!!!!
+                      nrows = 2000000 #DELETE THIS!!!!
                       )
 
           colnames(dVcf)[1]<-"CHR"
@@ -642,13 +644,13 @@ PradaClass$methods(
 
 
 
-          dVcf[,QUALACC:=1-10^(-QUAL/10)]
+          dVcf[,QUALACC:=1-10^(-QUAL/10)] #accuracy from the given Phred quality scores
           dVcf[dDepth,on=.(CHR=chr,POS<bp2, POS>=bp1), c('xdepth') := list(i.v)]
 
 
           dVcf[dApplicationCoverageRegions,on=.(CHR=chr_name_region,POS<bp2_region, POS>=bp1_region),inRegion:=1]
 
-          #variant counts
+          #variant counts and quality measurement
           sampleMeta[cUniqueSampleLabel,c("nvar","nvar_region","nvar_noregion")]<-c(nrow(dVcf), nrow(dVcf[!is.na(inRegion),]), nrow(dVcf[is.na(inRegion),]))
           sampleMeta[cUniqueSampleLabel,c("nvarq","nvarq_region","nvarq_noregion")]<-c(nrow(dVcf[QUAL>=20,]), nrow(dVcf[!is.na(inRegion) & QUAL>=20,]), nrow(dVcf[is.na(inRegion) & QUAL>=20,]))
 
@@ -670,7 +672,21 @@ PradaClass$methods(
 
 
 
+          #full version - uses lots of memory
+          #dVcf<-dVcf[CHR=='chr1' | CHR=='chr1' ,] #for testing
           dVcf.multi<-dApplicationCoverageRegions[dVcf,on=.(chr_name_region=CHR,bp2_region>POS, bp1_region<=POS)]
+
+          # #this does also seem to use lots of memory
+          # lVcf.multi<-list()
+          # for(iChr in 1:23){
+          #   #iChr<-1
+          #   cChr<-paste0('chr',iChr)
+          #   if(iChr==23) cChr<-'chrX'
+          #   cDVcf.multi<-dApplicationCoverageRegions[dVcf[CHR==eval(cChr),],on=.(chr_name_region=CHR,bp2_region>POS, bp1_region<=POS)]
+          #
+          #   lVcf.multi[iChr]<-list(cDVcf.multi)
+          # }
+
 
           if(nrow(dVcf.multi)>0){
 
@@ -700,15 +716,10 @@ PradaClass$methods(
             cSequencingStatsOriginalRegionsTable[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("nvar") := list(i.nvar)]
             cSequencingStatsOriginalRegionsTable[dVcf.nvarq.aggstats,on=c(label_region='label_region'),c("nvarq") := list(i.nvarq)]
 
-            # dApplicationCoverageRegions.sample[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("vcallacc_q002","vcallacc_q025","vcallacc_q050","vcallacc_q075","vcallacc_q098") := list(i.q002,i.q025,i.q050,i.q075,i.q098)]
-            # dApplicationCoverageRegions.sample[dVcf.QUALACC.aggstats,on=c(label_region='label_region'),c("nvar") := list(i.nvar)]
-            # dApplicationCoverageRegions.sample[dVcf.nvarq.aggstats,on=c(label_region='label_region'),c("nvarq") := list(i.nvarq)]
+            #sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<-as.data.frame(cSequencingStatsOriginalRegionsTable)
+            sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<<-as.data.frame(cSequencingStatsOriginalRegionsTable)
 
           }
-
-          #sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<-as.data.frame(cSequencingStatsOriginalRegionsTable)
-          sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<<-as.data.frame(cSequencingStatsOriginalRegionsTable)
-
 
 
           #combined pgx call statistics
@@ -716,10 +727,48 @@ PradaClass$methods(
           #names(sampleSettingsList[[cUniqueSampleLabel]])
           pgxCustom<-sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom
           setDT(pgxCustom)
+
+          setorder(pgxCustom, gene, -diplotype_score, diplotype_name)
+
+          pgxCustom.agg<-pgxCustom[, .(
+            count = .N,
+            version_top= head(.SD, 1)$version,
+            source_top= head(.SD, 1)$source,
+            chromosome_top= head(.SD, 1)$chromosome,
+            diplotype_name_top= head(.SD, 1)$diplotype_name,
+            diplotype_score_top= head(.SD, 1)$diplotype_score,
+            diplotype_score_mean= mean(diplotype_score, na.rm=T),
+            nvariants_mean= mean(nvariants, na.rm=T),
+            nmissingpos_mean= mean(nmissingpos, na.rm=T),
+            nundocpos_mean= mean(nundocpos, na.rm=T)
+
+          ), by = gene]
+
+          #fix NaN
+          pgxCustom.agg[is.nan(diplotype_score_top),diplotype_score_top:=NA_integer_]
+          pgxCustom.agg[is.nan(diplotype_score_mean),diplotype_score_mean:=NA_real_]
+          pgxCustom.agg[is.nan(nvariants_mean),nvariants_mean:=NA_real_]
+          pgxCustom.agg[is.nan(nmissingpos_mean),nmissingpos_mean:=NA_real_]
+          pgxCustom.agg[is.nan(nundocpos_mean),nundocpos_mean:=NA_real_]
+
+
+
           cSequencingStatsOriginalRegionsTable<-sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable
           setDT(cSequencingStatsOriginalRegionsTable)
 
-          #pgxCustom[cSequencingStatsOriginalRegionsTable, on=.()] #HERE!!!!!
+          #update this by reference
+          cSequencingStatsOriginalRegionsTable[pgxCustom.agg, on=.(label_region=gene, chr_name_region=chromosome_top), c("npgxcalls","source_top","diplotype_name_top","diplotype_score_top","diplotype_score_mean","nvariants_mean","nmissingpos_mean","nundocpos_mean"):=list(i.count, i.source_top, i.diplotype_name_top, i.diplotype_score_top, i.diplotype_score_mean, i.nvariants_mean, i.nmissingpos_mean, i.nundocpos_mean)]
+
+          #sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<-as.data.frame(cSequencingStatsOriginalRegionsTable)
+          sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable<<-as.data.frame(cSequencingStatsOriginalRegionsTable)
+
+          pgxCustom.agg[cSequencingStatsOriginalRegionsTable, on=.(gene=label_region, chromosome_top=chr_name_region), match:=1]
+          pgxCustom.agg.unmatched<-pgxCustom.agg[is.na(match), ]
+          nUnmatched<-nrow(pgxCustom.agg.unmatched)
+          if(nUnmatched>0){warning(paste0("Found ",nUnmatched, " pgx call genes not matching with the original region list!"))}
+
+          #sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg<-as.data.frame(pgxCustom.agg)
+          sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg<<-as.data.frame(pgxCustom.agg)
 
 
         }
