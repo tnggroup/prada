@@ -24,9 +24,16 @@ PradaClass <- setRefClass("Prada",
                                              #this is the constructor as per convention
                                              initialize=function()
                                              {
+
                                                #defaults
+                                               pradaApplicationDAO <<- NULL
+
                                                paddingPRSAnchorBp<<-10000
                                                paddingGeneBp<<-10000
+
+                                               applicationCoverageRegions <<- NULL
+                                               applicationCoverageRegionsFiltered <<- NULL
+                                               applicationCoverageRegionsFilteredPaddedStrands <<- NULL
 
                                                nThread <<- 6
                                                analysisSettingsList<<-c()

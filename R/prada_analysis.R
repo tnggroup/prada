@@ -625,8 +625,9 @@ PradaClass$methods(
         if(file.exists(filePathVcf)){
           #fCon<-gzfile(filePathVcf,"rt")
           #dVcf<-readLines(con = fCon,n = -1,encoding = "UTF-8")
-          dVcf<-fread(file = filePathVcf, na.strings =c(".",NA,"NA",""), encoding = "UTF-8", fill = T, blank.lines.skip = T, data.table = T,showProgress = T, nThread=nThread, header = T,  sep="\t",skip = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO",
-                      nrows = 2000000 #DELETE THIS!!!!
+          dVcf<-fread(file = filePathVcf, na.strings =c(".",NA,"NA",""), encoding = "UTF-8", fill = T, blank.lines.skip = T, data.table = T,showProgress = T, nThread=nThread, header = T,  sep="\t",
+                      skip = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO"
+                      #nrows = 2000000 #DELETE THIS!!!!
                       )
 
           colnames(dVcf)[1]<-"CHR"
@@ -651,8 +652,11 @@ PradaClass$methods(
           dVcf[dApplicationCoverageRegions,on=.(CHR=chr_name_region,POS<bp2_region, POS>=bp1_region),inRegion:=1]
 
           #variant counts and quality measurement
-          sampleMeta[cUniqueSampleLabel,c("nvar","nvar_region","nvar_noregion")]<-c(nrow(dVcf), nrow(dVcf[!is.na(inRegion),]), nrow(dVcf[is.na(inRegion),]))
-          sampleMeta[cUniqueSampleLabel,c("nvarq","nvarq_region","nvarq_noregion")]<-c(nrow(dVcf[QUAL>=20,]), nrow(dVcf[!is.na(inRegion) & QUAL>=20,]), nrow(dVcf[is.na(inRegion) & QUAL>=20,]))
+
+          # sampleMeta[cUniqueSampleLabel,c("nvar","nvar_region","nvar_noregion")]<-c(nrow(dVcf), nrow(dVcf[!is.na(inRegion),]), nrow(dVcf[is.na(inRegion),]))
+          # sampleMeta[cUniqueSampleLabel,c("nvarq","nvarq_region","nvarq_noregion")]<-c(nrow(dVcf[QUAL>=20,]), nrow(dVcf[!is.na(inRegion) & QUAL>=20,]), nrow(dVcf[is.na(inRegion) & QUAL>=20,]))
+          sampleMeta[cUniqueSampleLabel,c("nvar","nvar_region","nvar_noregion")]<<-c(nrow(dVcf), nrow(dVcf[!is.na(inRegion),]), nrow(dVcf[is.na(inRegion),]))
+          sampleMeta[cUniqueSampleLabel,c("nvarq","nvarq_region","nvarq_noregion")]<<-c(nrow(dVcf[QUAL>=20,]), nrow(dVcf[!is.na(inRegion) & QUAL>=20,]), nrow(dVcf[is.na(inRegion) & QUAL>=20,]))
 
           #snp call accuracy stratified by in original! region vs not in
           dVcf.inRegion<-dVcf[!is.na(inRegion),]
@@ -825,12 +829,20 @@ PradaClass$methods(
         cBarcode<-sampleMeta[iSample,c("barcode")]
         cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
 
-        cfilepath<-paste0("sampleSequencingDepthRegionsTableCustom_",cUniqueSampleLabel,".tsv")
-        fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+        if(!is.null(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom)){
+          cfilepath<-paste0("sequencingDepthRegionsTableCustom_",cUniqueSampleLabel,".tsv")
+          fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+        }
 
-        cfilepath<-paste0("sequencingDepthOriginalRegionsTableCustom_",cUniqueSampleLabel,".tsv")
-        fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthOriginalRegionsTableCustom,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+        if(!is.null(sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable)){
+          cfilepath<-paste0("sequencingStatsOriginalRegionsTable_",cUniqueSampleLabel,".tsv")
+          fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+        }
 
+        if(!is.null(sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg)){
+          cfilepath<-paste0("pgxCallsAggCustom_",cUniqueSampleLabel,".tsv")
+          fwrite(sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+        }
 
 
         #IGV graphs
