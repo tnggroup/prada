@@ -800,13 +800,16 @@ PradaClass$methods(
     if(!is.null(applicationCoverageRegions)){
       applicationCoverageRegions.filepath<-"applicationCoverageRegions.tsv"
       fwrite(applicationCoverageRegions,file = applicationCoverageRegions.filepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+      cat("\n",applicationCoverageRegions.filepath)
     }
 
     analysisMeta.filepath<-"analysisMeta.tsv"
     fwrite(analysisMeta,file = analysisMeta.filepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+    cat("\n",analysisMeta.filepath)
 
     sampleMeta.filepath<-"sampleMeta.tsv"
     fwrite(sampleMeta,file = sampleMeta.filepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+    cat("\n",sampleMeta.filepath)
 
 
     #nothing here yet - most data in sample settings list etc
@@ -832,16 +835,19 @@ PradaClass$methods(
         if(!is.null(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom)){
           cfilepath<-paste0("sequencingDepthRegionsTableCustom_",cUniqueSampleLabel,".tsv")
           fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+          cat("\n",cfilepath)
         }
 
         if(!is.null(sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable)){
           cfilepath<-paste0("sequencingStatsOriginalRegionsTable_",cUniqueSampleLabel,".tsv")
           fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+          cat("\n",cfilepath)
         }
 
         if(!is.null(sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg)){
           cfilepath<-paste0("pgxCallsAggCustom_",cUniqueSampleLabel,".tsv")
           fwrite(sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
+          cat("\n",cfilepath)
         }
 
 
@@ -853,6 +859,7 @@ PradaClass$methods(
         if(file.exists(cFPath)){
           dF<-fread(cFPath,header = F,nThread = nThread)
           fwrite(dF[,c("V1","V2","V3","V4")],file = cFPathOut,sep = "\t",row.names = F,col.names = F, append = F, nThread = nThread)
+          cat("\n",cFPathOut)
         }
 
         ##regions
@@ -861,6 +868,7 @@ PradaClass$methods(
         if(file.exists(cFPath)){
           dF<-fread(cFPath,header = F,nThread = nThread)
           fwrite(dF[,c("V1","V2","V3","V5")],file = cFPathOut,sep = "\t",row.names = F,col.names = F, append = F, nThread = nThread)
+          cat("\n",cFPathOut)
         }
 
 
