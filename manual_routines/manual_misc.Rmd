@@ -1,6 +1,6 @@
 # Command wrappers
 
-```sh
+```bash
 
 srun -p cpu --time 4:00:00 --ntasks 1 --cpus-per-task 6 --mem 32G --pty /bin/bash
 
@@ -10,7 +10,7 @@ srun -p cpu --time 4:00:00 --ntasks 1 --cpus-per-task 6 --mem 32G --pty /bin/bas
 
 We measure the performance of PGS with the coverace of polygenic regions. We compare to the genome-wide case, using GLAD+ genotyped data.
 
-```sh
+```bash
 
 sbatch --time 3:00:00 --partition cpu --job-name="munge" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R MDDIDP" --output "prs.munge.cojo.MDDIDP.$(date +%Y%m%d).out.txt"
 sbatch --time 3:00:00 --partition cpu --job-name="munge" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R BIPO03" --output "prs.munge.cojo.BIPO03.$(date +%Y%m%d).out.txt"
@@ -43,7 +43,7 @@ sbatch --time 4:00:00 --partition cpu --job-name="scoring" --ntasks 1 --cpus-per
 
 ### Installation and configuration
 
-```sh
+```bash
 
 export JAVA_HOME='/scratch/prj/ppn_tng/software/java/jdk-24.0.1'
 export JAVA_CMD='/scratch/prj/ppn_tng/software/java/jdk-24.0.1/bin/java'
@@ -64,7 +64,7 @@ https://docs.sylabs.io/guides/3.0/user-guide/installation.html
 
 
 Install prerequisites
-```sh
+```bash
 sudo pacman -Syu
 sudo pacman -Sy autoconf automake cryptsetup crun fuse2fs git fuse3 libseccomp libtool pkgconf shadow squashfs-tools wget zlib conmon go base-devel
 
@@ -73,7 +73,7 @@ sudo pacman -Sy autoconf automake cryptsetup crun fuse2fs git fuse3 libseccomp l
 ```
 
 After restart, this is the rouine of the installation.
-```sh
+```bash
 #in projects directory
 git clone --recurse-submodules https://github.com/sylabs/singularity.git
 cd singularity
@@ -87,7 +87,7 @@ sudo make -C builddir install
 
 # Building a mosdepth container/image
 
-```sh
+```bash
 
 
 
@@ -124,7 +124,7 @@ sudo -E singularity build prada_c2.sif /media/sf_mylinux_shared/prada_c2.def
 
 #Manual mosdepths runs
 
-```sh
+```bash
 
 #interactive test
 #singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode01/barcode01.haplotagged.bam
@@ -167,7 +167,7 @@ sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-t
 #Creating IGV graphs
 
 
-```sh
+```bash
 
 gunzip -c barcode01.regions.bed.gz | awk '{print $1, $2, $3, $5}' > barcode01.regions.bedgraph
 gunzip -c barcode01.per-base.bed.gz | awk '{print $1, $2, $3, $4}' > barcode01.per-base.bedgraph
@@ -195,6 +195,8 @@ igvtools toTDF /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/mosdepth/pilot2
 
 Run in work/pradaApp
 
+## Interactive version
+
 ```{R}
 
 
@@ -202,31 +204,61 @@ library(prada)
 library(data.table)
 
 projectFolderPath<-"/scratch/prj/sgdp_nanopore/Projects/prada_jz"
-
 pradaObj<-PradaClass()
-#pradaObj$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
-#pradaObj$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
 
-# pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube-nobedtest",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-nobedtest",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
-#pradaObj$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
+pradaObj$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = file.path(projectFolderPath, "data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442"),folderPathAnalysisOutputRaw = file.path(projectFolderPath, "work/pgx/pilot2/p2-gtube"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/pilot2/p2-gtube"))
 pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = file.path(projectFolderPath,"data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc"),folderPathAnalysisOutputRaw = file.path(projectFolderPath,"work/pgx/pilot2/p2-nogtube"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/pilot2/p2-nogtube"))
-#pradaObj$collectAnalysisCallData("p2-nogtube-nobedtest")
-#pradaObj$collectAnalysisCallData("p2-gtube")
+pradaObj$collectAnalysisCallData("p2-gtube")
 pradaObj$collectAnalysisCallData("p2-nogtube")
-
-#pradaObj$sampleMeta<-pradaO$sampleMeta[pradaO$sampleMeta$barcode=='barcode01',] #filter to barcode01 only
-
-#pradaObj$collectAnalysisDepthData("p2-nogtube-nobedtest")
-#pradaObj$collectAnalysisDepthData("p2-gtube")
+pradaObj$collectAnalysisDepthData("p2-gtube")
 pradaObj$collectAnalysisDepthData("p2-nogtube")
 pradaObj$computeDepthDataStatistics(filePathBed <- file.path(projectFolderPath,"data/bed/pgx_cnv.grch38.5k.2p1percent.bed"),filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv"))
 pradaObj$computeCallStatistics(filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv"))
 pradaObj$printData()
 
 
+#plotTable<-as.data.frame(matrix(NA,0,0))
+
+sampleMeta<-data.table::fread("sampleMeta.tsv")
+sampleMeta[,sampleLabel:=paste0(analysis,"_",barcode)]
+
+if(nrow(sampleMeta)>0){
+      for(iSample in 1:nrow(sampleMeta)){
+        #iSample<-1
+        cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
+        cBarcode<-sampleMeta[iSample,c("barcode")]
+        cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
+        
+        cStats<-data.table::fread(paste0("sequencingStatsOriginalRegionsTable_",cUniqueSampleLabel,".tsv"))
+        cPgx<-data.table::fread(paste0("pgxCallsAggCustom_",cUniqueSampleLabel,".tsv"))
+        cPgx[,pgxVariantRatio:=nvariants_mean/(nvariants_mean+nmissingpos_mean)]
+        
+        sampleMeta[sampleLabel==eval(cUniqueSampleLabel),c("nCalledPgx")]<-nrow(cPgx[!is.na(diplotype_score_top),])
+        sampleMeta[sampleLabel==eval(cUniqueSampleLabel),c("meanPgxVariantRatio")]<-mean(cPgx$pgxVariantRatio,na.rm=T)
+        
+      }
+        
+}
+
+
+plot(sampleMeta$sdepth_q050_bed,sampleMeta$nvarq_region)
+
+plot(sampleMeta$sdepth_q050_bed,sampleMeta$meanPgxVariantRatio)
+
+plot(sampleMeta$sdepth_q050_bed,sampleMeta$nCalledPgx)
+
+plot(sampleMeta$sdepth_q050_bed,sampleMeta$vcallacc_q050_region)
+
+
 ```
 
 
+```bash
+
+sbatch --time 1:00:00 --partition cpu --job-name="pap2" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot2.R" --output "pradaAppPilot2.$(date +%Y%m%d).out.txt"
+
+
+```
 
 
 
