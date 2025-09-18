@@ -163,13 +163,13 @@ sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-t
 
 #Downsampled genome in a bottle sample HG002 run
 
-sbatch --time 24:00:00 --partition cpu --job-name="md25" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-25/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
+sbatch --time 24:00:00 --partition cpu --job-name="md25" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode HG002_new /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-25/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
 
-sbatch --time 24:00:00 --partition cpu --job-name="md50" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-50/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
+sbatch --time 24:00:00 --partition cpu --job-name="md50" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode HG002_new /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-50/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
 
-sbatch --time 24:00:00 --partition cpu --job-name="md75" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-75/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
+sbatch --time 24:00:00 --partition cpu --job-name="md75" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode HG002_new /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-75/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
 
-sbatch --time 24:00:00 --partition cpu --job-name="md100" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-100/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
+sbatch --time 24:00:00 --partition cpu --job-name="md100" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode HG002_new /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-100/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
 
 
 ```
@@ -238,11 +238,20 @@ pradaObj$addSampleSetting(analysis = "hg002-25",sampleLabel = "HG002_new")
 
 pradaObj$collectAnalysisCallData("p2-gtube")
 pradaObj$collectAnalysisCallData("p2-nogtube")
-pradaObj$collectAnalysisCallData(settingLabel = "hg002-100",addBarcodeParticipantsFromData = FALSE)
+pradaObj$collectAnalysisCallData("hg002-100",addBarcodeParticipantsFromData = FALSE)
+pradaObj$collectAnalysisCallData("hg002-75",addBarcodeParticipantsFromData = FALSE)
+pradaObj$collectAnalysisCallData("hg002-50",addBarcodeParticipantsFromData = FALSE)
+pradaObj$collectAnalysisCallData("hg002-25",addBarcodeParticipantsFromData = FALSE)
 
 
 pradaObj$collectAnalysisDepthData("p2-gtube")
 pradaObj$collectAnalysisDepthData("p2-nogtube")
+pradaObj$collectAnalysisDepthData("hg002-100")
+pradaObj$collectAnalysisDepthData("hg002-75")
+pradaObj$collectAnalysisDepthData("hg002-50")
+pradaObj$collectAnalysisDepthData("hg002-25")
+
+
 pradaObj$computeDepthDataStatistics(filePathBed <- file.path(projectFolderPath,"data/bed/pgx_cnv.grch38.5k.2p1percent.bed"),filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv"))
 pradaObj$computeCallStatistics(filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv"))
 pradaObj$printData()
