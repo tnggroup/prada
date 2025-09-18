@@ -209,7 +209,8 @@ Run in work/pradaApp
 ## Interactive version
 
 ```{R}
-
+#devtools::install_github("tnggroup/prada")
+#devtools::install_github("tnggroup/prada",ref = 'jz_dev')
 
 library(prada)
 library(data.table)
@@ -230,10 +231,16 @@ pradaObj$addAnalysisSetting(settingLabel = "hg002-25",folderPathAnalysisSequenci
 
 
 #custom samples from hg002
-pradaObj$sampleMeta[cUniqueSampleLabel,c("analysis","barcode")]<<-c(settingLabel,barcodeFolders[iBarcode])
+pradaObj$addSampleSetting(analysis = "hg002-100",sampleLabel = "HG002_new")
+pradaObj$addSampleSetting(analysis = "hg002-75",sampleLabel = "HG002_new")
+pradaObj$addSampleSetting(analysis = "hg002-50",sampleLabel = "HG002_new")
+pradaObj$addSampleSetting(analysis = "hg002-25",sampleLabel = "HG002_new")
 
 pradaObj$collectAnalysisCallData("p2-gtube")
 pradaObj$collectAnalysisCallData("p2-nogtube")
+pradaObj$collectAnalysisCallData(settingLabel = "hg002-100",addBarcodeParticipantsFromData = FALSE)
+
+
 pradaObj$collectAnalysisDepthData("p2-gtube")
 pradaObj$collectAnalysisDepthData("p2-nogtube")
 pradaObj$computeDepthDataStatistics(filePathBed <- file.path(projectFolderPath,"data/bed/pgx_cnv.grch38.5k.2p1percent.bed"),filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv"))

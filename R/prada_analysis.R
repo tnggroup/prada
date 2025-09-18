@@ -12,10 +12,14 @@
 # # pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube-nobedtest",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-nobedtest",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
 # #pradaObj$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
 # pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube")
-# # pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube-empty-test",folderPathAnalysisSequencingRaw = NA,folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube")
+# pradaObj$addAnalysisSetting(settingLabel = "hg002-100",folderPathAnalysisSequencingRaw = NA,folderPathAnalysisOutputRaw = file.path(projectFolderPath,"work/pgx/downsampled-bam-runs/hg002-100"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/downsampled-bam-runs/hg002-100"))
+#
+# pradaObj$addSampleSetting(analysis = "hg002-100",sampleLabel = "HG002_new")
+#
 # #pradaObj$collectAnalysisCallData("p2-nogtube-nobedtest")
 # #pradaObj$collectAnalysisCallData("p2-gtube")
 # pradaObj$collectAnalysisCallData("p2-nogtube")
+# pradaObj$collectAnalysisCallData("hg002-100")
 #
 # #pradaObj$sampleMeta<-pradaObj$sampleMeta[pradaObj$sampleMeta$barcode=='barcode01',] #filter to barcode01 only
 #
@@ -97,13 +101,14 @@ PradaClass$methods(
 collectAnalysisCallData=function(settingLabel,
                                  addBarcodeParticipantsFromData=TRUE #add participant entries to metadata for any barcodeXX type folders found in the pgx-pipeline output (otherwise participants have to be added manually).
                                  ){
-  # settingLabel <- "p2-nogtube-empty-test"
+  # settingLabel <- "hg002-100"
   # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
   # nThread<-pradaObj$nThread
   # analysisSettingsList<-pradaObj$analysisSettingsList
   # sampleSettingsList<-pradaObj$sampleSettingsList
   # analysisMeta<-pradaObj$analysisMeta
   # sampleMeta<-pradaObj$sampleMeta
+  # addBarcodeParticipantsFromData=FALSE
 
   # #read file content of sequencing folder
   # analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList<-list.files(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw)
@@ -136,7 +141,7 @@ collectAnalysisCallData=function(settingLabel,
     #return(0)
   }
 
-if(length(analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList)>0){
+  if(length(analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList)>0){
 
     summaryMetadata<-readMetadata(filePath = file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameSummaryMetadata))
 
@@ -261,7 +266,7 @@ if(length(analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList)>0
 
   ##launch.json
 
-  #check if sequencing data exists, otherwise abort - assume that it is present for all analyses
+  #check if wf-pgx calling data exists, otherwise abort - assume that it is present for all analyses
   if(!file.exists(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"launch.json"))){
     warning(paste0("No calling data available for label ",settingLabel))
     return(0)
@@ -324,10 +329,10 @@ if(length(analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList)>0
     for(iBarcode in 1:nrow(sampleMeta.analysis)){
       #iBarcode<-1
       cUniqueSampleLabel <- paste0(settingLabel,"_",sampleMeta.analysis[iBarcode,c("barcode")])
-      cBarcodeFolderpath<-file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"output",barcodeFolders[iBarcode])
+      cBarcodeFolderpath<-file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"output",sampleMeta[cUniqueSampleLabel,c("barcode")])
 
       ##barcode match.json
-      con = file(file.path(cBarcodeFolderpath,paste0(barcodeFolders[iBarcode],".match.json")),open="r")
+      con = file(file.path(cBarcodeFolderpath,paste0(sampleMeta[cUniqueSampleLabel,c("barcode")],".match.json")),open="r")
       dString <- paste0(readLines(con = con,encoding = "UTF-8",warn = F),collapse = "\n")
       close(con)
       dJson<-jsonlite::fromJSON(dString,simplifyDataFrame=FALSE) #this otherwise reverts to true for some reason and creates data frames
@@ -341,7 +346,7 @@ if(length(analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList)>0
         chromosome="chr22",
         gene="CYP2D6",
         diplotypes = list(
-          list(name=d[d$Sample=="CYP2D6",c(barcodeFolders[iBarcode])])
+          list(name=d[d$Sample=="CYP2D6",c(sampleMeta[cUniqueSampleLabel,c("barcode")])])
         )
       )
       nd$source<-jsonlite::unbox(nd$source)
@@ -364,8 +369,8 @@ if(length(analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList)>0
       sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls<<-dJson
 
 
-      # #sampleMeta[cUniqueSampleLabel,c("analysis","barcode","pgx_calls")]<-c(settingLabel,barcodeFolders[iBarcode],jsonlite::toJSON(dJson,pretty = TRUE))
-      # sampleMeta[cUniqueSampleLabel,c("analysis","barcode","pgx_calls")]<<-c(settingLabel,barcodeFolders[iBarcode],jsonlite::toJSON(dJson,pretty = TRUE))
+      # #sampleMeta[cUniqueSampleLabel,c("analysis","barcode","pgx_calls")]<-c(settingLabel,sampleMeta[cUniqueSampleLabel,c("barcode")],jsonlite::toJSON(dJson,pretty = TRUE))
+      # sampleMeta[cUniqueSampleLabel,c("analysis","barcode","pgx_calls")]<<-c(settingLabel,sampleMeta[cUniqueSampleLabel,c("barcode")],jsonlite::toJSON(dJson,pretty = TRUE))
 
 
       #PGX calls, from match.json
@@ -429,7 +434,7 @@ if(length(analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList)>0
 
 
       ## XX.pharmcat.tsv
-      d<-as.data.frame(data.table::fread(file = file.path(cBarcodeFolderpath,paste0(barcodeFolders[iBarcode],".pharmcat.tsv")), fill = T, header = T,strip.white = T))
+      d<-as.data.frame(data.table::fread(file = file.path(cBarcodeFolderpath,paste0(sampleMeta[cUniqueSampleLabel,c("barcode")],".pharmcat.tsv")), fill = T, header = T,strip.white = T))
 
       #sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table<-d
       sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table<<-d
