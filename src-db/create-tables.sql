@@ -44,12 +44,15 @@ CREATE TABLE prada.drug
 (
 	rxnormid varchar(20), --should match the cpic rxnormid
 	name varchar(100), --in case we don't have the id
-    type text DEFAULT 'generic',
+    type text DEFAULT 'generic', --this is to separate for example cancer drugs from antidepressants
+    class text, --this is to distinguish classes of for example antidepressants based on metabolising pathways
     weight double precision DEFAULT 1.0
-    --CONSTRAINT drug_pkey PRIMARY KEY (rxnormid,name)
+    --CONSTRAINT drug_pkey PRIMARY KEY (rxnormid,name) --we have null values in rxnormid so won't fit into pkey
 );
 COMMENT ON TABLE prada.drug IS 'Custom project data on drugs. To prioritise drugs to include in the analyses.';
 CREATE UNIQUE INDEX drug_u ON prada.drug (rxnormid,name);
+ALTER TABLE prada.drug
+  ADD CONSTRAINT drug_pkey PRIMARY KEY (name);
 
 
 COMMIT;

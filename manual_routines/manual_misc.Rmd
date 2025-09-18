@@ -161,6 +161,17 @@ sbatch --time 24:00:00 --partition cpu --job-name="md03" --ntasks 1 --cpus-per-t
 sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-gtube-b4/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.barcode04.$(date +%Y%m%d).out.txt"
 
 
+#Downsampled genome in a bottle sample HG002 run
+
+sbatch --time 24:00:00 --partition cpu --job-name="md25" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-25/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md50" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-50/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md75" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-75/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md100" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-100/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
+
+
 ```
 
 
@@ -208,6 +219,19 @@ pradaObj<-PradaClass()
 
 pradaObj$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = file.path(projectFolderPath, "data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442"),folderPathAnalysisOutputRaw = file.path(projectFolderPath, "work/pgx/pilot2/p2-gtube"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/pilot2/p2-gtube"))
 pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = file.path(projectFolderPath,"data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc"),folderPathAnalysisOutputRaw = file.path(projectFolderPath,"work/pgx/pilot2/p2-nogtube"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/pilot2/p2-nogtube"))
+
+pradaObj$addAnalysisSetting(settingLabel = "hg002-100",folderPathAnalysisSequencingRaw = NA,folderPathAnalysisOutputRaw = file.path(projectFolderPath,"work/pgx/downsampled-bam-runs/hg002-100"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/downsampled-bam-runs/hg002-100"))
+
+pradaObj$addAnalysisSetting(settingLabel = "hg002-75",folderPathAnalysisSequencingRaw = NA,folderPathAnalysisOutputRaw = file.path(projectFolderPath,"work/pgx/downsampled-bam-runs/hg002-75"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/downsampled-bam-runs/hg002-75"))
+
+pradaObj$addAnalysisSetting(settingLabel = "hg002-50",folderPathAnalysisSequencingRaw = NA,folderPathAnalysisOutputRaw = file.path(projectFolderPath,"work/pgx/downsampled-bam-runs/hg002-50"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/downsampled-bam-runs/hg002-50"))
+
+pradaObj$addAnalysisSetting(settingLabel = "hg002-25",folderPathAnalysisSequencingRaw = NA,folderPathAnalysisOutputRaw = file.path(projectFolderPath,"work/pgx/downsampled-bam-runs/hg002-25"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/downsampled-bam-runs/hg002-25"))
+
+
+#custom samples from hg002
+pradaObj$sampleMeta[cUniqueSampleLabel,c("analysis","barcode")]<<-c(settingLabel,barcodeFolders[iBarcode])
+
 pradaObj$collectAnalysisCallData("p2-gtube")
 pradaObj$collectAnalysisCallData("p2-nogtube")
 pradaObj$collectAnalysisDepthData("p2-gtube")
@@ -240,14 +264,37 @@ if(nrow(sampleMeta)>0){
         
 }
 
+library(ggplot2)
 
-plot(sampleMeta$sdepth_q050_bed,sampleMeta$nvarq_region)
+ggplot(sampleMeta,aes(x = sdepth_q050_bed, y = nvarq_region, colour = analysis)) + 
+  geom_point() +
+  theme_minimal()
+#plot(sampleMeta$sdepth_q050_bed,sampleMeta$nvarq_region)
 
-plot(sampleMeta$sdepth_q050_bed,sampleMeta$meanPgxVariantRatio)
+ggplot(sampleMeta,aes(x = sdepth_q050_bed, y = vcallacc_q050_region, colour = analysis)) + 
+  geom_point() +
+  theme_minimal()
+#plot(sampleMeta$sdepth_q050_bed,sampleMeta$vcallacc_q050_region)
 
-plot(sampleMeta$sdepth_q050_bed,sampleMeta$nCalledPgx)
+ggplot(sampleMeta,aes(x = sdepth_q050_bed, y = meanPgxVariantRatio, colour = analysis)) + 
+  geom_point() +
+  theme_minimal()
+#plot(sampleMeta$sdepth_q050_bed,sampleMeta$meanPgxVariantRatio)
 
-plot(sampleMeta$sdepth_q050_bed,sampleMeta$vcallacc_q050_region)
+ggplot(sampleMeta,aes(x = sdepth_q050_bed, y = nCalledPgx, colour = analysis)) + 
+  geom_point() +
+  theme_minimal()
+#plot(sampleMeta$sdepth_q050_bed,sampleMeta$nCalledPgx)
+
+
+ggplot(sampleMeta,aes(x = sdepth_q050_nobed, y = nvarq_noregion, colour = analysis)) + 
+  geom_point() +
+  theme_minimal()
+
+ggplot(sampleMeta,aes(x = sdepth_q050_nobed, y = vcallacc_q050_noregion, colour = analysis)) + 
+  geom_point() +
+  theme_minimal()
+
 
 
 ```

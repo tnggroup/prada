@@ -1,3 +1,23 @@
+--2025
+
+--Guidelines for drugs, example
+
+SELECT pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx WHERE pgx.drug_name='sertraline' ORDER BY genesymbol, diplotype;
+
+--check of prada drug names correspondence with cpic drug names
+SELECT d.name,d.atcid, pd.* FROM cpic.drug d LEFT OUTER JOIN prada.drug pd ON d.name=pd.name AND pd.type!='cancer' ORDER BY atcid;
+SELECT * FROM prada.drug pd LEFT OUTER JOIN cpic.drug d  ON d.name=pd.name WHERE pd.type!='cancer';
+
+
+SELECT * FROM prada.drug pd INNER JOIN prada.harmonised_cpic_pgx pgx ON pd.name = pgx.drug_name AND pd.type!='cancer' ORDER BY pd.type, pd.class, pd.name;
+
+--STRING_AGG(genesymbol, ' ,')
+WITH a AS (SELECT pd.type, pd.class, pgx.genesymbol FROM prada.drug pd INNER JOIN prada.harmonised_cpic_pgx pgx ON pd.name = pgx.drug_name AND pd.type!='cancer' GROUP BY pd.type, pd.class, pgx.genesymbol)
+SELECT a.class, STRING_AGG(genesymbol, ', ') FROM a GROUP BY a.class;
+
+
+--Old test and scetches predating prada table and view designs 
+
 
 --How do the cpic guidelines work?
 --How does this translate into the genetic model?
@@ -73,3 +93,13 @@ WHERE pgkbcalevel = '1A' OR pgkbcalevel = '1B' OR pgkbcalevel = '2A' OR pgkbcale
 
 -- This result signifies that the patient has two copies of a no function allele. Based on the genotype result this patient is predicted to be a poor metabolizer of CYP2C19 substrates. This patient may be at a high risk for an adverse or poor response to medications that are metabolized by CYP2C19. To avoid an untoward drug response, dose adjustments or or alternative therapy may be necessary for medications metabolized by the CYP2C19. Please consult a clinical pharmacist for more information about how CYP2C19 metabolic status influences drug selection and dosing.
 -- This result signifies that the patient has two copies of a no function allele. Based on the genotype result this patient is predicted to be a TPMT poor metabolizer. This patient may be at a high risk for an adverse reactions to medications that are metabolized by TPMT (eg. thiopurines). To avoid an untoward drug response, dose adjustments or or alternative therapy may be necessary for medications metabolized by TPMT. However, thiopurines can be affected by a patient's TPMT and NUDT15 phenotype. Please consult a clinical pharmacist for more information about how TPMT and NUDT16 metabolic status influences drug selection and dosing.
+
+
+
+
+
+
+
+
+
+
