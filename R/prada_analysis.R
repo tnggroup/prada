@@ -828,6 +828,17 @@ PradaClass$methods(
           sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg<<-as.data.frame(pgxCustom.agg)
 
 
+
+
+          #sample additional pgx call statistics from the combined pgx
+          sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg[,pgxVariantRatio:=nvariants_mean/(nvariants_mean+nmissingpos_mean)]
+
+          sampleMeta[sampleLabel==eval(cUniqueSampleLabel),c("nCalledPgx")]<-nrow(cPgx[!is.na(diplotype_score_top),])
+          sampleMeta[sampleLabel==eval(cUniqueSampleLabel),c("meanPgxVariantRatio")]<-mean(
+            sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg$pgxVariantRatio,
+            na.rm=T
+            )
+
         }
       }
     }

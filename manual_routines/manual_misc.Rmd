@@ -172,6 +172,29 @@ sbatch --time 24:00:00 --partition cpu --job-name="md75" --ntasks 1 --cpus-per-t
 sbatch --time 24:00:00 --partition cpu --job-name="md100" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode HG002_new /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/downsampled-bam-runs/hg002-100/output/HG002_new/HG002_new.haplotagged.bam" --output "mdepth.HG002_new.$(date +%Y%m%d).out.txt"
 
 
+
+
+ #Pilot 3 test samples
+sbatch --time 24:00:00 --partition cpu --job-name="md01" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot3/p3-1-bed-b1/output/barcode01/barcode01.haplotagged.bam" --output "mdepth.p3-1.barcode01.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md02" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode02 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot3/p3-1-bed-b2/output/barcode02/barcode02.haplotagged.bam" --output "mdepth.p3-1.barcode02.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot3/p3-1-bed-b3/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.p3-1.barcode03.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot3/p3-1-bed-b4/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.p3-1.barcode04.$(date +%Y%m%d).out.txt"
+
+ #Pilot 3 control sample(s?)
+sbatch --time 24:00:00 --partition cpu --job-name="md01" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot3/p3-2-bed-b1/output/barcode01/barcode01.haplotagged.bam" --output "mdepth.p3-2.barcode01.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md02" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode02 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot3/p3-2-bed-b2/output/barcode02/barcode02.haplotagged.bam" --output "mdepth.p3-2.barcode02.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot3/p3-2-bed-b3/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.p3-2.barcode03.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot3/p3-2-bed-b4/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.p3-2.barcode04.$(date +%Y%m%d).out.txt"
+
+
+
+
 ```
 
 
@@ -320,8 +343,23 @@ ggplot(sampleMeta,aes(x = sdepth_q050_nobed, y = vcallacc_q050_noregion, colour 
 
 sbatch --time 1:00:00 --partition cpu --job-name="pap2" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot2.R" --output "pradaAppPilot2.$(date +%Y%m%d).out.txt"
 
+sbatch --time 1:00:00 --partition cpu --job-name="pap3" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot3.R" --output "pradaAppPilot3.$(date +%Y%m%d).out.txt"
+
 
 ```
+
+fixing the regions for pilot3
+
+```{r}
+
+library(data.table)
+
+d<-fread("/Users/jakz/Documents/work_rstudio/prada/data/applicationCoverageRegionsAsOfPilot2.tsv")
+d2<-d[type!=2,]
+fwrite(x = d2,file = "/Users/jakz/Documents/work_rstudio/prada/data/roughApplicationCoverageRegionsAsOfPilot3.tsv")
+
+```
+
 
 
 

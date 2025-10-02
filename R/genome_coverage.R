@@ -95,9 +95,9 @@ computeGenomeCoverage=function(
   }
 }
 )
-
-#library(prada)
-#library(data.table)
+#
+# library(prada)
+# library(data.table)
 # pradaO<-PradaClass()
 # pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
 # pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx.grch38.5k.0p7percent.bed",nPrioritisedCnv=0, nPrioritisedSnp=0, nPrioritisedTotal = 5000)
