@@ -498,8 +498,8 @@ PradaClass$methods(
     # sampleMeta<-pradaObj$sampleMeta
     # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
     #
-    # filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed"
-    # filePathApplicationCoverageRegions=NULL
+    # filePathBed <- file.path(projectFolderPath,"data/bed/pgx.grch38.5k.0p7percent.bed")
+    # filePathApplicationCoverageRegions=file.path(projectFolderPath,"data/roughApplicationCoverageRegionsAsOfPilot3.tsv")
 
     if(!is.null(filePathApplicationCoverageRegions)){
       dApplicationCoverageRegions<-data.table::fread(file = filePathApplicationCoverageRegions)
@@ -521,7 +521,7 @@ PradaClass$methods(
 
     if(nrow(sampleMeta)>0){
       for(iSample in 1:nrow(sampleMeta)){
-        #iSample<-1
+        #iSample<-4
         cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
         cBarcode<-sampleMeta[iSample,c("barcode")]
         cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
