@@ -1,8 +1,104 @@
 --2025
 
+--New dummy report
+DROP TABLE IF EXISTS t_gene_diplotype_input;
+CREATE TEMP TABLE IF NOT EXISTS t_gene_diplotype_input AS
+SELECT 'ABCG2' AS gene, 'rs2231142 reference (G)/rs2231142 reference (G)' AS diplotype
+	UNION ALL
+	SELECT 'CACNA1S','Reference/Reference'
+	UNION ALL
+	SELECT 'CFTR', 'Reference/Reference'
+	UNION ALL
+	SELECT 'CYP2B6', '*1/*4'
+	UNION ALL
+	SELECT 'CYP2C9', '*1/*1'
+	UNION ALL
+	SELECT 'CYP2C19', '*1/*4'
+	UNION ALL
+	SELECT 'CYP2C19', '*1/*17' --duplicate PharmCat output - equal weight
+	UNION ALL
+	SELECT 'CYP2D6', '*1/*41'
+	UNION ALL
+	SELECT 'CYP3A5', '*3/*3'
+	UNION ALL
+	SELECT 'CYP4F2', '*1/*1'
+	UNION ALL
+	SELECT 'DPYD', 'c.496A>G;c.2194G>A'
+	UNION ALL
+	SELECT 'G6PD', 'B (reference)/Orissa'
+	UNION ALL
+	SELECT 'IFNL3', '39248147' --check this diplotype
+	UNION ALL
+	SELECT 'NUDT15', '*1/*1'
+	UNION ALL
+	SELECT 'RYR1', 'c.6178G>T (heterozygous)'
+	UNION ALL
+	SELECT 'SLCO1B1', '*14/*37'
+	UNION ALL
+	SELECT 'TPMT', '*1/*1'
+	UNION ALL
+	SELECT 'UGT1A1', '*80+*28/*80+*28' -- duplication
+	UNION ALL
+	SELECT 'VKORC1', 'rs9923231' --check this diplotype
+	;
+
+DROP TABLE IF EXISTS t_drug_input;
+CREATE TEMP TABLE IF NOT EXISTS t_drug_input AS
+SELECT 'sertraline' AS drugname
+	UNION ALL
+	SELECT 'citalopram'
+	UNION ALL
+	SELECT 'escitalopram'
+	UNION ALL
+	SELECT 'fluoxetine'
+	UNION ALL
+	SELECT 'paroxetine'
+	UNION ALL
+	SELECT 'duloxetine'
+	UNION ALL
+	SELECT 'venlafaxine'
+	UNION ALL
+	SELECT 'amitriptyline'
+	UNION ALL
+	SELECT 'mirtazapine'
+	UNION ALL
+	SELECT 'trazodone'
+	UNION ALL
+	SELECT 'desipramine'
+	UNION ALL
+	SELECT 'maprotiline'
+	UNION ALL
+	SELECT 'isocarboxazid'
+	UNION ALL
+	SELECT 'bupropion';
+	
+SELECT pgx.drug_name, pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx 
+INNER JOIN t_gene_diplotype_input g ON pgx.genesymbol = g.gene AND pgx.diplotype = g.diplotype
+INNER JOIN t_drug_input d ON pgx.drug_name = d.drugname
+ORDER BY drug_name, genesymbol, pgx.diplotype;
+
+--check for weird diplotype definitions
+SELECT pgx.* FROM prada.harmonised_cpic_pgx pgx 
+INNER JOIN t_gene_diplotype_input g ON pgx.genesymbol = g.gene --AND pgx.diplotype = g.diplotype
+INNER JOIN t_drug_input d ON pgx.drug_name = d.drugname
+WHERE genesymbol='VKORC1'
+ORDER BY drug_name, genesymbol, pgx.diplotype
+;
+
 --Guidelines for drugs, example
+	
+
 
 SELECT pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx WHERE pgx.drug_name='sertraline' ORDER BY genesymbol, diplotype;
+SELECT pgx.drug_name, pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx WHERE pgx.diplotype ='*1/*17' AND pgx.genesymbol ='CYP2C19';
+SELECT DISTINCT pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx WHERE pgx.genesymbol ='CFTR';
+
+
+
+SELECT DISTINCT pgx.description FROM prada.harmonised_cpic_pgx pgx;
+SELECT DISTINCT pgx.result FROM prada.harmonised_cpic_pgx pgx;
+SELECT DISTINCT pgx.ehrpriority FROM prada.harmonised_cpic_pgx pgx WHERE pgx.drug_name='sertraline';
+
 
 --check of prada drug names correspondence with cpic drug names
 SELECT d.name,d.atcid, pd.* FROM cpic.drug d LEFT OUTER JOIN prada.drug pd ON d.name=pd.name AND pd.type!='cancer' ORDER BY atcid;

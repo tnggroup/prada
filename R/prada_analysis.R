@@ -521,7 +521,7 @@ PradaClass$methods(
 
     if(nrow(sampleMeta)>0){
       for(iSample in 1:nrow(sampleMeta)){
-        #iSample<-4
+        #iSample<-1
         cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
         cBarcode<-sampleMeta[iSample,c("barcode")]
         cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
@@ -650,7 +650,8 @@ PradaClass$methods(
     # sampleMeta<-pradaObj$sampleMeta
     # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
     # #filePathApplicationCoverageRegions=NULL
-    # filePathApplicationCoverageRegions <- file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv")
+    # filePathApplicationCoverageRegions <- file.path(projectFolderPath,"data/roughApplicationCoverageRegionsAsOfPilot3.tsv")
+
 
     if(!is.null(filePathApplicationCoverageRegions)){
       dApplicationCoverageRegions<-data.table::fread(file = filePathApplicationCoverageRegions)
@@ -661,7 +662,7 @@ PradaClass$methods(
 
     if(nrow(sampleMeta)>0){
       for(iSample in 1:nrow(sampleMeta)){
-        #iSample<-3
+        #iSample<-1
         cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
         cBarcode<-sampleMeta[iSample,c("barcode")]
         cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
@@ -824,21 +825,18 @@ PradaClass$methods(
           nUnmatched<-nrow(pgxCustom.agg.unmatched)
           if(nUnmatched>0){warning(paste0("Found ",nUnmatched, " pgx call genes not matching with the original region list!"))}
 
+          #sample additional pgx call statistics from the combined pgx
+          pgxCustom.agg[,pgxVariantRatio:=nvariants_mean/(nvariants_mean+nmissingpos_mean)]
+
           #sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg<-as.data.frame(pgxCustom.agg)
           sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg<<-as.data.frame(pgxCustom.agg)
 
-
-
-
-          #sample additional pgx call statistics from the combined pgx
-          sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg[,pgxVariantRatio:=nvariants_mean/(nvariants_mean+nmissingpos_mean)]
-
-          sampleMeta[sampleLabel==eval(cUniqueSampleLabel),c("nCalledPgx")]<-nrow(cPgx[!is.na(diplotype_score_top),])
-          sampleMeta[sampleLabel==eval(cUniqueSampleLabel),c("meanPgxVariantRatio")]<-mean(
-            sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg$pgxVariantRatio,
+          #sampleMeta is a data.frame
+          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgx")]<-nrow(pgxCustom.agg[!is.na(diplotype_score_top),])
+          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("meanPgxVariantRatio")]<-mean(
+            pgxCustom.agg$pgxVariantRatio,
             na.rm=T
             )
-
         }
       }
     }
