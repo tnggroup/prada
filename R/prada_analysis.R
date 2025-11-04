@@ -832,8 +832,13 @@ PradaClass$methods(
           sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg<<-as.data.frame(pgxCustom.agg)
 
           #sampleMeta is a data.frame
-          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgx")]<-nrow(pgxCustom.agg[!is.na(diplotype_score_top),])
-          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("meanPgxVariantRatio")]<-mean(
+          # sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgx")]<-nrow(pgxCustom.agg[!is.na(diplotype_score_top),])
+          # sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("meanPgxVariantRatio")]<-mean(
+          #   pgxCustom.agg$pgxVariantRatio,
+          #   na.rm=T
+          # )
+          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgx")]<<-nrow(pgxCustom.agg[!is.na(diplotype_score_top),])
+          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("meanPgxVariantRatio")]<<-mean(
             pgxCustom.agg$pgxVariantRatio,
             na.rm=T
             )
