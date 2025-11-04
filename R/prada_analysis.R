@@ -662,7 +662,7 @@ PradaClass$methods(
 
     if(nrow(sampleMeta)>0){
       for(iSample in 1:nrow(sampleMeta)){
-        #iSample<-1
+        #iSample<-2
         cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
         cBarcode<-sampleMeta[iSample,c("barcode")]
         cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
@@ -700,7 +700,8 @@ PradaClass$methods(
 
 
           dVcf[,QUALACC:=1-10^(-QUAL/10)] #accuracy from the given Phred quality scores
-          dVcf[dDepth,on=.(CHR=chr,POS<bp2, POS>=bp1), c('xdepth') := list(i.v)]
+          dVcf[,c('xdepth') := list(0)]
+          if(nrow(dDepth)>0) dVcf[dDepth,on=.(CHR=chr,POS<bp2, POS>=bp1), c('xdepth') := list(i.v)]
 
 
           dVcf[dApplicationCoverageRegions,on=.(CHR=chr_name_region,POS<bp2_region, POS>=bp1_region),inRegion:=1]
