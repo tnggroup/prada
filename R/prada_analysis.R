@@ -108,7 +108,7 @@ collectAnalysisCallData=function(settingLabel,
   # sampleSettingsList<-pradaObj$sampleSettingsList
   # analysisMeta<-pradaObj$analysisMeta
   # sampleMeta<-pradaObj$sampleMeta
-  # addBarcodeParticipantsFromData=FALSE
+  # addBarcodeParticipantsFromData=FALSE #you will need to add the participants yourself for this to work
 
   # #read file content of sequencing folder
   # analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList<-list.files(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw)
@@ -266,10 +266,10 @@ collectAnalysisCallData=function(settingLabel,
 
   ##launch.json
 
-  #check if wf-pgx calling data exists, New behaviour: do not abort here, just warn!
+  #check if wf-pgx calling data exists, otherwise abort - assume that it is present for all analyses
   if(!file.exists(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"launch.json"))){
     warning(paste0("No calling data available for label ",settingLabel))
-    #return(0)
+    return(0)
   }
 
   con = file(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"launch.json"),open="r")
@@ -325,6 +325,9 @@ collectAnalysisCallData=function(settingLabel,
   }
 
   sampleMeta.analysis<-sampleMeta[sampleMeta$analysis==settingLabel,]
+  if(nrow(sampleMeta.analysis)<1){
+    warning(paste0("No samples for analysis ",settingLabel))
+  }
   if(nrow(sampleMeta.analysis)>0){
     for(iBarcode in 1:nrow(sampleMeta.analysis)){
       #iBarcode<-1
