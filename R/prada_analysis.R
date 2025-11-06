@@ -101,7 +101,7 @@ PradaClass$methods(
 collectAnalysisCallData=function(settingLabel,
                                  addBarcodeParticipantsFromData=TRUE #add participant entries to metadata for any barcodeXX type folders found in the pgx-pipeline output (otherwise participants have to be added manually).
                                  ){
-  # settingLabel <- "hg002-100"
+  # settingLabel <- "multi-hg002-75"
   # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
   # nThread<-pradaObj$nThread
   # analysisSettingsList<-pradaObj$analysisSettingsList
@@ -266,10 +266,10 @@ collectAnalysisCallData=function(settingLabel,
 
   ##launch.json
 
-  #check if wf-pgx calling data exists, otherwise abort - assume that it is present for all analyses
+  #check if wf-pgx calling data exists, New behaviour: do not abort here, just warn!
   if(!file.exists(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"launch.json"))){
     warning(paste0("No calling data available for label ",settingLabel))
-    return(0)
+    #return(0)
   }
 
   con = file(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"launch.json"),open="r")

@@ -365,6 +365,7 @@ ggplot(sampleMeta,aes(x = sdepth_q050_nobed, y = vcallacc_q050_noregion, colour 
 
 ```
 
+## Automated runs
 
 ```bash
 
@@ -372,21 +373,8 @@ sbatch --time 2:00:00 --partition cpu --job-name="pap2" --ntasks 1 --cpus-per-ta
 
 sbatch --time 2:00:00 --partition cpu --job-name="pap3" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot3.R" --output "pradaAppPilot3.$(date +%Y%m%d).out.txt"
 
+sbatch --time 2:00:00 --partition cpu --job-name="pap4" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot4.R" --output "pradaAppPilot4.$(date +%Y%m%d).out.txt"
+
 
 ```
-
-fixing the regions for pilot3
-
-```{r}
-
-library(data.table)
-
-d<-fread("/Users/jakz/Documents/work_rstudio/prada/data/applicationCoverageRegionsAsOfPilot2.tsv")
-d2<-d[type!=2,]
-fwrite(x = d2,file = "/Users/jakz/Documents/work_rstudio/prada/data/roughApplicationCoverageRegionsAsOfPilot3.tsv")
-
-```
-
-
-
 

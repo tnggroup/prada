@@ -7,7 +7,7 @@
 #general shared package utilities
 pradaPackageVersion.major.minor.patch<-c()
 pradaPackageVersion.major.minor.patch[1]<-0
-pradaPackageVersion.major.minor.patch[2]<-2
+pradaPackageVersion.major.minor.patch[2]<-4
 pradaPackageVersion.major.minor.patch[3]<-0
 
 
