@@ -337,3 +337,46 @@ CREATE UNIQUE INDEX harmonised_combined_pgx_gene_i ON prada.harmonised_combined_
 --REFRESH MATERIALIZED VIEW prada.harmonised_combined_pgx_gene;
 
 --SELECT * FROM prada.harmonised_combined_pgx_gene ORDER BY prada_gene_score DESC;
+
+--DROP MATERIALIZED VIEW prada.harmonised_combined_drug;
+CREATE MATERIALIZED VIEW prada.harmonised_combined_drug
+AS
+WITH a AS
+(
+SELECT
+p.drug_name,
+p.rxnormid,
+count(*) num_diplotype
+FROM prada.harmonised_combined_pgx p
+GROUP BY p.drug_name, p.rxnormid
+) SELECT 
+d.name drug_name,
+d."type",
+d."class",
+d.weight,
+d2.drugid,
+d2.pharmgkbid,
+d2.rxnormid,
+d2.drugbankid,
+d2.atcid,
+d2.umlscui,
+d2.flowchart,
+d2.version,
+d2.guidelineid,
+a.num_diplotype
+FROM prada.drug d
+LEFT OUTER JOIN cpic.drug d2 ON (d.rxnormid=d2.rxnormid OR (d.rxnormid IS NULL AND d.name=d2.name)) --This does not join on the CPIC drugid
+LEFT OUTER JOIN a ON (a.rxnormid=d.rxnormid OR (d.rxnormid IS NULL AND a.drug_name=d.name))
+;
+CREATE UNIQUE INDEX harmonised_combined_drug_u ON prada.harmonised_combined_drug (drug_name);
+CREATE UNIQUE INDEX harmonised_combined_drug_u2 ON prada.harmonised_combined_drug (rxnormid);
+CREATE INDEX harmonised_combined_drug_i ON prada.harmonised_combined_drug (type,class);
+
+--REFRESH MATERIALIZED VIEW prada.harmonised_combined_drug;
+
+--SELECT * FROM prada.harmonised_combined_drug ORDER BY type,class,num_diplotype DESC, drug_name;
+--SELECT * FROM prada.harmonised_combined_drug WHERE type = 'antidepressant' ORDER BY type,class,num_diplotype DESC, drug_name;
+--SELECT * FROM prada.drug WHERE type ='antidepressant';
+
+
+
