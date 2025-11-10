@@ -101,14 +101,14 @@ PradaClass$methods(
 collectAnalysisCallData=function(settingLabel,
                                  addBarcodeParticipantsFromData=TRUE #add participant entries to metadata for any barcodeXX type folders found in the pgx-pipeline output (otherwise participants have to be added manually).
                                  ){
-  # settingLabel <- "multi-hg002-75"
+  # settingLabel <- "p4-1"
   # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
   # nThread<-pradaObj$nThread
   # analysisSettingsList<-pradaObj$analysisSettingsList
   # sampleSettingsList<-pradaObj$sampleSettingsList
   # analysisMeta<-pradaObj$analysisMeta
   # sampleMeta<-pradaObj$sampleMeta
-  # addBarcodeParticipantsFromData=FALSE #you will need to add the participants yourself for this to work
+  # addBarcodeParticipantsFromData=TRUE #you will need to add the participants yourself for this to work
 
   # #read file content of sequencing folder
   # analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList<-list.files(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw)
@@ -352,11 +352,11 @@ collectAnalysisCallData=function(settingLabel,
           list(name=d[d$Sample=="CYP2D6",c(sampleMeta[cUniqueSampleLabel,c("barcode")])])
         )
       )
-      nd$source<-jsonlite::unbox(nd$source)
-      nd$version<-jsonlite::unbox(nd$version)
-      nd$chromosome<-jsonlite::unbox(nd$chromosome)
-      nd$gene<-jsonlite::unbox(nd$gene)
-      #ndJson <- jsonlite::toJSON(x = nd,pretty = TRUE)
+      # nd$source<-jsonlite::unbox(nd$source)
+      # nd$version<-jsonlite::unbox(nd$version)
+      # nd$chromosome<-jsonlite::unbox(nd$chromosome)
+      # nd$gene<-jsonlite::unbox(nd$gene)
+      # ndJson <- jsonlite::toJSON(x = nd,pretty = TRUE)
 
       dJson$results[[length(dJson$results)+1]]<- nd #update with cyp2d6 call
       #View(dJson$results)
@@ -436,7 +436,7 @@ collectAnalysisCallData=function(settingLabel,
       sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom<<-cPGXCalls
 
 
-      ## XX.pharmcat.tsv - is later used as the foundation for pgx stats
+      ## XX.pharmcat.tsv
       d<-as.data.frame(data.table::fread(file = file.path(cBarcodeFolderpath,paste0(sampleMeta[cUniqueSampleLabel,c("barcode")],".pharmcat.tsv")), fill = T, header = T,strip.white = T))
 
       #add in CHINOOK results
