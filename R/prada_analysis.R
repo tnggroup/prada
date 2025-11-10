@@ -436,8 +436,11 @@ collectAnalysisCallData=function(settingLabel,
       sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom<<-cPGXCalls
 
 
-      ## XX.pharmcat.tsv
+      ## XX.pharmcat.tsv - is later used as the foundation for pgx stats
       d<-as.data.frame(data.table::fread(file = file.path(cBarcodeFolderpath,paste0(sampleMeta[cUniqueSampleLabel,c("barcode")],".pharmcat.tsv")), fill = T, header = T,strip.white = T))
+
+      #add in CHINOOK results
+      d[nrow(d)+1,c("Sample","Gene","Diplotype")]<-list(sampleMeta.analysis[iBarcode,c("barcode")],"CYP2D6",unlist(nd$diplotypes)[1])
 
       #sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table<-d
       sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table<<-d

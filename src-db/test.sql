@@ -1,5 +1,6 @@
 --2025
 
+
 --New dummy report
 DROP TABLE IF EXISTS t_gene_diplotype_input;
 CREATE TEMP TABLE IF NOT EXISTS t_gene_diplotype_input AS
