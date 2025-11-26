@@ -1,3 +1,4 @@
+--Expanded version of cpic.diplotype
 --DROP MATERIALIZED VIEW prada.cpic_genetics;
 CREATE MATERIALIZED VIEW prada.cpic_genetics --OR REPLACE
 AS SELECT
@@ -19,12 +20,11 @@ g.notesonallelenaming,
 grd.diplotype,
 grd.diplotypekey,
 grl.description,
-grl.lookupkey,
+grl.lookupkey grl_lookupkey,
 gr.result,
 gr.activityscore,
 gr.ehrpriority,
 gr.consultationtext,
-
 
 (
 	CASE
@@ -36,10 +36,24 @@ gr.consultationtext,
 		WHEN gr.ehrpriority='Routine/Low-Risk' THEN 2
 		ELSE 1
 	END
-) AS prada_ehrpriority_num
+) AS prada_ehrpriority_num,
+
+(
+	CASE
+		WHEN gr.genesymbol IS NOT NULL THEN
+			json_build_object(gr.genesymbol,
+		    CASE
+		        WHEN g.lookupmethod = 'ACTIVITY_SCORE'::text THEN grl.totalactivityscore
+		        ELSE gr.result
+		    END
+		    )
+		ELSE NULL
+	END
+) AS lookupkey
+        
 FROM
 cpic.gene g
-LEFT OUTER JOIN cpic.gene_result gr ON g.symbol = gr.genesymbol
+LEFT OUTER JOIN cpic.gene_result gr ON gr.genesymbol::text = g.symbol::text --ON g.symbol = gr.genesymbol
 LEFT OUTER JOIN cpic.gene_result_lookup grl ON grl.phenotypeid =gr.id
 LEFT OUTER JOIN cpic.gene_result_diplotype grd ON grd.functionphenotypeid = grl.id;
 --cpic.gene_result_diplotype grd
@@ -61,6 +75,7 @@ CREATE INDEX cpic_genetics_i ON prada.cpic_genetics (chr,genesymbol,ensemblid,pr
 CREATE MATERIALIZED VIEW prada.harmonised_cpic_pgx --OR REPLACE
 AS SELECT
 d.name drug_name,
+d.drugid cpic_drugid,
 d.pharmgkbid,
 d.rxnormid,
 d.drugbankid,
@@ -95,8 +110,8 @@ g.result,
 g.activityscore,
 g.ehrpriority,
 g.consultationtext,
---g.lookupkey,
---g.diplotypekey,
+g.lookupkey,
+g.diplotypekey,
 g.prada_ehrpriority_num,
 (
 	CASE
@@ -127,13 +142,23 @@ g.prada_ehrpriority_num,
 		ELSE 1
 	END
 ) AS prada_usedforrecommendation_num
+
+--r.implications,
+--r.drugrecommendation,
+--r.classification,
+--r.population,
+--r.comments
+
 FROM 
 prada.cpic_genetics g 
 LEFT OUTER JOIN cpic.pair p ON p.genesymbol = g.genesymbol AND p.removed = FALSE --AND p.usedforrecommendation = TRUE
 LEFT OUTER JOIN cpic.drug d ON d.drugid = p.drugid
-LEFT OUTER JOIN cpic.guideline gl ON d.guidelineid = gl.id;
+LEFT OUTER JOIN cpic.guideline gl ON d.guidelineid = gl.id
+--LEFT OUTER JOIN cpic.recommendation r ON d.drugid=r.drugid AND gl.id = r.guidelineid
+;
 
-CREATE INDEX harmonised_cpic_pgx_i ON prada.harmonised_cpic_pgx (drug_name,pharmgkbid,genesymbol,ensemblid,chr,prada_ehrpriority_num,prada_cpiclevel_num,prada_pgkbcalevel_num,prada_usedforrecommendation_num);
+CREATE INDEX harmonised_cpic_pgx_i ON prada.harmonised_cpic_pgx (drug_name,cpic_drugid,pharmgkbid,genesymbol,ensemblid,chr);
+CREATE INDEX harmonised_cpic_pgx_i2 ON prada.harmonised_cpic_pgx (prada_ehrpriority_num,prada_cpiclevel_num,prada_pgkbcalevel_num,prada_usedforrecommendation_num);
 
 --REFRESH MATERIALIZED VIEW prada.harmonised_cpic_pgx;
 
@@ -231,6 +256,7 @@ CREATE UNIQUE INDEX harmonised_gene_i ON prada.harmonised_gene (chrn,bp1,bp2,gen
 --SELECT * FROM prada.harmonised_gene WHERE gene_name= 'Metazoa_SRP';
 --SELECT DISTINCT chr FROM prada.harmonised_gene;
 
+--CPIC recommendations are linked in here
 --DROP VIEW prada.harmonised_combined_pgx;
 CREATE OR REPLACE VIEW prada.harmonised_combined_pgx
 AS SELECT
@@ -258,7 +284,7 @@ p.umlscui,
 p.flowchart,
 p.version,
 p.guidelineid,
-d.type drug_type,
+d.class drug_class,
 (
 CASE
 	WHEN d.weight IS NULL THEN 1.0
@@ -279,18 +305,28 @@ p.consultationtext,
 p.prada_ehrpriority_num,
 p.prada_cpiclevel_num,
 p.prada_pgkbcalevel_num,
-p.prada_usedforrecommendation_num
+p.prada_usedforrecommendation_num,
+p.lookupkey,
+p.diplotypekey,
+r.implications,
+r.drugrecommendation,
+r.phenotypes,
+r.classification,
+r.population,
+r.comments
 FROM 
 prada.harmonised_gene g
 LEFT OUTER JOIN prada.harmonised_cpic_pgx p ON --we trust the ensemblid and chr mapping because of the harmonised cpic pgx view
 	p.ensemblid=g.gene_id
 	AND g.chr=p.chr
 LEFT OUTER JOIN prada.drug d ON (p.rxnormid=d.rxnormid OR (d.rxnormid IS NULL AND p.drug_name=d.name))
+LEFT OUTER JOIN cpic.recommendation r ON p.cpic_drugid=r.drugid AND p.guidelineid = r.guidelineid AND p.lookupkey::jsonb <@  r.lookupkey 
 WHERE g.in_pgx=TRUE OR g.in_cpic=TRUE OR g.has_cpiclevel=TRUE OR g.in_dpwg=TRUE OR g.in_twist=TRUE OR g.in_pharmvar=TRUE OR g.in_cmrg=TRUE OR g.in_pharmcat=TRUE OR p.ensemblid IS NOT NULL
 --AND d.type !='cancer'
 ;
 
---SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='azathioprine' ORDER by drug_name;
+--SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='sertraline';
+--SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='azathioprine';
 --SELECT * FROM  prada.harmonised_combined_pgx tp ORDER by drug_name;
 /*SELECT * FROM  prada.harmonised_combined_pgx tp ORDER by prada_ehrpriority_num DESC, prada_cpiclevel_num DESC, prada_pgkbcalevel_num DESC
 LIMIT 100;*/

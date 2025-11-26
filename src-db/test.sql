@@ -1,5 +1,8 @@
 --2025
 
+--test of cpic functon
+--SELECT * FROM cpic.recommendation_lookup('{"CYP2C19": {"*4": 1, "*9": 1}}');
+
 
 --New dummy report
 DROP TABLE IF EXISTS t_gene_diplotype_input;
@@ -73,10 +76,12 @@ SELECT 'sertraline' AS drugname
 	UNION ALL
 	SELECT 'bupropion';
 	
-SELECT pgx.drug_name, pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx 
-INNER JOIN t_gene_diplotype_input g ON pgx.genesymbol = g.gene AND pgx.diplotype = g.diplotype
+SELECT pgx.drug_name, pgx.drug_class, pgx.gene_name, pgx.flowchart, pgx.diplotype, pgx.cpiclevel, pgx.prada_cpiclevel_num, pgx.result, pgx.description, pgx.activityscore, pgx.ehrpriority, pgx.implications, pgx.drugrecommendation, pgx.classification, pgx.population, pgx.comments
+--pgx.drug_name, pgx.drug_class, pgx.gene_name, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext, pgx.implications, pgx.drugrecommendations, pgx.phenotypes, pgx.classification, pgx.population, pgx.comments 
+FROM prada.harmonised_combined_pgx pgx 
+INNER JOIN t_gene_diplotype_input g ON pgx.gene_name = g.gene AND pgx.diplotype = g.diplotype
 INNER JOIN t_drug_input d ON pgx.drug_name = d.drugname
-ORDER BY drug_name, genesymbol, pgx.diplotype;
+ORDER BY drug_name, gene_name, pgx.diplotype;
 
 --check for weird diplotype definitions
 SELECT pgx.* FROM prada.harmonised_cpic_pgx pgx 
@@ -92,7 +97,8 @@ ORDER BY drug_name, genesymbol, pgx.diplotype
 
 SELECT pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx WHERE pgx.drug_name='sertraline' ORDER BY genesymbol, diplotype;
 SELECT pgx.drug_name, pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx WHERE pgx.diplotype ='*1/*17' AND pgx.genesymbol ='CYP2C19';
-SELECT DISTINCT pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx WHERE pgx.genesymbol ='CFTR';
+SELECT DISTINCT pgx.genesymbol, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx WHERE pgx.genesymbol ='CYP2C9';
+SELECT DISTINCT pgx.genesymbol, pgx.drug_name, pgx.ehrpriority, pgx.consultationtext FROM prada.harmonised_cpic_pgx pgx WHERE pgx.genesymbol ='CYP2C9';
 
 
 
