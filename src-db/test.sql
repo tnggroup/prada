@@ -5,6 +5,9 @@
 
 
 --New dummy report
+
+
+--UNKNOWN PARTICIPANT?
 DROP TABLE IF EXISTS t_gene_diplotype_input;
 CREATE TEMP TABLE IF NOT EXISTS t_gene_diplotype_input AS
 SELECT 'ABCG2' AS gene, 'rs2231142 reference (G)/rs2231142 reference (G)' AS diplotype
@@ -15,11 +18,11 @@ SELECT 'ABCG2' AS gene, 'rs2231142 reference (G)/rs2231142 reference (G)' AS dip
 	UNION ALL
 	SELECT 'CYP2B6', '*1/*4'
 	UNION ALL
-	SELECT 'CYP2C9', '*1/*1'
-	UNION ALL
 	SELECT 'CYP2C19', '*1/*4'
 	UNION ALL
 	SELECT 'CYP2C19', '*1/*17' --duplicate PharmCat output - equal weight
+	UNION ALL
+	SELECT 'CYP2C9', '*1/*1'
 	UNION ALL
 	SELECT 'CYP2D6', '*1/*41'
 	UNION ALL
@@ -44,6 +47,91 @@ SELECT 'ABCG2' AS gene, 'rs2231142 reference (G)/rs2231142 reference (G)' AS dip
 	SELECT 'UGT1A1', '*80+*28/*80+*28' -- duplication
 	UNION ALL
 	SELECT 'VKORC1', 'rs9923231' --check this diplotype
+	;
+
+
+--P4 barcode01
+DROP TABLE IF EXISTS t_gene_diplotype_input;
+CREATE TEMP TABLE IF NOT EXISTS t_gene_diplotype_input AS
+SELECT 'ABCG2' AS gene, 'rs2231142 reference (G)/rs2231142 reference (G)' AS diplotype
+	UNION ALL
+	SELECT 'CACNA1S','Reference/Reference'
+	UNION ALL
+	SELECT 'CFTR', 'ivacaftor non-responsive CFTR sequence/ivacaftor non-responsive CFTR sequence'
+	UNION ALL
+	SELECT 'CYP2B6', '*5/*5'
+	UNION ALL
+	SELECT 'CYP2C19', '*1/*17'
+	UNION ALL
+	SELECT 'CYP2C9', '*1/*1'
+	UNION ALL
+	SELECT 'CYP2D6', '*1/*41'
+	UNION ALL
+	SELECT 'CYP3A4', '*1/*1'
+	UNION ALL
+	SELECT 'CYP3A5', '*1/*3'
+	UNION ALL
+	SELECT 'CYP4F2', '*1/*1'
+	UNION ALL
+	SELECT 'DPYD', 'Reference/c.85T>C (*9A)'
+	UNION ALL
+	SELECT 'G6PD', 'B (reference)/B (reference)'
+	UNION ALL
+	SELECT 'IFNL3', 'rs12979860 variant (T)/rs12979860 variant (T)' --check this diplotype
+	UNION ALL
+	SELECT 'NUDT15', '*1/*1'
+	UNION ALL
+	SELECT 'RYR1', 'Reference/Reference'
+	UNION ALL
+	SELECT 'SLCO1B1', '*1/*15'
+	UNION ALL
+	SELECT 'TPMT', '*1/*1'
+	UNION ALL
+	SELECT 'UGT1A1', '*1/*80+*28' -- duplication
+	UNION ALL
+	SELECT 'VKORC1', 'rs9923231 reference (C)/rs9923231 variant (T)' --check this diplotype
+	;
+
+--HG002
+DROP TABLE IF EXISTS t_gene_diplotype_input;
+CREATE TEMP TABLE IF NOT EXISTS t_gene_diplotype_input AS
+SELECT 'ABCG2' AS gene, 'rs2231142 reference (G)/rs2231142 reference (G)' AS diplotype
+	UNION ALL
+	SELECT 'CACNA1S','Reference/Reference'
+	UNION ALL
+	SELECT 'CFTR', 'ivacaftor non-responsive CFTR sequence/ivacaftor non-responsive CFTR sequence'
+	UNION ALL
+	SELECT 'CYP2B6', '*1/*2'
+	UNION ALL
+	SELECT 'CYP2C19', '*1/*1'
+	UNION ALL
+	SELECT 'CYP2C9', '*1/*1'
+	UNION ALL
+	SELECT 'CYP2D6', '*2/*4'
+	UNION ALL
+	SELECT 'CYP3A4', '*1/*1'
+	UNION ALL
+	SELECT 'CYP3A5', '*3/*3'
+	UNION ALL
+	SELECT 'CYP4F2', '*1/*4'
+	UNION ALL
+	SELECT 'DPYD', 'Reference/Reference'
+	UNION ALL
+	SELECT 'G6PD', 'B (reference)/B (reference)'
+	UNION ALL
+	SELECT 'IFNL3', 'rs12979860 reference (C)/rs12979860 reference (C)' --check this diplotype
+	UNION ALL
+	SELECT 'NUDT15', '*1/*1'
+	UNION ALL
+	SELECT 'RYR1', 'Reference/Reference'
+	UNION ALL
+	SELECT 'SLCO1B1', '*1/*1'
+	UNION ALL
+	SELECT 'TPMT', '*1/*1'
+	UNION ALL
+	SELECT 'UGT1A1', '*1/*1'
+	UNION ALL
+	SELECT 'VKORC1', 'rs9923231 variant (T)/rs9923231 variant (T)' --check this diplotype
 	;
 
 DROP TABLE IF EXISTS t_drug_input;
@@ -75,13 +163,55 @@ SELECT 'sertraline' AS drugname
 	SELECT 'isocarboxazid'
 	UNION ALL
 	SELECT 'bupropion';
+--vortioxatine
 	
-SELECT pgx.drug_name, pgx.drug_class, pgx.gene_name, pgx.flowchart, pgx.diplotype, pgx.cpiclevel, pgx.prada_cpiclevel_num, pgx.result, pgx.description, pgx.activityscore, pgx.ehrpriority, pgx.implications, pgx.drugrecommendation, pgx.classification, pgx.population, pgx.comments
+--SELECT pgx.drug_name, pgx.drug_class, pgx.gene_name, pgx.flowchart, pgx.diplotype, pgx.cpiclevel, pgx.prada_cpiclevel_num, pgx.result, pgx.description, pgx.activityscore, pgx.ehrpriority, pgx.implications, pgx.drugrecommendation, pgx.classification, pgx.population, pgx.comments
+----pgx.drug_name, pgx.drug_class, pgx.gene_name, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext, pgx.implications, pgx.drugrecommendations, pgx.phenotypes, pgx.classification, pgx.population, pgx.comments 
+--FROM prada.harmonised_combined_pgx pgx 
+--INNER JOIN t_gene_diplotype_input g ON pgx.gene_name = g.gene AND pgx.diplotype = g.diplotype
+--INNER JOIN t_drug_input d ON pgx.drug_name = d.drugname
+--ORDER BY drug_name, gene_name, pgx.diplotype;
+
+--SELECT DISTINCT drugrecommendation FROM cpic.recommendation;
+
+--simple report scratch
+DROP TABLE IF EXISTS t_simple_report_raw;
+CREATE TEMP TABLE IF NOT EXISTS t_simple_report_raw AS
+SELECT ROW_NUMBER() OVER (PARTITION BY pgx.drug_name, pgx.gene_name ORDER BY pgx.prada_cpiclevel_num DESC, pgx.prada_ehrpriority_num DESC, pgx.diplotype NULLS LAST) AS rn, pgx.drug_name, pgx.drug_class, pgx.gene_name, pgx.flowchart, pgx.diplotype, pgx.cpiclevel, pgx.prada_cpiclevel_num, pgx.result, pgx.description, pgx.activityscore, pgx.ehrpriority, pgx.prada_ehrpriority_num, pgx.implications, pgx.drugrecommendation, pgx.classification, pgx.population, pgx.comments,
+(
+CASE
+	WHEN pgx.result = 'Rapid Metabolizer' THEN 1.0
+	WHEN pgx.drugrecommendation = 'Avoid amitriptyline use. If amitripyline is warranted, consider a 50% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments.' THEN 1.0
+	WHEN pgx.drugrecommendation = 'Consider a lower starting dose, slower titration schedule and 50% reduction of standard maintenance dose as compared to CYP2C19 normal metabolizers or select a clinically appropriate alternative antidepressant not predominantly metabolized by CYP2C19.' THEN 1.0
+	ELSE 0.0
+END
+) AS prada_app_input_side_effects,
+(
+CASE
+	WHEN pgx.drugrecommendation = 'Initiate therapy with recommended starting dose' THEN 0.0
+	WHEN pgx.drugrecommendation = 'Initiate therapy with recommended starting dose.' THEN 0.0
+	WHEN pgx.drugrecommendation = 'Initiate therapy with recommended starting dose. Consider a slower titration schedule and lower maintenance dose than CYP2C19 normal metabolizers.' THEN 1.0
+	WHEN pgx.drugrecommendation = 'Initiate therapy with recommended starting dose. Consider a slower titration schedule and lower maintenance dose than normal metabolizers.' THEN 1.0
+	WHEN pgx.drugrecommendation = 'Avoid amitriptyline use. If amitripyline is warranted, consider a 50% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments.' THEN 1.0
+	WHEN pgx.drugrecommendation = 'Consider a 25% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments.' THEN 1.0
+	WHEN pgx.drugrecommendation = 'Initiate therapy with recommended starting dose. Consider a slower titration schedule and lower maintenance dose.' THEN 1.0
+	WHEN pgx.drugrecommendation = 'Consider a lower starting dose, slower titration schedule and 50% reduction of standard maintenance dose as compared to CYP2C19 normal metabolizers or select a clinically appropriate alternative antidepressant not predominantly metabolized by CYP2C19.' THEN 1.0
+	ELSE 0.0
+END
+) AS prada_app_input_dosage_reduction
 --pgx.drug_name, pgx.drug_class, pgx.gene_name, pgx.diplotype, pgx.description, pgx.result, pgx.ehrpriority, pgx.consultationtext, pgx.implications, pgx.drugrecommendations, pgx.phenotypes, pgx.classification, pgx.population, pgx.comments 
 FROM prada.harmonised_combined_pgx pgx 
 INNER JOIN t_gene_diplotype_input g ON pgx.gene_name = g.gene AND pgx.diplotype = g.diplotype
 INNER JOIN t_drug_input d ON pgx.drug_name = d.drugname
+WHERE pgx.classification != 'Optional'
 ORDER BY drug_name, gene_name, pgx.diplotype;
+
+--SELECT * FROM t_simple_report_raw;
+--SELECT DISTINCT drugrecommendation FROM t_simple_report_raw;
+
+SELECT drug_name, drug_class, gene_name, flowchart, diplotype, cpiclevel, result, ehrpriority, drugrecommendation, classification, population, comments,
+prada_app_input_side_effects,prada_app_input_dosage_reduction
+FROM t_simple_report_raw WHERE rn < 2;
 
 --check for weird diplotype definitions
 SELECT pgx.* FROM prada.harmonised_cpic_pgx pgx 

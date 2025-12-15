@@ -308,6 +308,7 @@ p.prada_pgkbcalevel_num,
 p.prada_usedforrecommendation_num,
 p.lookupkey,
 p.diplotypekey,
+r.id AS recommendation,
 r.implications,
 r.drugrecommendation,
 r.phenotypes,
@@ -326,7 +327,7 @@ WHERE g.in_pgx=TRUE OR g.in_cpic=TRUE OR g.has_cpiclevel=TRUE OR g.in_dpwg=TRUE 
 ;
 
 --SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='sertraline';
---SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='azathioprine';
+--SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='bupropion';
 --SELECT * FROM  prada.harmonised_combined_pgx tp ORDER by drug_name;
 /*SELECT * FROM  prada.harmonised_combined_pgx tp ORDER by prada_ehrpriority_num DESC, prada_cpiclevel_num DESC, prada_pgkbcalevel_num DESC
 LIMIT 100;*/

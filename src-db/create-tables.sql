@@ -54,5 +54,23 @@ CREATE UNIQUE INDEX drug_u ON prada.drug (rxnormid,name);
 ALTER TABLE prada.drug
   ADD CONSTRAINT drug_pkey PRIMARY KEY (name);
 
+-- DROP TABLE prada.recommendation;
+CREATE TABLE prada.recommendation
+(
+	recommendation integer NOT NULL,
+	guideline integer NOT NULL,
+	drugid text NOT NULL,
+	prada_dose numeric,
+	prada_efficacy numeric,
+	prada_sideeffect numeric,
+	prada_discontinuation numeric,
+	prada_contraindication numeric,
+	time_change TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE prada.recommendation IS 'Custom project data on clinical recommendations. Complement to primarily the cpic.recommendation table.';
+CREATE UNIQUE INDEX recommendation_u ON prada.recommendation (recommendation,guideline,drugid);
+ALTER TABLE prada.recommendation
+  ADD CONSTRAINT recommendation_pkey PRIMARY KEY (recommendation);
+
 
 COMMIT;

@@ -1,16 +1,60 @@
 # Command wrappers
 
-```bash
+```{bash}
 
 srun -p cpu --time 4:00:00 --ntasks 1 --cpus-per-task 6 --mem 32G --pty /bin/bash
 
 ```
 
+## PGS feasibility check across fractions of multisampled HG002/sequencing depths
+
+```{bash}
+
+#convert to plink format for SBayesRC scoring
+#run in wprk/pgs
+
+printf "hg002-100\nhg002-75\nhg002-50\nhg002-25\nhg002-20\nhg002-15\nhg002-15\nhg002-10\nhg002-05\n" > hg002-multisample-sample-names.txt
+#printf "hg002-100\nhg002-75\nhg002-50\nhg002-25\n" > hg002-multisample-sample-names.txt
+
+
+bcftools merge --force-samples -o hg002-multisampled.bcf /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/test-2/wf-pgx/bed/hg002-100-p3/output/HG002_new_hg19_merged_hg38/HG002_new_hg19_merged_hg38.filtered.vcf.gz /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/test-2/wf-pgx/bed/hg002-75-p3/output/HG002_new_hg19_merged/HG002_new_hg19_merged.filtered.vcf.gz /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/test-2/wf-pgx/bed/hg002-50-p3/output/HG002_new_hg19_merged/HG002_new_hg19_merged.filtered.vcf.gz /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/test-2/wf-pgx/bed/hg002-25-p3/output/HG002_new_hg19_merged/HG002_new_hg19_merged.filtered.vcf.gz
+/users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/test-2/wf-pgx/bed/hg002-20-p3/output/HG002_new_hg19_merged/HG002_new_hg19_merged.filtered.vcf.gz
+/users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/test-2/wf-pgx/bed/hg002-15-p3/output/HG002_new_hg19_merged/HG002_new_hg19_merged.filtered.vcf.gz
+/users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/test-2/wf-pgx/bed/hg002-10-p3/output/HG002_new_hg19_merged/HG002_new_hg19_merged.filtered.vcf.gz
+/users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/test-2/wf-pgx/bed/hg002-05-p3/output/HG002_new_hg19_merged/HG002_new_hg19_merged.filtered.vcf.gz
+
+#bcftools reheader -s hg002-multisample-sample-names.txt -o hg002-multisampled.vcf.gz hg002-multisampled.vcf.gz --this messes with teh file format somehow
+
+bcftools view -H hg002-multisampled.bcf | head -n 250
+
+tabix -p bcf hg002-multisampled.bcf
+
+#this needs lots of memory?
+sbatch --time 3:00:00 --partition cpu --job-name="annotate" --ntasks 1 --cpus-per-task 6 --mem 64G --wrap="bcftools annotate -a /scratch/prj/gwas_sumstats/reference_panel/hc1kgp3.b38.plink/hc1kgp3.b38.eur.jz2024.vcf.gz -o hg002-multisampled.vcf.gz hg002-multisampled.bcf" --output "prs.annotate.$(date +%Y%m%d).out.txt" 
+
+bcftools annotate -a /scratch/prj/gwas_sumstats/reference_panel/hc1kgp3.b38.plink/hc1kgp3.b38.eur.jz2024.vcf.gz hg002-multisampled.bcf > hg002-multisampled.vcf
+
+
+bcftools view -H hg002-multisampled.annotated.vcf.gz | head -n 1000
+bcftools view -H hg002-multisampled.annotated.bcf | head -n 1000
+
+plink --vcf hg002-multisampled.vcf.gz --out hg002-multisampled
+
+sbatch --time 3:00:00 --partition cpu --job-name="sMDDIDP" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ~/project/prada_jz/manual_routines/prs-check-gladp-hg002-upsampling.R score MDDIDP" --output "prs.score.MDDIDP.$(date +%Y%m%d).out.txt"
+
+sbatch --time 3:00:00 --partition cpu --job-name="sBIPO03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ~/project/prada_jz/manual_routines/prs-check-gladp-hg002-upsampling.R score BIPO03" --output "prs.score.BIPO03.$(date +%Y%m%d).out.txt"
+
+sbatch --time 3:00:00 --partition cpu --job-name="sBIPO03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ~/project/prada_jz/manual_routines/prs-check-gladp-hg002-upsampling.R score BIPO03" --output "prs.score.BIPO03.$(date +%Y%m%d).out.txt"
+
+
+```
+
 ## PGS feasibility check across region coverages
 
-We measure the performance of PGS with the coverace of polygenic regions. We compare to the genome-wide case, using GLAD+ genotyped data.
+We measure the performance of PGS with the coverage of polygenic regions. We compare to the genome-wide case, using GLAD+ genotyped data.
 
 ```bash
+
 
 sbatch --time 3:00:00 --partition cpu --job-name="munge" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R MDDIDP" --output "prs.munge.cojo.MDDIDP.$(date +%Y%m%d).out.txt"
 sbatch --time 3:00:00 --partition cpu --job-name="munge" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript ../manual_routines/prs-check-gladp.R BIPO03" --output "prs.munge.cojo.BIPO03.$(date +%Y%m%d).out.txt"
