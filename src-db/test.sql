@@ -1,5 +1,15 @@
 --2025
 
+--test of allele population statistics
+--SELECT version();
+--SELECT cg.*, (cg.diplotypekey->>cg.genesymbol)::jsonb->>'c.212C>A' FROM prada.cpic_genetics cg 
+--SELECT cg.*, (cg.diplotypekey->>cg.genesymbol)::jsonb->>'c.212C>A' FROM prada.cpic_genetics cg 
+--
+--SELECT cg.*, a1.name a1 FROM prada.cpic_genetics cg 
+--LEFT OUTER JOIN cpic.allele a1 ON a1.genesymbol = cg.genesymbol AND (cg.diplotypekey->>cg.genesymbol)::jsonb->>a1.name = '1'
+
+--AND a1.name::jsonb <@  cg.diplotypekey;
+
 --test of cpic functon
 --SELECT * FROM cpic.recommendation_lookup('{"CYP2C19": {"*4": 1, "*9": 1}}');
 
