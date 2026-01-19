@@ -19,6 +19,7 @@ g.functionmethods,
 g.notesonallelenaming,
 grd.diplotype,
 grd.diplotypekey,
+grd.frequency diplotype_frequency,
 grl.description,
 grl.lookupkey grl_lookupkey,
 gr.result,
@@ -56,10 +57,7 @@ cpic.gene g
 LEFT OUTER JOIN cpic.gene_result gr ON gr.genesymbol::text = g.symbol::text --ON g.symbol = gr.genesymbol
 LEFT OUTER JOIN cpic.gene_result_lookup grl ON grl.phenotypeid =gr.id
 LEFT OUTER JOIN cpic.gene_result_diplotype grd ON grd.functionphenotypeid = grl.id;
---cpic.gene_result_diplotype grd
---INNER JOIN cpic.gene_result_lookup grl ON grd.functionphenotypeid = grl.id
---INNER JOIN cpic.gene_result gr ON grl.phenotypeid =gr.id
---INNER JOIN cpic.gene g ON g.symbol = gr.genesymbol;
+
 
 CREATE INDEX cpic_genetics_i ON prada.cpic_genetics (chr,genesymbol,ensemblid,prada_ehrpriority_num);
 
@@ -73,7 +71,16 @@ CREATE INDEX cpic_genetics_i ON prada.cpic_genetics (chr,genesymbol,ensemblid,pr
 
 --DROP MATERIALIZED VIEW prada.harmonised_cpic_pgx;
 CREATE MATERIALIZED VIEW prada.harmonised_cpic_pgx --OR REPLACE
-AS SELECT
+AS 
+WITH a AS (
+SELECT *,row_number() OVER (PARTITION BY chr, genesymbol, diplotype ORDER BY g1.allele) rn FROM (SELECT g.*,jsonb_object_keys(g.diplotypekey::jsonb -> g.genesymbol) allele FROM prada.cpic_genetics g) g1
+),
+g AS (
+SELECT g.*, a1.allele::text allele1, a2.allele::text allele2 FROM prada.cpic_genetics g
+LEFT OUTER JOIN a a1 ON g.chr=a1.chr AND g.genesymbol=a1.genesymbol AND g.diplotypekey=a1.diplotypekey AND a1.rn=1
+LEFT OUTER JOIN a a2 ON g.chr=a2.chr AND g.genesymbol=a2.genesymbol AND g.diplotypekey=a2.diplotypekey AND a2.rn=2
+)
+SELECT
 d.name drug_name,
 d.drugid cpic_drugid,
 d.pharmgkbid,
@@ -112,6 +119,7 @@ g.ehrpriority,
 g.consultationtext,
 g.lookupkey,
 g.diplotypekey,
+g.diplotype_frequency,
 g.prada_ehrpriority_num,
 (
 	CASE
@@ -141,7 +149,11 @@ g.prada_ehrpriority_num,
 		WHEN p.usedforrecommendation = TRUE THEN 2
 		ELSE 1
 	END
-) AS prada_usedforrecommendation_num
+) AS prada_usedforrecommendation_num,
+g.allele1,
+g.allele2,
+al1.frequency allele1_frequency,
+al2.frequency allele2_frequency
 
 --r.implications,
 --r.drugrecommendation,
@@ -150,11 +162,12 @@ g.prada_ehrpriority_num,
 --r.comments
 
 FROM 
-prada.cpic_genetics g 
+g 
 LEFT OUTER JOIN cpic.pair p ON p.genesymbol = g.genesymbol AND p.removed = FALSE --AND p.usedforrecommendation = TRUE
 LEFT OUTER JOIN cpic.drug d ON d.drugid = p.drugid
 LEFT OUTER JOIN cpic.guideline gl ON d.guidelineid = gl.id
---LEFT OUTER JOIN cpic.recommendation r ON d.drugid=r.drugid AND gl.id = r.guidelineid
+LEFT OUTER JOIN cpic.allele al1 ON g.genesymbol=al1.genesymbol AND g.allele1=al1.name
+LEFT OUTER JOIN cpic.allele al2 ON g.genesymbol=al2.genesymbol AND g.allele2=al2.name
 ;
 
 CREATE INDEX harmonised_cpic_pgx_i ON prada.harmonised_cpic_pgx (drug_name,cpic_drugid,pharmgkbid,genesymbol,ensemblid,chr);
@@ -308,6 +321,11 @@ p.prada_pgkbcalevel_num,
 p.prada_usedforrecommendation_num,
 p.lookupkey,
 p.diplotypekey,
+p.diplotype_frequency,
+p.allele1,
+p.allele2,
+p.allele1_frequency,
+p.allele2_frequency,
 r.id AS recommendation,
 r.implications,
 r.drugrecommendation,

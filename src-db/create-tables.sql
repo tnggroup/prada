@@ -53,6 +53,8 @@ COMMENT ON TABLE prada.drug IS 'Custom project data on drugs. To prioritise drug
 CREATE UNIQUE INDEX drug_u ON prada.drug (rxnormid,name);
 ALTER TABLE prada.drug
   ADD CONSTRAINT drug_pkey PRIMARY KEY (name);
+ALTER TABLE prada.drug
+	ADD COLUMN selected_for_prada smallint;
 
 -- DROP TABLE prada.recommendation;
 CREATE TABLE prada.recommendation
