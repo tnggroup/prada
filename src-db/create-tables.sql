@@ -62,17 +62,25 @@ CREATE TABLE prada.recommendation
 	recommendation integer NOT NULL,
 	guideline integer NOT NULL,
 	drugid text NOT NULL,
-	prada_dose numeric,
-	prada_efficacy numeric,
-	prada_sideeffect numeric,
-	prada_discontinuation numeric,
-	prada_contraindication numeric,
-	time_change TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+	gene_name text NOT NULL, --one row per gene!
+	implications jsonb NOT NULL,
+	prada_start_dose numeric,
+	prada_target_dose numeric,
+	prada_titration_speed smallint,
+	prada_switch_drug text[],
+	prada_switch1_drug smallint,
+	prada_switch1_gene smallint,
+	prada_switch2_drug smallint,
+	prada_switch2_gene smallint,
+	prada_tdm smallint,
+	drugrecommendation text,
+	time_change TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+	version integer
 );
 COMMENT ON TABLE prada.recommendation IS 'Custom project data on clinical recommendations. Complement to primarily the cpic.recommendation table.';
-CREATE UNIQUE INDEX recommendation_u ON prada.recommendation (recommendation,guideline,drugid);
+--CREATE UNIQUE INDEX recommendation_u ON prada.recommendation (recommendation,guideline,drugid,gene_name);
 ALTER TABLE prada.recommendation
-  ADD CONSTRAINT recommendation_pkey PRIMARY KEY (recommendation);
+  ADD CONSTRAINT recommendation_pkey PRIMARY KEY (recommendation,guideline,drugid,gene_name);
 
 
 COMMIT;

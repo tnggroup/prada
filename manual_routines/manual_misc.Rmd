@@ -424,3 +424,20 @@ sbatch --time 2:00:00 --partition cpu --job-name="dshg002" --ntasks 1 --cpus-per
 
 ```
 
+
+# DB routines
+
+```{bash}
+
+#assuming ssh-tunnel with specified port settngs
+pg_dump -h localhost -p 65432 -U postgres -d prada_central -F d -f prada_central_dump -Z 9 -j 6
+#single transaction restore
+pg_restore -h localhost -p 65432 -U postgres -d prada_central_old -c --if-exists --no-data-for-failed-tables -1 prada_central_dump
+#multiple jobs restore
+pg_restore -h localhost -p 65432 -U postgres -d prada_central_old -c --if-exists --no-data-for-failed-tables -j 6 prada_central_dump
+
+#restorting a text format dump
+psql -h localhost -p 65432 -U postgres -d prada_central_old < dump-prada_central-202601191142.sql
+
+```
+

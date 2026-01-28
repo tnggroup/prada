@@ -59,7 +59,7 @@ LEFT OUTER JOIN cpic.gene_result_lookup grl ON grl.phenotypeid =gr.id
 LEFT OUTER JOIN cpic.gene_result_diplotype grd ON grd.functionphenotypeid = grl.id;
 
 
-CREATE INDEX cpic_genetics_i ON prada.cpic_genetics (chr,genesymbol,ensemblid,prada_ehrpriority_num);
+CREATE INDEX cpic_genetics_i ON prada.cpic_genetics (chr,genesymbol,ensemblid,prada_ehrpriority_num, diplotype, diplotypekey, grl_lookupkey);
 
 --REFRESH MATERIALIZED VIEW prada.cpic_genetics;
 
@@ -170,8 +170,9 @@ LEFT OUTER JOIN cpic.allele al1 ON g.genesymbol=al1.genesymbol AND g.allele1=al1
 LEFT OUTER JOIN cpic.allele al2 ON g.genesymbol=al2.genesymbol AND g.allele2=al2.name
 ;
 
-CREATE INDEX harmonised_cpic_pgx_i ON prada.harmonised_cpic_pgx (drug_name,cpic_drugid,pharmgkbid,genesymbol,ensemblid,chr);
-CREATE INDEX harmonised_cpic_pgx_i2 ON prada.harmonised_cpic_pgx (prada_ehrpriority_num,prada_cpiclevel_num,prada_pgkbcalevel_num,prada_usedforrecommendation_num);
+CREATE INDEX harmonised_cpic_pgx_i ON prada.harmonised_cpic_pgx (drug_name,cpic_drugid,pharmgkbid,chr,genesymbol,ensemblid);
+CREATE INDEX harmonised_cpic_pgx_i2 ON prada.harmonised_cpic_pgx (pharmgkbid,chr,genesymbol,ensemblid,diplotype, diplotypekey);
+CREATE INDEX harmonised_cpic_pgx_i3 ON prada.harmonised_cpic_pgx (prada_ehrpriority_num,prada_cpiclevel_num,prada_pgkbcalevel_num,prada_usedforrecommendation_num);
 
 --REFRESH MATERIALIZED VIEW prada.harmonised_cpic_pgx;
 
