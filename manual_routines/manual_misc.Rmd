@@ -4,6 +4,8 @@
 
 srun -p cpu --time 4:00:00 --ntasks 1 --cpus-per-task 6 --mem 32G --pty /bin/bash
 
+srun -p cpu --time 4:00:00 --ntasks 1 --cpus-per-task 6 --mem 256G --pty /bin/bash
+
 ```
 
 ## PGS feasibility check across fractions of multisampled HG002/sequencing depths

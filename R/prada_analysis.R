@@ -646,7 +646,8 @@ PradaClass$methods(
 #this requires the vcf-files
 PradaClass$methods(
   computeCallStatistics=function(
-    filePathApplicationCoverageRegions=NULL
+    filePathApplicationCoverageRegions=NULL,
+    mddPharmacogeneticsRelevantGenes=c("CYP2B6","CYP2C19","CYP2D6")
   ){
     # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
     # nThread<-pradaObj$nThread
@@ -657,6 +658,7 @@ PradaClass$methods(
     # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
     # #filePathApplicationCoverageRegions=NULL
     # filePathApplicationCoverageRegions <- file.path(projectFolderPath,"data/roughApplicationCoverageRegionsAsOfPilot3.tsv")
+    # mddPharmacogeneticsRelevantGenes<-c("CYP2B6","CYP2C19","CYP2D6")
 
 
     if(!is.null(filePathApplicationCoverageRegions)){
@@ -668,7 +670,7 @@ PradaClass$methods(
 
     if(nrow(sampleMeta)>0){
       for(iSample in 1:nrow(sampleMeta)){
-        #iSample<-2
+        #iSample<-1
         cAnalysisLabel<-sampleMeta[iSample,c("analysis")]
         cBarcode<-sampleMeta[iSample,c("barcode")]
         cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
@@ -727,9 +729,9 @@ PradaClass$methods(
 
 
 #
-          # sampleMeta[cUniqueSampleLabel,c("vcallacc_q000_region","vcallacc_q002_region","vcallacc_q025_region","vcallacc_q050_region","vcallacc_q075_region","vcallacc_q098_region","vcallacc_q100_region","vcallacc_q000_noregion","vcallacc_q002_noregion","vcallacc_q025_noregion","vcallacc_q050_noregion","vcallacc_q075_noregion","vcallacc_q098_noregion","vcallacc_q100_noregion")]<-c(
-          #   qQualaccInRegion[1],qQualaccInRegion[2],qQualaccInRegion[3],qQualaccInRegion[4],qQualaccInRegion[5],qQualaccInRegion[6],qQualaccInRegion[7],qQualaccNotInRegion[1],qQualaccNotInRegion[2],qQualaccNotInRegion[3],qQualaccNotInRegion[4],qQualaccNotInRegion[5],qQualaccNotInRegion[6],qQualaccNotInRegion[7]
-          # )
+# sampleMeta[cUniqueSampleLabel,c("vcallacc_q000_region","vcallacc_q002_region","vcallacc_q025_region","vcallacc_q050_region","vcallacc_q075_region","vcallacc_q098_region","vcallacc_q100_region","vcallacc_q000_noregion","vcallacc_q002_noregion","vcallacc_q025_noregion","vcallacc_q050_noregion","vcallacc_q075_noregion","vcallacc_q098_noregion","vcallacc_q100_noregion")]<-c(
+#   qQualaccInRegion[1],qQualaccInRegion[2],qQualaccInRegion[3],qQualaccInRegion[4],qQualaccInRegion[5],qQualaccInRegion[6],qQualaccInRegion[7],qQualaccNotInRegion[1],qQualaccNotInRegion[2],qQualaccNotInRegion[3],qQualaccNotInRegion[4],qQualaccNotInRegion[5],qQualaccNotInRegion[6],qQualaccNotInRegion[7]
+# )
           sampleMeta[cUniqueSampleLabel,c("vcallacc_q000_region","vcallacc_q002_region","vcallacc_q025_region","vcallacc_q050_region","vcallacc_q075_region","vcallacc_q098_region","vcallacc_q100_region","vcallacc_q000_noregion","vcallacc_q002_noregion","vcallacc_q025_noregion","vcallacc_q050_noregion","vcallacc_q075_noregion","vcallacc_q098_noregion","vcallacc_q100_noregion")]<<-c(
             qQualaccInRegion[1],qQualaccInRegion[2],qQualaccInRegion[3],qQualaccInRegion[4],qQualaccInRegion[5],qQualaccInRegion[6],qQualaccInRegion[7],qQualaccNotInRegion[1],qQualaccNotInRegion[2],qQualaccNotInRegion[3],qQualaccNotInRegion[4],qQualaccNotInRegion[5],qQualaccNotInRegion[6],qQualaccNotInRegion[7]
           )
@@ -839,16 +841,29 @@ PradaClass$methods(
           sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg<<-as.data.frame(pgxCustom.agg)
 
           #sampleMeta is a data.frame
-          # sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgx")]<-nrow(pgxCustom.agg[!is.na(diplotype_score_top),])
+          # sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgx")]<-nrow(pgxCustom.agg[!is.na(diplotype_name_top),])
           # sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("meanPgxVariantRatio")]<-mean(
           #   pgxCustom.agg$pgxVariantRatio,
           #   na.rm=T
           # )
-          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgx")]<<-nrow(pgxCustom.agg[!is.na(diplotype_score_top),])
+          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgx")]<<-nrow(pgxCustom.agg[!is.na(diplotype_name_top),])
           sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("meanPgxVariantRatio")]<<-mean(
             pgxCustom.agg$pgxVariantRatio,
             na.rm=T
             )
+
+
+          # sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgxMDD")]<-nrow(pgxCustom.agg[!is.na(diplotype_name_top) & gene %in% eval(mddPharmacogeneticsRelevantGenes),])
+          # sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("meanPgxVariantRatioMDD")]<-mean(
+          #   pgxCustom.agg[!is.na(diplotype_name_top) & gene %in% eval(mddPharmacogeneticsRelevantGenes),]$pgxVariantRatio,
+          #   na.rm=T
+          # )
+          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("nCalledPgxMDD")]<<-nrow(pgxCustom.agg[!is.na(diplotype_name_top) & gene %in% eval(mddPharmacogeneticsRelevantGenes),])
+          sampleMeta[paste0(sampleMeta$analysis,"_",sampleMeta$barcode)==cUniqueSampleLabel,c("meanPgxVariantRatioMDD")]<<-mean(
+            pgxCustom.agg[!is.na(diplotype_name_top) & gene %in% eval(mddPharmacogeneticsRelevantGenes),]$pgxVariantRatio,
+            na.rm=T
+          )
+
         }
       }
     }
