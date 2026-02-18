@@ -82,6 +82,24 @@ INNER JOIN d ON r.recommendation = d.recommendation AND r.drugid = d.drug_name A
 GROUP BY r.gene_name,r.drugid;
 SELECT * FROM t_distinct_diplotype_any;
 
+DROP TABLE IF EXISTS t_distinct_diplotype_any_no_tdm;
+CREATE TEMP TABLE IF NOT EXISTS t_distinct_diplotype_any_no_tdm AS
+WITH d AS (
+SELECT DISTINCT ON (rec.drug_name, rec.gene_name, rec.diplotype) rec.recommendation, rec.drug_name, rec.gene_name, rec.diplotype, rec.diplotype_frequency_pop, rec.allele1_frequency_pop, rec.allele2_frequency_pop, rec.consensus_allele_frequency 
+FROM t_freq_recommendation rec
+INNER JOIN prada.recommendation r ON r.recommendation = rec.recommendation AND r.drugid = rec.drug_name AND r.gene_name = rec.gene_name
+WHERE r.prada_start_dose !=1 OR r.prada_target_dose !=1 OR r.prada_titration_speed !=2 OR r.prada_switch1_drug =1 OR r.prada_switch1_gene =1 OR r.prada_switch2_drug =1 OR r.prada_switch2_gene =1 --OR r.prada_tdm =1
+ORDER BY rec.drug_name, rec.gene_name, rec.diplotype, rec.recommendation, rec.lookupkey::text, rec.implications
+) 
+SELECT r.gene_name,r.drugid,
+sum(d.consensus_allele_frequency) freq_sum_any_no_tdm,
+count(d.consensus_allele_frequency) num_any_no_tdm
+FROM
+prada.recommendation r
+INNER JOIN d ON r.recommendation = d.recommendation AND r.drugid = d.drug_name AND r.gene_name = d.gene_name
+GROUP BY r.gene_name,r.drugid;
+SELECT * FROM t_distinct_diplotype_any_no_tdm;
+
 DROP TABLE IF EXISTS t_distinct_diplotype_start_dose;
 CREATE TEMP TABLE IF NOT EXISTS t_distinct_diplotype_start_dose AS
 WITH d AS (
@@ -201,7 +219,7 @@ ORDER BY rec.drug_name, rec.gene_name, rec.diplotype, rec.recommendation, rec.lo
 ) 
 SELECT r.gene_name,r.drugid,
 sum(d.consensus_allele_frequency) freq_sum_tdm,
-count(d.consensus_allele_frequency) num_switch_tdm
+count(d.consensus_allele_frequency) num_tdm
 FROM
 prada.recommendation r
 INNER JOIN d ON r.recommendation = d.recommendation AND r.drugid = d.drug_name AND r.gene_name = d.gene_name
@@ -214,6 +232,7 @@ CREATE TEMP TABLE IF NOT EXISTS t_freq_recommendation_summary AS
 SELECT 
 da.drugid,da.gene_name,
 da.freq_sum_any, --da.num_any,
+dant.freq_sum_any_no_tdm,
 dsd.freq_sum_start_dose, --dsd.num_start_dose,
 dtd.freq_sum_target_dose,
 dts.freq_sum_titration_speed,
@@ -224,6 +243,7 @@ dtdm.freq_sum_tdm
 
 FROM
 t_distinct_diplotype_any da
+LEFT OUTER JOIN t_distinct_diplotype_any_no_tdm dant ON da.drugid = dant.drugid AND da.gene_name = dant.gene_name
 LEFT OUTER JOIN t_distinct_diplotype_start_dose dsd ON da.drugid = dsd.drugid AND da.gene_name = dsd.gene_name
 LEFT OUTER JOIN t_distinct_diplotype_target_dose dtd ON da.drugid = dtd.drugid AND da.gene_name = dtd.gene_name
 LEFT OUTER JOIN t_distinct_diplotype_titration_speed dts ON da.drugid = dts.drugid AND da.gene_name = dts.gene_name
@@ -236,46 +256,241 @@ SELECT * FROM t_freq_recommendation_summary
 ORDER BY drugid,gene_name;
 
 
---SELECT 
---rec.recommendation,
---rec.gene_name,
---rec.drug_name,
-----rec.diplotype,
---sum(rec.consensus_allele_frequency) freq,
---count(rec.consensus_allele_frequency) num
---FROM t_freq_recommendation rec 
---GROUP BY rec.recommendation,rec.gene_name,rec.drug_name;
+--across genes/unique per drug
+SELECT
+f.drugid,
+AVG(freq_sum_any) freq_sum_any,
+AVG(freq_sum_any_no_tdm) freq_sum_any_no_tdm,
+AVG(freq_sum_start_dose) freq_sum_start_dose,
+AVG(freq_sum_target_dose) freq_sum_target_dose,
+AVG(freq_sum_titration_speed) freq_sum_titration_speed,
+AVG(freq_sum_switch_any) freq_sum_switch_any,
+AVG(freq_sum_switch_drug) freq_sum_switch_drug,
+AVG(freq_sum_switch_gene) freq_sum_switch_gene,
+AVG(freq_sum_tdm) freq_sum_tdm
 
---DROP TABLE IF EXISTS t_freq_agg_recommendation;
---CREATE TEMP TABLE IF NOT EXISTS t_freq_agg_recommendation AS
---SELECT 
-----rec.recommendation,
---rec.gene_name,
---rec.drug_name,
-----rec.diplotype,
---sum(rec.consensus_allele_frequency) freq,
---count(rec.consensus_allele_frequency) num
---FROM t_freq_recommendation rec INNER JOIN prada.recommendation r ON r.recommendation = rec.recommendation AND r.drugid = rec.drug_name AND r.gene_name = rec.gene_name
---WHERE r.prada_start_dose !=1 OR r.prada_target_dose !=1 OR r.prada_titration_speed !=2 OR r.prada_switch1_drug =1 OR r.prada_switch1_gene =1 OR r.prada_switch2_drug =1 OR r.prada_switch2_gene =1 OR r.prada_tdm =1
---GROUP BY rec.recommendation,rec.gene_name,rec.drug_name;
---
---SELECT * FROM t_freq_agg_recommendation f INNER JOIN prada.recommendation r ON r.recommendation = f.recommendation AND r.gene_name = f.gene_name;
---
---DROP TABLE IF EXISTS t_freq_agg_recommendation2;
---CREATE TEMP TABLE IF NOT EXISTS t_freq_agg_recommendation2 AS
---SELECT 
---rec.recommendation,
---rec.gene_name,
---rec.drug_name,
-----rec.diplotype,
---sum(rec.consensus_allele_frequency) freq,
---count(rec.consensus_allele_frequency) num
---FROM t_freq_recommendation rec INNER JOIN prada.recommendation r ON r.recommendation = rec.recommendation AND r.drugid = rec.drug_name AND r.gene_name = rec.gene_name
---WHERE NOT (r.prada_start_dose !=1 OR r.prada_target_dose !=1 OR r.prada_titration_speed !=2 OR r.prada_switch1_drug =1 OR r.prada_switch1_gene =1 OR r.prada_switch2_drug =1 OR r.prada_switch2_gene =1 OR r.prada_tdm =1)
---GROUP BY rec.recommendation,rec.gene_name,rec.drug_name;
---
---SELECT * FROM t_freq_agg_recommendation2;
+FROM t_freq_recommendation_summary f
+--WHERE freq_sum_rank1x IS NOT NULL
+GROUP BY
+f.drugid
+ORDER BY drugid;
+
+--INCREMENTAL IMPROVEMENT ON PETRUSHKA RECOMMENDATIONS
+
+--SELECT p.column1 id, d.*, p.* FROM petrushka."petrushka_output_ad.csv" p LEFT OUTER JOIN prada.drug d ON UPPER(p.anti_prescribed) = UPPER(d."name");
+
+DROP TABLE IF EXISTS t_petrushka_drug;
+CREATE TEMP TABLE IF NOT EXISTS t_petrushka_drug AS
+SELECT p.column1::integer id, LOWER(p.anti_prescribed) anti_prescribed, SUBSTRING(p.rank1 FROM 5) rank1, SUBSTRING(p.rank2 FROM 5) rank2, SUBSTRING(p.rank3 FROM 5) rank3 FROM petrushka."petrushka_output_ad.csv" p;
+
+--SELECT * FROM t_petrushka_drug WHERE anti_prescribed!=rank1;
+
+SELECT anti_prescribed, rank1, count(*) n 
+FROM t_petrushka_drug
+GROUP BY anti_prescribed, rank1
+ORDER by anti_prescribed, rank1;
 
 
+--difference from anti_prescribed
+DROP TABLE IF EXISTS t_petrushka_drug_delta_anti_prescribed;
+CREATE TEMP TABLE IF NOT EXISTS t_petrushka_drug_delta_anti_prescribed AS
+WITH d AS (
+SELECT DISTINCT ON (rec.drug_name, rec.gene_name, rec.diplotype) rec.recommendation, rec.drug_name, rec.gene_name, rec.diplotype, rec.diplotype_frequency_pop, rec.allele1_frequency_pop, rec.allele2_frequency_pop, rec.consensus_allele_frequency 
+FROM t_freq_recommendation rec
+INNER JOIN prada.recommendation r ON r.recommendation = rec.recommendation AND r.drugid = rec.drug_name AND r.gene_name = rec.gene_name
+WHERE r.prada_start_dose !=1 OR r.prada_target_dose !=1 OR r.prada_titration_speed !=2 OR r.prada_switch1_drug =1 OR r.prada_switch1_gene =1 OR r.prada_switch2_drug =1 OR r.prada_switch2_gene =1 --OR r.prada_tdm =1
+ORDER BY rec.drug_name, rec.gene_name, rec.diplotype, rec.recommendation, rec.lookupkey::text, rec.implications
+) 
+SELECT pd.id, r.gene_name, r.drugid,
+sum(d.consensus_allele_frequency) freq_sum_anti_prescribed,
+count(d.consensus_allele_frequency) num_anti_prescribed
+FROM
+prada.recommendation r
+INNER JOIN d ON r.recommendation = d.recommendation AND r.drugid = d.drug_name AND r.gene_name = d.gene_name
+INNER JOIN t_petrushka_drug pd ON r.drugid=pd.anti_prescribed
+GROUP BY pd.id, r.gene_name, r.drugid;
+SELECT * FROM t_petrushka_drug_delta_anti_prescribed ORDER BY id, drugid, gene_name;
+
+--difference from rank1
+DROP TABLE IF EXISTS t_petrushka_drug_delta_rank1;
+CREATE TEMP TABLE IF NOT EXISTS t_petrushka_drug_delta_rank1 AS
+WITH d AS (
+SELECT DISTINCT ON (rec.drug_name, rec.gene_name, rec.diplotype) rec.recommendation, rec.drug_name, rec.gene_name, rec.diplotype, rec.diplotype_frequency_pop, rec.allele1_frequency_pop, rec.allele2_frequency_pop, rec.consensus_allele_frequency 
+FROM t_freq_recommendation rec
+INNER JOIN prada.recommendation r ON r.recommendation = rec.recommendation AND r.drugid = rec.drug_name AND r.gene_name = rec.gene_name
+WHERE r.prada_start_dose !=1 OR r.prada_target_dose !=1 OR r.prada_titration_speed !=2 OR r.prada_switch1_drug =1 OR r.prada_switch1_gene =1 OR r.prada_switch2_drug =1 OR r.prada_switch2_gene =1 --OR r.prada_tdm =1
+ORDER BY rec.drug_name, rec.gene_name, rec.diplotype, rec.recommendation, rec.lookupkey::text, rec.implications
+) 
+SELECT pd.id, r.gene_name, r.drugid,
+sum(d.consensus_allele_frequency) freq_sum_rank1,
+count(d.consensus_allele_frequency) num_rank1
+FROM
+prada.recommendation r
+INNER JOIN d ON r.recommendation = d.recommendation AND r.drugid = d.drug_name AND r.gene_name = d.gene_name
+INNER JOIN t_petrushka_drug pd ON r.drugid=pd.rank1
+GROUP BY pd.id, r.gene_name, r.drugid;
+SELECT * FROM t_petrushka_drug_delta_rank1 ORDER BY id, drugid, gene_name;
+
+--unique rank1 compared to anti_prescribed
+
+--DROP TABLE IF EXISTS t_petrushka_drug_delta_rank1x;
+--CREATE TEMP TABLE IF NOT EXISTS t_petrushka_drug_delta_rank1x AS
+--WITH d AS (
+--SELECT DISTINCT ON (rec.drug_name, rec.gene_name, rec.diplotype) rec.recommendation, rec.drug_name, rec.gene_name, rec.diplotype, rec.diplotype_frequency_pop, rec.allele1_frequency_pop, rec.allele2_frequency_pop, rec.consensus_allele_frequency 
+--FROM t_freq_recommendation rec
+--INNER JOIN prada.recommendation r ON r.recommendation = rec.recommendation AND r.drugid = rec.drug_name AND r.gene_name = rec.gene_name
+--WHERE r.prada_start_dose !=1 OR r.prada_target_dose !=1 OR r.prada_titration_speed !=2 OR r.prada_switch1_drug =1 OR r.prada_switch1_gene =1 OR r.prada_switch2_drug =1 OR r.prada_switch2_gene =1 --OR r.prada_tdm =1
+--ORDER BY rec.drug_name, rec.gene_name, rec.diplotype, rec.recommendation, rec.lookupkey::text, rec.implications
+--) 
+--SELECT pd.id, r.gene_name, r.drugid,
+--sum(d0.consensus_allele_frequency) freq_sum_rank1x,
+--count(d0.consensus_allele_frequency) num_rank1x
+--FROM
+--t_petrushka_drug pd
+--INNER JOIN prada.recommendation r ON r.drugid = pd.rank1 AND r.drugid!=pd.anti_prescribed
+--INNER JOIN d d0 ON r.recommendation = d0.recommendation AND r.drugid = d0.drug_name AND r.gene_name = d0.gene_name
+--GROUP BY pd.id, r.gene_name, r.drugid;
+--SELECT * FROM t_petrushka_drug_delta_rank1x ORDER BY id, drugid, gene_name;
+
+
+DROP TABLE IF EXISTS t_petrushka_drug_delta_rank1x_rank1;
+CREATE TEMP TABLE IF NOT EXISTS t_petrushka_drug_delta_rank1x_rank1 AS
+WITH d AS (
+SELECT DISTINCT ON (rec.drug_name, rec.gene_name, rec.diplotype) rec.recommendation, rec.drug_name, rec.gene_name, rec.diplotype, rec.diplotype_frequency_pop, rec.allele1_frequency_pop, rec.allele2_frequency_pop, rec.consensus_allele_frequency 
+FROM t_freq_recommendation rec
+INNER JOIN prada.recommendation r ON r.recommendation = rec.recommendation AND r.drugid = rec.drug_name AND r.gene_name = rec.gene_name
+WHERE r.prada_start_dose !=1 OR r.prada_target_dose !=1 OR r.prada_titration_speed !=2 OR r.prada_switch1_drug =1 OR r.prada_switch1_gene =1 OR r.prada_switch2_drug =1 OR r.prada_switch2_gene =1 --OR r.prada_tdm =1
+ORDER BY rec.drug_name, rec.gene_name, rec.diplotype, rec.recommendation, rec.lookupkey::text, rec.implications
+) 
+SELECT pd.id, r.gene_name, r.drugid,
+d.diplotype,d.consensus_allele_frequency
+FROM
+prada.recommendation r
+INNER JOIN d ON r.recommendation = d.recommendation AND r.drugid = d.drug_name AND r.gene_name = d.gene_name
+INNER JOIN t_petrushka_drug pd ON r.drugid=pd.rank1;
+SELECT * FROM t_petrushka_drug_delta_rank1x_rank1 ORDER BY id, drugid, gene_name, diplotype;
+
+DROP TABLE IF EXISTS t_petrushka_drug_delta_rank1x_anti_prescribed;
+CREATE TEMP TABLE IF NOT EXISTS t_petrushka_drug_delta_rank1x_anti_prescribed AS
+WITH d AS (
+SELECT DISTINCT ON (rec.drug_name, rec.gene_name, rec.diplotype) rec.recommendation, rec.drug_name, rec.gene_name, rec.diplotype, rec.diplotype_frequency_pop, rec.allele1_frequency_pop, rec.allele2_frequency_pop, rec.consensus_allele_frequency 
+FROM t_freq_recommendation rec
+INNER JOIN prada.recommendation r ON r.recommendation = rec.recommendation AND r.drugid = rec.drug_name AND r.gene_name = rec.gene_name
+WHERE r.prada_start_dose !=1 OR r.prada_target_dose !=1 OR r.prada_titration_speed !=2 OR r.prada_switch1_drug =1 OR r.prada_switch1_gene =1 OR r.prada_switch2_drug =1 OR r.prada_switch2_gene =1 --OR r.prada_tdm =1
+ORDER BY rec.drug_name, rec.gene_name, rec.diplotype, rec.recommendation, rec.lookupkey::text, rec.implications
+) 
+SELECT pd.id, r.gene_name, r.drugid,
+d.diplotype,d.consensus_allele_frequency
+FROM
+prada.recommendation r
+INNER JOIN d ON r.recommendation = d.recommendation AND r.drugid = d.drug_name AND r.gene_name = d.gene_name
+INNER JOIN t_petrushka_drug pd ON r.drugid=pd.anti_prescribed;
+SELECT * FROM t_petrushka_drug_delta_rank1x_anti_prescribed ORDER BY id, drugid, gene_name, diplotype;
+
+DROP TABLE IF EXISTS t_petrushka_drug_delta_rank1x;
+CREATE TEMP TABLE IF NOT EXISTS t_petrushka_drug_delta_rank1x AS
+WITH ud AS (
+SELECT DISTINCT d1.id, d1.gene_name, d1.diplotype
+FROM t_petrushka_drug_delta_rank1x_rank1 d1 
+INNER JOIN t_petrushka_drug_delta_rank1x_anti_prescribed d2 
+ON d1.id = d2.id AND d1.gene_name = d2.gene_name AND d1.diplotype=d2.diplotype
+),
+d AS (
+SELECT DISTINCT ON (rec.drug_name, rec.gene_name, rec.diplotype) rec.recommendation, rec.drug_name, rec.gene_name, rec.diplotype, rec.diplotype_frequency_pop, rec.allele1_frequency_pop, rec.allele2_frequency_pop, rec.consensus_allele_frequency 
+FROM t_freq_recommendation rec
+INNER JOIN prada.recommendation r ON r.recommendation = rec.recommendation AND r.drugid = rec.drug_name AND r.gene_name = rec.gene_name
+WHERE r.prada_start_dose !=1 OR r.prada_target_dose !=1 OR r.prada_titration_speed !=2 OR r.prada_switch1_drug =1 OR r.prada_switch1_gene =1 OR r.prada_switch2_drug =1 OR r.prada_switch2_gene =1 --OR r.prada_tdm =1
+ORDER BY rec.drug_name, rec.gene_name, rec.diplotype, rec.recommendation, rec.lookupkey::text, rec.implications
+) 
+SELECT pd.id, r.gene_name, r.drugid,
+--d.diplotype,d.consensus_allele_frequency,
+--ud.diplotype
+sum(d.consensus_allele_frequency) freq_sum_rank1x,
+count(d.consensus_allele_frequency) num_rank1x
+FROM
+prada.recommendation r
+INNER JOIN d ON r.recommendation = d.recommendation AND r.drugid = d.drug_name AND r.gene_name = d.gene_name
+INNER JOIN t_petrushka_drug pd ON r.drugid=pd.rank1
+LEFT OUTER JOIN ud ON pd.id=ud.id AND r.gene_name=ud.gene_name AND d.diplotype = ud.diplotype
+WHERE ud.diplotype IS NULL
+GROUP BY pd.id, r.gene_name, r.drugid;
+SELECT * FROM t_petrushka_drug_delta_rank1x ORDER BY id, drugid, gene_name;
+
+DROP TABLE IF EXISTS t_freq_drug_delta_summary;
+CREATE TEMP TABLE IF NOT EXISTS t_freq_drug_delta_summary AS
+SELECT
+d.id,
+d.anti_prescribed,
+dd.gene_name gene_name_anti_prescribed,
+pd_ap.class class_anti_prescribed,
+d.rank1,
+COALESCE(ddr1.gene_name,ddr1x.gene_name) gene_name_rank1,
+pd_r1.class class_rank1,
+--COALESCE(dd.id,ddr1.id,ddr1x.id) id,
+--COALESCE(dd.drugid,ddr1.drugid,ddr1x.drugid) drugid,
+--COALESCE(dd.gene_name,ddr1.gene_name,ddr1x.gene_name) gene_name,
+dd.freq_sum_anti_prescribed,
+ddr1.freq_sum_rank1,
+ddr1x.freq_sum_rank1x
+FROM t_petrushka_drug d 
+LEFT OUTER JOIN prada.drug pd_ap ON pd_ap.name=d.anti_prescribed
+LEFT OUTER JOIN prada.drug pd_r1 ON pd_r1.name=d.rank1
+LEFT OUTER JOIN t_petrushka_drug_delta_anti_prescribed dd ON d.id = dd.id
+LEFT OUTER JOIN t_petrushka_drug_delta_rank1 ddr1 ON d.id = ddr1.id AND d.rank1=ddr1.drugid
+LEFT OUTER JOIN t_petrushka_drug_delta_rank1x ddr1x ON d.id = ddr1x.id AND d.rank1=ddr1x.drugid AND ddr1x.gene_name=ddr1.gene_name
+ORDER BY d.id,anti_prescribed;
+;
+SELECT * FROM t_freq_drug_delta_summary
+ORDER BY id,anti_prescribed,gene_name_anti_prescribed,rank1,gene_name_rank1;
+--
+--SELECT * FROM t_petrushka_drug d 
+--LEFT OUTER JOIN prada.drug pd_ap ON pd_ap.name=d.anti_prescribed
+--LEFT OUTER JOIN prada.drug pd_r1 ON pd_r1.name=d.rank1
+--LEFT OUTER JOIN t_petrushka_drug_delta_anti_prescribed dd ON d.id = dd.id
+--LEFT OUTER JOIN t_petrushka_drug_delta_rank1 ddr1 ON d.id = ddr1.id AND d.rank1=ddr1.drugid
+--LEFT OUTER JOIN t_petrushka_drug_delta_rank1x ddr1x ON d.id = ddr1x.id AND d.rank1=ddr1x.drugid AND ddr1x.gene_name=ddr1.gene_name
+--ORDER BY d.id,anti_prescribed;
+
+DROP TABLE IF EXISTS t_freq_drug_delta_summary_unique_drug;
+CREATE TEMP TABLE IF NOT EXISTS t_freq_drug_delta_summary_unique_drug AS
+SELECT
+f.id,
+f.anti_prescribed,
+f.class_anti_prescribed,
+f.rank1,
+f.class_rank1,
+AVG(freq_sum_anti_prescribed) freq_sum_anti_prescribed,
+AVG(freq_sum_rank1) freq_sum_rank1,
+AVG(freq_sum_rank1x) freq_sum_rank1x
+FROM t_freq_drug_delta_summary f
+--WHERE freq_sum_rank1x IS NOT NULL
+GROUP BY
+f.id,
+f.anti_prescribed,
+f.class_anti_prescribed,
+f.rank1,
+f.class_rank1
+ORDER BY id,anti_prescribed,rank1;
+SELECT * FROM t_freq_drug_delta_summary_unique_drug;
+
+SELECT 
+f.anti_prescribed,
+f.class_anti_prescribed,
+f.rank1,
+f.class_rank1,
+f.freq_sum_anti_prescribed,
+f.freq_sum_rank1,
+f.freq_sum_rank1x,
+COUNT(*) n
+FROM t_freq_drug_delta_summary_unique_drug f
+GROUP BY
+f.anti_prescribed,
+f.class_anti_prescribed,
+f.rank1,
+f.class_rank1,
+f.freq_sum_anti_prescribed,
+f.freq_sum_rank1,
+f.freq_sum_rank1x
+ORDER BY anti_prescribed,rank1;
 
 

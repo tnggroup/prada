@@ -23,6 +23,10 @@ sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampl
 cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","pilot4","sampleMeta.tsv"))
 sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)
 
+#pilot 6
+cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","pilot6","sampleMeta.tsv"))
+sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)
+
 #downsampled bam
 cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","downsampled-bam-runs","sampleMeta.tsv"))
 sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)
@@ -61,6 +65,19 @@ ggplot(sampleMetaTot,aes(x = sdepth_q050_bed, y = nCalledPgx, colour = analysis,
   theme_minimal()
 ggsave(filename = file.path(projectFolderPath,"work","pradaApp","unified-plots","ncalledpgx.png"), plot = get_last_plot())
 
+ggplot(sampleMetaTot,aes(x = sdepth_q050_bed, y = meanPgxVariantRatioMDD, colour = analysis, label=analysis)) +
+  geom_point() +
+  ggtitle("Mean PGx SNP ratio called/total, MDD PGx genes only") +
+  geom_text_repel(size = 2.5) +
+  theme_minimal()
+ggsave(filename = file.path(projectFolderPath,"work","pradaApp","unified-plots","pgxvariantratio_mdd.png"), plot = get_last_plot())
+
+ggplot(sampleMetaTot,aes(x = sdepth_q050_bed, y = nCalledPgxMDD, colour = analysis, label=analysis)) +
+  geom_point() +
+  ggtitle("# called PGx diplotype variants, MDD PGx genes only") +
+  geom_text_repel(size = 2.5) +
+  theme_minimal()
+ggsave(filename = file.path(projectFolderPath,"work","pradaApp","unified-plots","ncalledpgx_mdd.png"), plot = get_last_plot())
 
 ggplot(sampleMetaTot,aes(x = sdepth_q050_nobed, y = nvarq_noregion, colour = analysis, label=analysis)) +
   geom_point() +

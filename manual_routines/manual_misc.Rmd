@@ -170,7 +170,7 @@ sudo -E singularity build prada_c2.sif /media/sf_mylinux_shared/prada_c2.def
 
 #Manual mosdepths runs
 
-```bash
+```{bash}
 
 #interactive test
 #singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot2/p2-nogtube-nobedtest/output/barcode01/barcode01.haplotagged.bam
@@ -267,6 +267,17 @@ sbatch --time 24:00:00 --partition interruptible_cpu --job-name="md02" --ntasks 
 sbatch --time 24:00:00 --partition interruptible_cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot4/p4-nb-b3/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.p4-1.barcode03.$(date +%Y%m%d).out.txt"
 
 sbatch --time 24:00:00 --partition interruptible_cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot4/p4-nb-b4/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.p4-1.barcode04.$(date +%Y%m%d).out.txt"
+
+
+
+ #Pilot 6 test samples
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="md01" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode01 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot6/p6-1/output/barcode01/barcode01.haplotagged.bam" --output "mdepth.p6-1.barcode01.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="md02" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode02 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot6/p6-1/output/barcode02/barcode02.haplotagged.bam" --output "mdepth.p6-1.barcode02.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="md03" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot6/p6-1/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.p6-1.barcode03.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="md04" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="singularity run --bind /scratch/prj/sgdp_nanopore/Projects/prada_jz ~/project/prada_jz/venv/mosdepth_c2.sif -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx_cnv.grch38.5k.2p1percent.bed --fast-mode barcode04 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot6/p6-1/output/barcode04/barcode04.haplotagged.bam" --output "mdepth.p6-1.barcode04.$(date +%Y%m%d).out.txt"
 
 ```
 
@@ -413,15 +424,17 @@ ggplot(sampleMeta,aes(x = sdepth_q050_nobed, y = vcallacc_q050_noregion, colour 
 
 ## Automated runs
 
-```bash
+```{bash}
 
-sbatch --time 2:00:00 --partition cpu --job-name="pap2" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot2.R" --output "pradaAppPilot2.$(date +%Y%m%d).out.txt"
+sbatch --time 2:00:00 --partition cpu --job-name="pap2" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot2.R" --output "pradaAppPilot2.$(date +%Y%m%d).out.txt"
 
-sbatch --time 2:00:00 --partition cpu --job-name="pap3" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot3.R" --output "pradaAppPilot3.$(date +%Y%m%d).out.txt"
+sbatch --time 2:00:00 --partition cpu --job-name="pap3" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot3.R" --output "pradaAppPilot3.$(date +%Y%m%d).out.txt"
 
-sbatch --time 2:00:00 --partition cpu --job-name="pap4" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot4.R" --output "pradaAppPilot4.$(date +%Y%m%d).out.txt"
+sbatch --time 2:00:00 --partition cpu --job-name="pap4" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot4.R" --output "pradaAppPilot4.$(date +%Y%m%d).out.txt"
 
-sbatch --time 2:00:00 --partition cpu --job-name="dshg002" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppDownsampledHg002.R" --output "pradaAppDownsampledHg002.$(date +%Y%m%d).out.txt"
+sbatch --time 2:00:00 --partition cpu --job-name="pap6" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot6.R" --output "pradaAppPilot6.$(date +%Y%m%d).out.txt"
+
+sbatch --time 2:00:00 --partition cpu --job-name="dshg002" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppDownsampledHg002.R" --output "pradaAppDownsampledHg002.$(date +%Y%m%d).out.txt"
 
 
 ```
@@ -440,6 +453,105 @@ pg_restore -h localhost -p 65432 -U postgres -d prada_central_old -c --if-exists
 
 #restorting a text format dump
 psql -h localhost -p 65432 -U postgres -d prada_central_old < dump-prada_central-202601191142.sql
+
+```
+
+
+# QUILT imputation experiments
+
+## Genome chunks definitions 
+
+```{r}
+
+library(STITCH)
+library(mspbwt)
+library(QUILT)
+projectFolderPath<-"/users/k2481717/project/prada_jz"
+workFolderPath<-file.path(projectFolderPath,"work","imputation","quilt")
+
+ldat<-c()
+
+for(iChr in 1:22){
+  ldat[iChr] <- list(QUILT::quilt_chunk_map(paste0("chr",iChr), paste0("/scratch/prj/ppn_tng/projects/jzphdmove/SHARED/software/QUILT/maps/hg38/CEU-chr",iChr,"-final.b38.txt.gz")))
+}
+dat <- data.table::rbindlist(ldat,use.names = TRUE,fill = TRUE)
+saveRDS(dat,file.path(workFolderPath,"chunks.quilt.Rds"))
+#str(dat)
+
+
+# rare_af_threshold<- 0.001
+# subsamples <- "-"
+# 
+# ifelse(regionStart-buffer<1, samtoolslike <- paste0(chr, ":", 1, "-", regionEnd+buffer), samtoolslike <- paste0(chr, ":", regionStart-buffer, "-", regionEnd+buffer) )
+# 
+# out <- STITCH::Rcpp_get_hap_info_from_vcf(
+#         vcffile = reference_vcf_file,
+#         af_cutoff = rare_af_threshold,
+#         region = samtoolslike,
+#         samples = subsamples
+#       )
+
+
+```
+
+## Reference panel preparation
+
+Creates the slurm commands to run.
+
+```{r}
+
+projectFolderPath<-"/users/k2481717/project/prada_jz"
+projectFolderPathLocal<-"/Users/jakz/Documents/work_rstudio/prada"
+workFolderPath<-file.path(projectFolderPath,"work","imputation","quilt")
+
+
+chunks<-readRDS(file.path(projectFolderPathLocal,"chunks.quilt.Rds"))
+
+cf <- data.frame(command=paste0(
+  "\n#",1:nrow(chunks),"
+  sbatch --time 1:00:00 --partition cpu --job-name=\"c",1:nrow(chunks),"\" --ntasks 1 --cpus-per-task 5 --mem 32G --wrap=\"Rscript ",file.path(projectFolderPath,"src-r","prada-prepare-reference-chunk.R"), " ",1:nrow(chunks),"\" --output \"quiltChunk.",1:nrow(chunks),".$(date +%Y%m%d).out.txt\" 
+  
+  
+  "
+)
+)
+
+data.table::fwrite(cf,file = file.path(workFolderPath,"prepare-reference-chunk-commands.sh"), append = F, quote = F, sep = "\t", col.names = F, nThread=4, na = "NA") 
+
+```
+
+#Assess imputation quality
+
+```{sh}
+
+bedtools intersect -a /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/quilt/results_01x/quilt.14.1.300000000.vcf.gz -b /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/truth-set/concordance_v2/truth_chr14.vcf.gz
+
+bedtools intersect -a /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/quilt/results_01x/quilt.14.1.300000000.vcf.gz -b /scratch/prj/gwas_sumstats/reference_panel/hc1kgp3.b38.plink/hc1kgp3.b38.eur.jz2024.vcf.gz
+
+bedtools intersect -a /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/output/hg002-01/chr14/hg002-01.chr14.vcf.gz -b /scratch/prj/gwas_sumstats/reference_panel/hc1kgp3.b38.plink/hc1kgp3.b38.eur.jz2024.vcf.gz
+
+bcftools stats /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/reference_panel_final/1000GP_chr14.sites.vcf.gz
+#2640944
+
+bedtools intersect -a /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/output/hg002-01/chr14/hg002-01.chr14.vcf.gz -b /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/reference_panel_final/1000GP_chr14.sites.vcf.gz -u | wc -l
+#2627602
+
+
+bedtools intersect -a /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/output/hg002-02/chr14/hg002-02.chr14.vcf.gz -b /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/reference_panel_final/1000GP_chr14.sites.vcf.gz -u | wc -l
+#2627602
+
+
+bedtools intersect -a /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/output/hg002-03/chr14/hg002-03.chr14.vcf.gz -b /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/reference_panel_final/1000GP_chr14.sites.vcf.gz -u | wc -l
+#2627602
+
+bedtools intersect -a /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/output/hg002-03/chr14/hg002-03.chr14.vcf.gz -b /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/reference_panel_final/1000GP_chr14.sites.vcf.gz -v | wc -l
+
+bedtools intersect -a /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/reference_panel_final/1000GP_chr14.sites.vcf.gz -b /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/output/hg002-03/chr14/hg002-03.chr14.vcf.gz -v | wc -l
+#12935
+
+bedtools intersect -a /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/reference_panel_final/1000GP_chr14.sites.vcf.gz -b /users/k2481717/project/prada_jz/work/pgx/downsampled-bam-runs/imputation/glimpse/output/hg002-02/chr14/hg002-02.chr14.vcf.gz -v | wc -l
+
+
 
 ```
 

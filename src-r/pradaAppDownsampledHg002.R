@@ -1,6 +1,6 @@
 
-#devtools::install_github("tnggroup/prada")
-#devtools::install_github("tnggroup/prada",ref = 'jz_dev')
+#remotes::install_github("tnggroup/prada")
+#remotes::install_github("tnggroup/prada",ref = 'jz_dev')
 #install.packages("ggstats") #this is not installed automatically with packages for some reason. - added now to namespace.
 
 library(prada)
