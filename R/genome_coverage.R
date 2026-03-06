@@ -29,7 +29,8 @@ computeGenomeCoverage=function(
     nPrioritisedTotal=25000,
     wGene=1e20,
     wVariantCnv=1e7,
-    wVariantSnp=1
+    wVariantSnp=1,
+    useLabelIdsForGenes=TRUE
     ){
   #pradaApplicationDAO<-pradaO$pradaApplicationDAO
   applicationCoverageRegions<<-pradaApplicationDAO$selectApplicationCoverageRegions(
@@ -44,26 +45,28 @@ computeGenomeCoverage=function(
     wVariantCnv=wVariantCnv,
     wVariantSnp=wVariantSnp
     )
+  setDT(applicationCoverageRegions)
   applicationCoverageRegionsFiltered <<- pradaApplicationDAO$selectFilteredApplicationCoverageRegions()
   setDT(applicationCoverageRegionsFiltered)
+
+  if(useLabelIdsForGenes){
+    applicationCoverageRegions[type==0,id:=label]
+    applicationCoverageRegionsFiltered[type==0,id:=label]
+  }
 
   cat("The coverage of the current selection is ",sum(applicationCoverageRegionsFiltered$coveragebp), "bp or ",sum(applicationCoverageRegionsFiltered$coveragebp/3088269832))
 
 
   applicationCoverageRegionsFiltered[,score:=0]
 
-  #create safe IDs
-  applicationCoverageRegionsFiltered[,id:=gsub(pattern = " ",replacement = "_", x = id, fixed = T)]
-  #grep(pattern = " ",x = applicationCoverageRegionsFiltered$id, fixed = T)
-
 
   rPos<-as.data.frame(applicationCoverageRegionsFiltered)
   setDT(rPos)
-  rPos[,strand:='+'][,abp1_final:=bp1-eval(paddingGroupFinal)][,abp2_final:=bp2]
+  rPos[,strand:='+'][,abp1_final:=abp1-eval(paddingGroupFinal)][,abp2_final:=abp2]
   rPos[abp1_final<1,abp1_final:=1]
   rNeg<-as.data.frame(applicationCoverageRegionsFiltered)
   setDT(rNeg)
-  rNeg[,strand:='-'][,abp1_final:=bp1][,abp2_final:=bp2+eval(paddingGroupFinal)]
+  rNeg[,strand:='-'][,abp1_final:=abp1][,abp2_final:=abp2+eval(paddingGroupFinal)]
   rNeg[abp2_final>chromosome_sizebp,abp2_final:=chromosome_sizebp]
 
   applicationCoverageRegionsFilteredPaddedStrands<<-rbind(rPos,rNeg)
@@ -74,7 +77,10 @@ computeGenomeCoverage=function(
   if(!is.null(writeToThisBedPath)){
 
     if(writePaddedStrands){
-      bedDf<-applicationCoverageRegionsFilteredPaddedStrands
+      cat("\nWriting padded strands BED\n")
+      bedDf<-as.data.frame(applicationCoverageRegionsFilteredPaddedStrands)
+      bedDf$id<-gsub("[^a-zA-z1-9_-]","_",bedDf$id) #create safe IDs
+      setDT(bedDf)
       data.table::setorderv(bedDf,
                             cols = c("chr","bp1","id","strand","bp2"),
                             order =c(1,1,1,1,1)
@@ -83,7 +89,10 @@ computeGenomeCoverage=function(
 
       #bedDf<-applicationCoverageRegionsFiltered[,.(chr_name,start=abp1,end=abp2,id=paste0("\"",id,"\""))]
     } else {
-      bedDf<-applicationCoverageRegionsFiltered
+      cat("\nWriting single unpadded BED\n")
+      bedDf<-as.data.frame(applicationCoverageRegionsFiltered)
+      bedDf$id<-gsub("[^a-zA-z1-9_-]","_",bedDf$id) #create safe IDs
+      setDT(bedDf)
       data.table::setorderv(bedDf,
                             cols = c("chr","bp1","id","bp2"),
                             order =c(1,1,1,1)

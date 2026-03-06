@@ -8,7 +8,8 @@ srun -p cpu --time 4:00:00 --ntasks 1 --cpus-per-task 6 --mem 256G --pty /bin/ba
 
 ```
 
-## PGS feasibility check across fractions of multisampled HG002/sequencing depths
+
+# PGS feasibility check across fractions of multisampled HG002/sequencing depths
 
 ```{bash}
 
@@ -51,7 +52,7 @@ sbatch --time 3:00:00 --partition cpu --job-name="sBIPO03" --ntasks 1 --cpus-per
 
 ```
 
-## PGS feasibility check across region coverages
+# PGS feasibility check across region coverages
 
 We measure the performance of PGS with the coverage of polygenic regions. We compare to the genome-wide case, using GLAD+ genotyped data.
 
@@ -85,9 +86,9 @@ sbatch --time 4:00:00 --partition cpu --job-name="scoring" --ntasks 1 --cpus-per
 
 ```
 
-## ONT human variation workflow
+# ONT human variation workflow
 
-### Installation and configuration
+## Installation and configuration
 
 ```bash
 
@@ -102,7 +103,7 @@ $NEXTFLOW_CMD run epi2me-labs/wf-human-variation --help
 
 ```
 
-## Singularity
+# Singularity
 
 Install singularity. Singularity can't build containers on MacOS currently. You can use a virtual machine (f.ex. using VirtualBox) to run Linux and then build Singularity that can build containers from definitions.
 https://github.com/sylabs/singularity/blob/main/INSTALL.md
@@ -442,19 +443,31 @@ sbatch --time 2:00:00 --partition cpu --job-name="dshg002" --ntasks 1 --cpus-per
 
 # DB routines
 
+
+Misc dump and restore
+
 ```{bash}
 
 #assuming ssh-tunnel with specified port settngs
-pg_dump -h localhost -p 65432 -U postgres -d prada_central -F d -f prada_central_dump -Z 9 -j 6
-#single transaction restore
-pg_restore -h localhost -p 65432 -U postgres -d prada_central_old -c --if-exists --no-data-for-failed-tables -1 prada_central_dump
-#multiple jobs restore
-pg_restore -h localhost -p 65432 -U postgres -d prada_central_old -c --if-exists --no-data-for-failed-tables -j 6 prada_central_dump
+pg_dump -h localhost -p 65432 -U postgres -d prada_central_dev -F d -f prada_central_dev_dump -Z 9 -j 6
+pg_dump -h localhost -p 65432 -U postgres -d covidcnsdb -F d -f covidcnsdb_dump -Z 9 -j 6
+pg_dump -h localhost -p 65432 -U postgres -d phenodb -F d -f phenodb_dump -Z 9 -j 6
+pg_dump -h localhost -p 65432 -U postgres -d redash -F d -f redash_dump -Z 9 -j 6
 
-#restorting a text format dump
+#single transaction restore - same database
+pg_restore -h localhost -p 65432 -U postgres -d prada_central_dev -c --if-exists --no-data-for-failed-tables -1 prada_central_dev_dump
+#multiple jobs restore - same database
+pg_restore -h localhost -p 65432 -U postgres -d prada_central_dev -c --if-exists --no-data-for-failed-tables -j 6 prada_central_dev_dump
+
+#restore to new database
+createdb -h localhost -p 65432 -U postgres -W covidcnsdb_restore
+pg_restore -h localhost -p 65432 -U postgres -d covidcnsdb_restore -v --no-data-for-failed-tables -j 6 covidcnsdb_dump
+
+#restoring a text format dump - same database (not recommended, because slow)
 psql -h localhost -p 65432 -U postgres -d prada_central_old < dump-prada_central-202601191142.sql
 
 ```
+
 
 
 # QUILT imputation experiments
