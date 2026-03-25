@@ -8,7 +8,7 @@ library(data.table)
 projectFolderPath<-"/scratch/prj/sgdp_nanopore/Projects/prada_jz"
 pradaObj<-PradaClass()
 
-pradaObj$addAnalysisSetting(settingLabel = "p6-1",folderPathAnalysisSequencingRaw = file.path(projectFolderPath, "data/ont_raw/pilot6"),folderPathAnalysisOutputRaw = file.path(projectFolderPath, "work/pgx/pilot6/p6-1"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/pilot6"))
+pradaObj$addAnalysisSetting(settingLabel = "p6-nwr-ob",folderPathAnalysisSequencingRaw = file.path(projectFolderPath, "data/ont_raw/pilot6/Pilot8_repeat_nowash_reload_Old_bed/20260305_1106_1C_PBA20773_85ef8c12"),folderPathAnalysisOutputRaw = file.path(projectFolderPath, "work/pgx/pilot6/p6-1"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/pilot6"))
 
 
 pradaObj$collectAnalysisCallData("p6-1")
