@@ -476,4 +476,36 @@ sbatch --time 2-00:00:00 --partition cpu --job-name="downx" --ntasks 1 --cpus-pe
 
 ```
 
+```{r}
+
+library(prada)
+library(data.table)
+
+finalBed<-fread("/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx.grch38.padded_100k.bed")
+
+finalBed.compact<-unique(finalBed[,c("V1","V4")])
+setDT(finalBed.compact)
+finalBed.compact[finalBed[V6=="+",],on=c(V1='V1' , V4='V4'), c('bp1') := list(i.V2)]
+finalBed.compact[finalBed[V6=="-",],on=c(V1='V1' , V4='V4'), c('bp2') := list(i.V3)]
+
+
+colnames(finalBed.compact)<-c("chr_reg","label_reg","bp1_reg","bp2_reg")
+#finalBed.compact[,chr_reg:=as.integer(chr_reg)]
+unique(finalBed.compact$chr_reg)
+
+pradaO<-PradaClass()
+pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central_dev")
+dbRegions <- pradaO$pradaApplicationDAO$selectApplicationCoverageRegions(paddingGeneBp = 0, paddingVariantCnvBp = 0, paddingVariantSnpBp = 0, nPrioritisedGene = 1000)
+unique(dbRegions$chr_name)
+
+setDT(dbRegions)
+dbRegions[finalBed.compact,on=.(chr_name=chr_reg , bp1>bp1_reg, bp2<bp2_reg), c('region') := list(i.label_reg)]
+
+#CYP1A2 from GENCODE: chr15, bp1=74748845, bp2=74756607
+#CYP1A2 in BED: chr15, bp1=74638844, bp2=74866607
+
+#CYP2A6 from GENCODE: chr19, bp1=40843541, bp2=40850447
+#CYP2B6 (includes CYP2A6) in BED: chr19, bp1=40733540, bp2=41206195
+
+```
 

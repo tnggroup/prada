@@ -1,4 +1,4 @@
-#Functions to compute the genome coverage
+#Functions to compute the genome coverage and select gene lists to use for target regions
 #
 #
 # writeToThisBedPath=NULL
@@ -15,6 +15,7 @@
 # wVariantCnv=1e6
 # wVariantSnp=1
 
+#This funcgtion both produces target region lists (in BED-format) and computes the corresponding genomic coverage of the on-target regions.
 PradaClass$methods(
 computeGenomeCoverage=function(
     writeToThisBedPath=NULL,

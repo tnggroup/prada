@@ -347,10 +347,12 @@ WHERE g.in_pgx=TRUE OR g.in_cpic=TRUE OR g.has_cpiclevel=TRUE OR g.in_dpwg=TRUE 
 
 --SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='sertraline';
 --SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='bupropion';
+--SELECT * FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_class IS NOT NULL;
 --SELECT * FROM  prada.harmonised_combined_pgx tp ORDER by drug_name;
 /*SELECT * FROM  prada.harmonised_combined_pgx tp ORDER by prada_ehrpriority_num DESC, prada_cpiclevel_num DESC, prada_pgkbcalevel_num DESC
 LIMIT 100;*/
 --SELECT DISTINCT chr,bp1,bp2,gene_name,gene_id FROM  prada.harmonised_combined_pgx tp WHERE prada_cpiclevel_num > 0 OR prada_pgkbcalevel_num > 0 OR prada_pgkbcalevel_num > 0 ORDER by chr,bp1,bp2;
+--SELECT DISTINCT chr,bp1,bp2,gene_name,gene_id,drug_class FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_class IS NOT NULL AND (prada_cpiclevel_num > 0 OR prada_pgkbcalevel_num > 0) ORDER by gene_name,chr,bp1,bp2; --antidepressant with some pgx literture support
 
 
 --DROP MATERIALIZED VIEW prada.harmonised_combined_pgx_gene;
@@ -393,6 +395,7 @@ CREATE UNIQUE INDEX harmonised_combined_pgx_gene_i ON prada.harmonised_combined_
 --REFRESH MATERIALIZED VIEW prada.harmonised_combined_pgx_gene;
 
 --SELECT * FROM prada.harmonised_combined_pgx_gene ORDER BY prada_gene_score DESC;
+--SELECT * FROM prada.harmonised_combined_pgx_gene ORDER BY gene_name;
 
 --DROP MATERIALIZED VIEW prada.harmonised_combined_drug;
 CREATE MATERIALIZED VIEW prada.harmonised_combined_drug

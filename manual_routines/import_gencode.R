@@ -1,3 +1,5 @@
+#This should be Release 48 (GRCh38.p14)
+
 library(data.table)
 
 gencode <- data.table::fread("~/Downloads/gencode.v48.chr_patch_hapl_scaff.basic.annotation.gff3",header = F,fill = T, blank.lines.skip = T,data.table = T,skip = 7,sep = '\t')
