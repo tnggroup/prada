@@ -143,4 +143,28 @@ sbatch --time 24:00:00 --partition interruptible_cpu --job-name="wrob2" --ntasks
 sbatch --time 24:00:00 --partition interruptible_cpu --job-name="wrob3" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode barcode03 /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot8/p8_wash_reload_old-bed/output/barcode03/barcode03.haplotagged.bam" --output "mdepth.p8_wash_reload_old-bed.barcode03.$(date +%Y%m%d).out.txt"
 
 
+
+#Pilot 9 test samples
+ 
+##adaptive-nowash
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="nwA" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode PradaA /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot9/adaptive-nowash/output/PradaA/PradaA.haplotagged.bam" --output "mdepth.p9_adaptive-nowash.PradaA.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="nwB" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode PradaB /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot9/adaptive-nowash/output/PradaB/PradaB.haplotagged.bam" --output "mdepth.p9_adaptive-nowash.PradaB.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="nwC" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode PradaC /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot9/adaptive-nowash/output/PradaC/PradaC.haplotagged.bam" --output "mdepth.p9_adaptive-nowash.PradaC.$(date +%Y%m%d).out.txt"
+
+##adaptive-wash
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="wA" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode PradaA /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot9/adaptive-wash/output/PradaA/PradaA.haplotagged.bam" --output "mdepth.p9_adaptive-wash.PradaA.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="wB" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode PradaB /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot9/adaptive-wash/output/PradaB/PradaB.haplotagged.bam" --output "mdepth.p9_adaptive-wash.PradaB.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="wC" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode PradaC /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot9/adaptive-wash/output/PradaC/PradaC.haplotagged.bam" --output "mdepth.p9_adaptive-wash.PradaC.$(date +%Y%m%d).out.txt"
+
+##wgs-nowash
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="wA" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode PradaA /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot9/wgs-nowash/output/PradaA/PradaA.haplotagged.bam" --output "mdepth.p9_wgs-nowash.PradaA.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="wB" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode PradaB /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot9/wgs-nowash/output/PradaB/PradaB.haplotagged.bam" --output "mdepth.p9_wgs-nowash.PradaB.$(date +%Y%m%d).out.txt"
+
+sbatch --time 24:00:00 --partition interruptible_cpu --job-name="wC" --ntasks 1 --cpus-per-task 6 --mem 16G --wrap="/users/k2481717/project/SHARED/software/mosdepth/mosdepth -t 6 --by /scratch/prj/sgdp_nanopore/Projects/prada_jz/data/bed/pgx.grch38.5k.0p7percent.bed --fast-mode PradaC /scratch/prj/sgdp_nanopore/Projects/prada_jz/work/pgx/pilot9/wgs-nowash/output/PradaC/PradaC.haplotagged.bam" --output "mdepth.p9_wgs-nowash.PradaC.$(date +%Y%m%d).out.txt"
+
 ```

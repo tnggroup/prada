@@ -328,6 +328,10 @@ sbatch --time 2:00:00 --partition cpu --job-name="pap6" --ntasks 1 --cpus-per-ta
 
 sbatch --time 2:00:00 --partition cpu --job-name="dshg002" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppDownsampledHg002.R" --output "pradaAppDownsampledHg002.$(date +%Y%m%d).out.txt"
 
+sbatch --time 2:00:00 --partition cpu --job-name="pap8" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot8.R" --output "pradaAppPilot8.$(date +%Y%m%d).out.txt"
+
+sbatch --time 2:00:00 --partition cpu --job-name="pap9" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot9.R" --output "pradaAppPilot9.$(date +%Y%m%d).out.txt"
+
 
 ```
 

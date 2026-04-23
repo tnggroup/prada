@@ -310,18 +310,31 @@ collectAnalysisCallData=function(settingLabel,
   outputFiles <- list.files(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"output"))
 
   if(addBarcodeParticipantsFromData){
+    #read sample sheet
+    sampleSheetfilePath<-file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw,"output","sample_sheet.csv")
+    if(file.exists(sampleSheetfilePath)){
+      sampleSheetData<-fread(sampleSheetfilePath)
+      if(nrow(sampleSheetData)>0){
+        for(iBarcode in 1:nrow(sampleSheetData)){
+          #iBarcode<-3
+          cUniqueSampleLabel <- paste0(settingLabel,"_",sampleSheetData[iBarcode,c("alias")])
+          #sampleMeta[cUniqueSampleLabel,c("analysis","barcode")]<-c(settingLabel,barcodeFolders[iBarcode])
+          sampleMeta[cUniqueSampleLabel,c("analysis","barcode","barcode_original")]<<-c(settingLabel,sampleSheetData[iBarcode,c("alias")],sampleSheetData[iBarcode,c("barcode")])
+        }
+      }
+    } else {
+      #fall back on identifying barcode folders based on pattern
+      barcodeFolders<-grep(pattern = "^barcode\\d\\d",x = outputFiles,value = T)
 
-    barcodeFolders<-grep(pattern = "^barcode\\d\\d",x = outputFiles,value = T)
-
-    if(length(barcodeFolders)>0){
-      for(iBarcode in 1:length(barcodeFolders)){
-        #iBarcode<-3
-        cUniqueSampleLabel <- paste0(settingLabel,"_",barcodeFolders[iBarcode])
-        #sampleMeta[cUniqueSampleLabel,c("analysis","barcode")]<-c(settingLabel,barcodeFolders[iBarcode])
-        sampleMeta[cUniqueSampleLabel,c("analysis","barcode")]<<-c(settingLabel,barcodeFolders[iBarcode])
+      if(length(barcodeFolders)>0){
+        for(iBarcode in 1:length(barcodeFolders)){
+          #iBarcode<-3
+          cUniqueSampleLabel <- paste0(settingLabel,"_",barcodeFolders[iBarcode])
+          #sampleMeta[cUniqueSampleLabel,c("analysis","barcode")]<-c(settingLabel,barcodeFolders[iBarcode])
+          sampleMeta[cUniqueSampleLabel,c("analysis","barcode")]<<-c(settingLabel,barcodeFolders[iBarcode])
+        }
       }
     }
-
   }
 
   sampleMeta.analysis<-sampleMeta[sampleMeta$analysis==settingLabel,]
