@@ -208,8 +208,8 @@ Run in work/pradaApp
 ## Interactive version
 
 ```{R}
-#devtools::install_github("tnggroup/prada")
-#devtools::install_github("tnggroup/prada",ref = 'jz_dev')
+#remotes::install_github("tnggroup/prada")
+#remotes::install_github("tnggroup/prada",ref = 'jz_dev')
 
 library(prada)
 library(data.table)
@@ -331,6 +331,8 @@ sbatch --time 2:00:00 --partition cpu --job-name="dshg002" --ntasks 1 --cpus-per
 sbatch --time 2:00:00 --partition cpu --job-name="pap8" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot8.R" --output "pradaAppPilot8.$(date +%Y%m%d).out.txt"
 
 sbatch --time 2:00:00 --partition cpu --job-name="pap9" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot9.R" --output "pradaAppPilot9.$(date +%Y%m%d).out.txt"
+
+sbatch --time 2:00:00 --partition cpu --job-name="plots" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/unified-plots.R" --output "prada-plots.$(date +%Y%m%d).out.txt"
 
 
 ```

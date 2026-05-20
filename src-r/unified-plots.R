@@ -27,6 +27,14 @@ sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampl
 cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","pilot6","sampleMeta.tsv"))
 sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)
 
+#pilot 8
+cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","pilot8","sampleMeta.tsv"))
+sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)
+
+#pilot 9
+cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","pilot9","sampleMeta.tsv"))
+sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)
+
 #downsampled bam
 cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","downsampled-bam-runs","sampleMeta.tsv"))
 sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)

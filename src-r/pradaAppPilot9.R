@@ -1,7 +1,7 @@
 
 #this was sequenced after changes to the dna extraction protocol
-#devtools::install_github("tnggroup/prada")
-#devtools::install_github("tnggroup/prada",ref = 'jz_dev')
+#remotes::install_github("tnggroup/prada")
+#remotes::install_github("tnggroup/prada",ref = 'jz_dev')
 library(prada)
 library(data.table)
 
