@@ -132,16 +132,20 @@ collectAnalysisCallData=function(settingLabel,
   ##final summary metadata. this filename has a unique identifier attachd to it, so we must find it in the file-list
   filenameSummaryMetadata<-grep(pattern = "^final_summary.+\\.txt$",x = analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList, value = T)
 
+  hasSequencingDataCheck<-length(filenameSummaryMetadata)>0 #first check the existence of this file
+
   #check if sequencing data exists. NEW - it may be missing for some analyses
   if(is.na(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw)){
     warning(paste0("No sequencing data present for analysis ",settingLabel))
+    hasSequencingDataCheck<-F
     #return(0)
-  } else if(!file.exists(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameSummaryMetadata))){
+  } else if(length(filenameSummaryMetadata)>0 && !file.exists(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameSummaryMetadata))){
     warning(paste0("No sequencing data present for analysis ",settingLabel))
+    hasSequencingDataCheck<-F
     #return(0)
   }
 
-  if(length(analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList)>0){
+  if(hasSequencingDataCheck && length(analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList)>0){
 
     summaryMetadata<-readMetadata(filePath = file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameSummaryMetadata))
 

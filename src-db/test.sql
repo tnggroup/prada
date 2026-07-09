@@ -1,3 +1,51 @@
+--2026
+
+SELECT DISTINCT genesymbol,lookupkey::text FROM prada.cpic_genetics ORDER BY genesymbol;
+
+SELECT DISTINCT gene_name,diplotype,lookupkey::text,recommendation FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='sertraline'
+ORDER BY gene_name, recommendation;
+
+SELECT DISTINCT gene_name,diplotype,lookupkey::text,ehrpriority  FROM  prada.harmonised_combined_pgx tp WHERE tp.gene_name = 'CYP2B6'
+ORDER BY gene_name, ehrpriority;
+
+SELECT DISTINCT gene_name,lookupkey::text FROM  prada.harmonised_combined_pgx tp WHERE tp.gene_name = 'CYP2B6'
+ORDER BY gene_name, lookupkey;
+
+SELECT DISTINCT gene_name, ehrpriority FROM  prada.harmonised_combined_pgx tp WHERE tp.gene_name = 'CYP2B6'
+ORDER BY gene_name, ehrpriority;
+
+SELECT DISTINCT gene_name,diplotype,lookupkey::text,ehrpriority  FROM  prada.harmonised_combined_pgx tp WHERE tp.gene_name = 'CYP2C19'
+ORDER BY gene_name, ehrpriority;
+
+SELECT DISTINCT gene_name,lookupkey::text FROM  prada.harmonised_combined_pgx tp WHERE tp.gene_name = 'CYP2C19'
+ORDER BY gene_name, lookupkey;
+
+SELECT DISTINCT gene_name, ehrpriority FROM  prada.harmonised_combined_pgx tp WHERE tp.gene_name = 'CYP2C19'
+ORDER BY gene_name, ehrpriority;
+
+SELECT DISTINCT gene_name,diplotype,lookupkey::text,ehrpriority  FROM  prada.harmonised_combined_pgx tp WHERE tp.gene_name = 'CYP2D6'
+ORDER BY gene_name, ehrpriority;
+
+SELECT DISTINCT gene_name, ehrpriority FROM  prada.harmonised_combined_pgx tp WHERE tp.gene_name = 'CYP2D6'
+ORDER BY gene_name, ehrpriority;
+
+SELECT tp.drug_name,tp.guidelineid, tp.recommendation FROM  prada.harmonised_combined_pgx tp WHERE (tp.gene_name = 'CYP2B6' OR tp.gene_name = 'CYP2C19' OR tp.gene_name = 'CYP2D6')
+ORDER BY drug_name;
+
+SELECT DISTINCT tp.drug_name FROM  prada.harmonised_combined_pgx tp WHERE (tp.gene_name = 'CYP2B6' OR tp.gene_name = 'CYP2C19' OR tp.gene_name = 'CYP2D6') AND tp.recommendation IS NOT NULL
+ORDER BY drug_name; --drugs for CYP2B6,CYP2C19,CYP2D6 CPIC recommendations 
+
+SELECT DISTINCT tp.drug_name FROM  prada.harmonised_combined_pgx tp WHERE (tp.gene_name = 'CYP2B6' OR tp.gene_name = 'CYP2C19' OR tp.gene_name = 'CYP2D6') AND tp.recommendation IS NOT NULL
+AND drug_class IS NOT NULL
+ORDER BY drug_name; --drugs for CYP2B6,CYP2C19,CYP2D6 CPIC recommendations, restricting to hypothesised MDD medications
+
+SELECT tp.* FROM  prada.harmonised_combined_pgx tp WHERE tp.drug_name='sertraline'
+ORDER BY gene_name, recommendation;
+
+--pair phenotypes with recommendations for CYP2B6 and CYP2C19
+
+SELECT DISTINCT gene_name FROM prada.recommendation r;
+
 --2025
 
 --test of allele population statistics
