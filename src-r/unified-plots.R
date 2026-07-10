@@ -39,6 +39,14 @@ sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampl
 cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","downsampled-bam-runs","sampleMeta.tsv"))
 sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)
 
+#pilot 10
+cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","pilot10","sampleMeta.tsv"))
+sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)
+
+#pilot 11
+cSampleMeta<-data.table::fread(file.path(projectFolderPath,"work","pradaApp","pilot11","sampleMeta.tsv"))
+sampleMetaTot <- data.table::rbindlist(l=list(sampleMetaTot=sampleMetaTot,cSampleMeta=cSampleMeta),fill = TRUE)
+
 
 library(ggplot2)
 library(ggrepel)
