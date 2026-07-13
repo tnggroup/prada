@@ -44,12 +44,16 @@ dSamplePGX.C<-fread(file.path(projectFolderPath,"work","pradaApp","pilot10","pgx
 setDT(dSampleVCF.C)
 setkeyv(dSampleVCF.C,c("CHROM","POS","REF","ALT"))
 
+print("References read")
+
 for(iSample in 1:nrow(dSample)){
   #iSample<-1
   cSampleID<-dSample[iSample,c("barcode")]
   cAnalysisID<-dSample[iSample,c("analysis")]
   cPilotID<-dAnalysis[`analysis id`==eval(cAnalysisID),c("pilot id")]
   cPathAnalysisOutput<-dAnalysis[`analysis id`==eval(cAnalysisID),c("pathAnalysisOutput")]
+
+  cat(paste0("\nSample ",cSampleID))
 
   # dSampleVCF.result<-shru::supermunge(filePaths = file.path(projectFolderPath,cPathAnalysisOutput,"output",cSampleID,paste0(cSampleID,".filtered.vcf.gz")),traitNames = cSampleID,writeOutput = F)
   # dSampleVCF<-dSampleVCF.result$last
@@ -78,7 +82,8 @@ for(iSample in 1:nrow(dSample)){
   ratioOfMostCredibleReference<-0
 
   if(is.na(knownReference)){
-    for(cComparison in c("H","A","B","C")){
+    cat(paste0(", establishing credible reference"))
+    for(cComparison in list("H","A","B","C")){
       #cComparison<-"H"
       dSampleVCF.REF<-dSampleVCF.H
       if(cComparison=="H") dSampleVCF.REF<-dSampleVCF.H
@@ -91,52 +96,122 @@ for(iSample in 1:nrow(dSample)){
       dSampleVCF.fix.merged <- dSampleVCF.fix[dSampleVCF.REF, on=.(CHROM=CHROM.REF,POS=POS.REF)]
 
       mREF<-nrow(dSampleVCF.REF)
+      mVCF<-nrow(dSampleVCF.fix)
       mConcordantREF<-nrow(dSampleVCF.fix.merged[REF==REF.REF,])
       mConcordantALT<-nrow(dSampleVCF.fix.merged[ALT==ALT.REF,])
       mDiscordantREF<-nrow(dSampleVCF.fix.merged[REF!=REF.REF,])
       mDiscordantALT<-nrow(dSampleVCF.fix.merged[ALT!=ALT.REF,])
 
-      evaluationRatio<-(mConcordantREF+1000*mConcordantALT-mDiscordantREF-1000*mDiscordantALT)/mREF
-      if(evaluationRatio>ratioOfMostCredibleReference){
+      evaluationRatio<-(mConcordantREF+1000*mConcordantALT-mDiscordantREF-1000*mDiscordantALT)/mVCF
+      if(is.finite(evaluationRatio) && evaluationRatio>ratioOfMostCredibleReference){
         mostCredibleReference<-cComparison
         ratioOfMostCredibleReference<-evaluationRatio
       }
 
       dSample[iSample,c(
-        paste0("mREF.",cComparison),
+        #paste0("mREF.",cComparison),
+        paste0("mVCF.",cComparison),
         paste0("mConcordantREF.",cComparison),
         paste0("mConcordantALT.",cComparison),
         paste0("mDiscordantREF.",cComparison),
         paste0("mDiscordantALT.",cComparison)
-      ):=list(mREF,mConcordantREF,mConcordantALT,mDiscordantREF,mDiscordantALT)]
+      ):=list(mVCF,mConcordantREF,mConcordantALT,mDiscordantREF,mDiscordantALT)]
 
     }
   } else {
     mostCredibleReference<-knownReference
   }
 
-  dSample[iSample,c("mostCredibleReference"):=list(mostCredibleReference)]
+  cat(paste0(": ",mostCredibleReference))
 
+  dSample[iSample,c("mostCredibleReference")]<-mostCredibleReference
 
-  dSamplePGX<-fread(file.path(projectFolderPath,"work","pradaApp", cPilotID ,paste0("pgxCallsAggCustom_",cAnalysisID,"_",cSampleID,".tsv")))
-  dSamplePGX.REF<-dSamplePGX.H
-  if(mostCredibleReference=="H") dSamplePGX.REF<-dSamplePGX.H
-  if(mostCredibleReference=="A") dSamplePGX.REF<-dSamplePGX.A
-  if(mostCredibleReference=="B") dSamplePGX.REF<-dSamplePGX.B
-  if(mostCredibleReference=="C") dSamplePGX.REF<-dSamplePGX.C
+  filePathPGX<-file.path(projectFolderPath,"work","pradaApp", cPilotID ,paste0("pgxCallsAggCustom_",cAnalysisID,"_",cSampleID,".tsv"))
+  if(file.exists(filePathPGX)){
+    dSamplePGX<-fread(filePathPGX)
+    dSamplePGX.REF<-dSamplePGX.H
+    if(mostCredibleReference=="H") dSamplePGX.REF<-dSamplePGX.H
+    if(mostCredibleReference=="A") dSamplePGX.REF<-dSamplePGX.A
+    if(mostCredibleReference=="B") dSamplePGX.REF<-dSamplePGX.B
+    if(mostCredibleReference=="C") dSamplePGX.REF<-dSamplePGX.C
 
-  colnames(dSamplePGX.REF)<-paste0(colnames(dSamplePGX.REF),".REF")
-  dSamplePGX.merged <- dSamplePGX[dSamplePGX.REF, on=.(gene=gene.REF,chromosome_top=chromosome_top.REF)]
-  allGeneCalls<-dSamplePGX.merged[,.(gene)]
-  matchingGeneCalls<-dSamplePGX.merged[diplotype_name_top==diplotype_name_top.REF,.(gene)]
-  matchingCond<-unlist(allGeneCalls) %in% unlist(matchingGeneCalls)
+    colnames(dSamplePGX.REF)<-paste0(colnames(dSamplePGX.REF),".REF")
+    dSamplePGX.merged <- dSamplePGX[dSamplePGX.REF, on=.(gene=gene.REF,chromosome_top=chromosome_top.REF)]
+    allGeneCalls<-dSamplePGX.merged[,.(gene)]
+    matchingGeneCalls<-dSamplePGX.merged[diplotype_name_top==diplotype_name_top.REF,.(gene)]
+    matchingCond<-unlist(allGeneCalls) %in% unlist(matchingGeneCalls)
 
-  allGeneCalls.columns<-paste0("GENE_CALL_",unlist(allGeneCalls))
-  dSample[iSample,allGeneCalls.columns]<-0
-  dSample[iSample,allGeneCalls.columns[matchingCond]]<-1
+    allGeneCalls.columns<-paste0("GC_",unlist(allGeneCalls))
+    dSample[iSample,allGeneCalls.columns]<-0
+    dSample[iSample,allGeneCalls.columns[matchingCond]]<-1
+
+    cat(paste0(" 🧬"))
+
+  }
 
   shru::writeFile(dSample,file=file.path(projectFolderPath,"work","pradaApp","per-sample-analysis","samples.tsv"),nThreads = 5)
 
 }
 
 
+
+#plots
+
+##read back samples
+dSample<-fread(file.path(projectFolderPath,"work","pradaApp","per-sample-analysis","samples.tsv"))
+
+#add back evaluationRatio
+dSample[mostCredibleReference=="H",evaluationRatio:=(mConcordantREF.H+1000*mConcordantALT.H-mDiscordantREF.H-1000*mDiscordantALT.H)/mVCF.H]
+dSample[mostCredibleReference=="A",evaluationRatio:=(mConcordantREF.A+1000*mConcordantALT.A-mDiscordantREF.A-1000*mDiscordantALT.A)/mVCF.A]
+dSample[mostCredibleReference=="B",evaluationRatio:=(mConcordantREF.B+1000*mConcordantALT.B-mDiscordantREF.B-1000*mDiscordantALT.B)/mVCF.B]
+dSample[mostCredibleReference=="C",evaluationRatio:=(mConcordantREF.C+1000*mConcordantALT.C-mDiscordantREF.C-1000*mDiscordantALT.C)/mVCF.C]
+dSample[is.na(evaluationRatio),evaluationRatio:=1]
+
+
+#remove duplicate samples
+dSample.n<-nrow(dSample)
+dSample$MERGEID<-1:dSample.n
+
+dSample<-dSample[order(-evaluationRatio,MERGEID),]
+dSample.unique<-dSample[, .(MERGEID = head(MERGEID,1)), by = c("analysis","mostCredibleReference")]
+dSample.unique<-dSample[dSample.unique, on=c(MERGEID=c("MERGEID"))]
+
+dSequencing <- fread(file.path(projectFolderPath,"work","pradaApp","unified-plots","sampleMetaTot.tsv"))
+
+dSample.unique[dSequencing, on=c("analysis","barcode"), c("depth_on","depth_off"):=list(i.sdepth_q050_bed, i.sdepth_q050_nobed)]
+dSample.unique[,label:=paste0(analysis,".",mostCredibleReference)]
+
+colnamesAllGeneCalls <- c("GC_ABCG2","GC_CACNA1S","GC_CFTR","GC_CYP2B6","GC_CYP2C19","GC_CYP2C9","GC_CYP2D6","GC_CYP3A4","GC_CYP3A5","GC_CYP4F2","GC_DPYD","GC_G6PD","GC_IFNL3","GC_NUDT15","GC_RYR1","GC_SLCO1B1","GC_TPMT","GC_UGT1A1","GC_VKORC1")
+colnamesAllGeneCalls.antidepressant <- c("GC_CYP2B6","GC_CYP2C19","GC_CYP2D6")
+
+dSample.unique[,c("nCalls")] <-rowSums(dSample.unique[,..colnamesAllGeneCalls],na.rm = T)
+dSample.unique[,c("nCalls.dep")] <-rowSums(dSample.unique[,..colnamesAllGeneCalls.antidepressant],na.rm = T)
+dSample.unique[,sample:=mostCredibleReference]
+
+library(ggplot2)
+library(ggrepel)
+
+ggplot(dSample.unique, aes(x=depth_on, y=nCalls, color=sample, label=label)) +
+  geom_point() +
+  geom_line() +
+  geom_text_repel(size = 2) +
+  theme_light()
+ggsave(file.path(projectFolderPath,"work","pradaApp","per-sample-analysis",paste0("trueCallsAll.png")))
+
+ggplot(dSample.unique, aes(x=depth_on, y=nCalls.dep, color=sample, label=label)) +
+  geom_point() +
+  geom_line() +
+  geom_text_repel(size = 2) +
+  theme_light()
+ggsave(file.path(projectFolderPath,"work","pradaApp","per-sample-analysis",paste0("trueCallsAntidepressant.png")))
+
+for(iGene in 1:length(colnamesAllGeneCalls)){
+  #iGene<-1
+  cCol<-colnamesAllGeneCalls[iGene]
+  ggplot(dSample.unique, aes(x=depth_on, y=UQ(as.name(cCol)), color=sample, label=label)) +
+    geom_point() +
+    geom_line() +
+    geom_text_repel(size = 2) +
+    theme_light()
+  ggsave(file.path(projectFolderPath,"work","pradaApp","per-sample-analysis",paste0("trueCalls_",cCol,".png")))
+}
