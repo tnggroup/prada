@@ -16,7 +16,7 @@
 # wVariantSnp=1
 
 #This funcgtion both produces target region lists (in BED-format) and computes the corresponding genomic coverage of the on-target regions.
-PradaClass$methods(
+PgxrexClass$methods(
 computeGenomeCoverage=function(
     writeToThisBedPath=NULL,
     writePaddedStrands=FALSE,
@@ -33,8 +33,8 @@ computeGenomeCoverage=function(
     wVariantSnp=1,
     useLabelIdsForGenes=TRUE
     ){
-  #pradaApplicationDAO<-pradaO$pradaApplicationDAO
-  applicationCoverageRegions<<-pradaApplicationDAO$selectApplicationCoverageRegions(
+  #pgxrexApplicationDAO<-pgxrexO$pgxrexApplicationDAO
+  applicationCoverageRegions<<-pgxrexApplicationDAO$selectApplicationCoverageRegions(
     paddingGeneBp=paddingGeneBp,
     paddingVariantCnvBp=paddingVariantCnvBp,
     paddingVariantSnpBp=paddingVariantSnpBp,
@@ -47,7 +47,7 @@ computeGenomeCoverage=function(
     wVariantSnp=wVariantSnp
     )
   setDT(applicationCoverageRegions)
-  applicationCoverageRegionsFiltered <<- pradaApplicationDAO$selectFilteredApplicationCoverageRegions()
+  applicationCoverageRegionsFiltered <<- pgxrexApplicationDAO$selectFilteredApplicationCoverageRegions()
   setDT(applicationCoverageRegionsFiltered)
 
   if(useLabelIdsForGenes){
@@ -106,24 +106,24 @@ computeGenomeCoverage=function(
 }
 )
 #
-# library(prada)
+# library(pgxrex)
 # library(data.table)
-# pradaO<-PradaClass()
-# pradaO$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx.grch38.5k.0p7percent.bed",nPrioritisedCnv=0, nPrioritisedSnp=0, nPrioritisedTotal = 5000)
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv.grch38.5k.2p1percent.bed",nPrioritisedSnp=0, nPrioritisedTotal = 5000)
-# #pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.5k.1p3percent.bed",nPrioritisedTotal = 5000) #1e6 CNV weighting
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.5k.2p6percent.bed",nPrioritisedTotal = 5000)
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.25k.4p5percent.bed",nPrioritisedTotal = 25000)
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.50k.7p3percent.bed",nPrioritisedTotal = 50000)
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.75k.10p0percent.bed",nPrioritisedTotal = 75000)
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.100k.12p8percent.bed",nPrioritisedTotal = 100000)
+# pgxrexO<-PgxrexClass()
+# pgxrexO$connectPgxrexDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
+# pgxrexO$computeGenomeCoverage( writeToThisBedPath = "pgx.grch38.5k.0p7percent.bed",nPrioritisedCnv=0, nPrioritisedSnp=0, nPrioritisedTotal = 5000)
+# pgxrexO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv.grch38.5k.2p1percent.bed",nPrioritisedSnp=0, nPrioritisedTotal = 5000)
+# #pgxrexO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.5k.1p3percent.bed",nPrioritisedTotal = 5000) #1e6 CNV weighting
+# pgxrexO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.5k.2p6percent.bed",nPrioritisedTotal = 5000)
+# pgxrexO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.25k.4p5percent.bed",nPrioritisedTotal = 25000)
+# pgxrexO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.50k.7p3percent.bed",nPrioritisedTotal = 50000)
+# pgxrexO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.75k.10p0percent.bed",nPrioritisedTotal = 75000)
+# pgxrexO$computeGenomeCoverage( writeToThisBedPath = "pgx_cnv_mddeur.grch38.100k.12p8percent.bed",nPrioritisedTotal = 100000)
 
 
 #
-# pradaO$computeGenomeCoverage( writeToThisBedPath = "pgx.grch38.5k.0p7percent.bed",nPrioritisedCnv=0, nPrioritisedSnp=0, nPrioritisedTotal = 5000)
+# pgxrexO$computeGenomeCoverage( writeToThisBedPath = "pgx.grch38.5k.0p7percent.bed",nPrioritisedCnv=0, nPrioritisedSnp=0, nPrioritisedTotal = 5000)
 #
-# View(pradaO$applicationCoverageRegionsFiltered)
+# View(pgxrexO$applicationCoverageRegionsFiltered)
 
 #PGX:                                   The coverage of the current selection is  20296834 bp or  0.006572235
 #PGX + CNV:                             The coverage of the current selection is  66340186 bp or  0.02148134

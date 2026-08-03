@@ -1,7 +1,7 @@
 
 
 
-PradaPgDatabaseUtilityClass <- setRefClass("PradaPgDatabaseUtility",
+PgxrexPgDatabaseUtilityClass <- setRefClass("PgxrexPgDatabaseUtility",
                                              fields = list(
                                                dbname = "character",
                                                user = "character",
@@ -47,7 +47,7 @@ PradaPgDatabaseUtilityClass <- setRefClass("PradaPgDatabaseUtility",
 # we can add more methods after creating the ref class (but not more fields!)
 
 # cache frequently and rarely changing data from the server
-PradaPgDatabaseUtilityClass$methods(
+PgxrexPgDatabaseUtilityClass$methods(
   cache=function(refresh=F, write=T, cacheSaveFilePath=NULL){
     if(is.null(cacheSaveFilePath)){
       cacheSaveFilePath <- savedCachePath
@@ -70,7 +70,7 @@ PradaPgDatabaseUtilityClass$methods(
 )
 
 #this is not injection safe
-PradaPgDatabaseUtilityClass$methods(
+PgxrexPgDatabaseUtilityClass$methods(
   setSearchPath=function(searchPath){
     #searchPath<-"dat_cohort"
     c <- paste0("SET search_path TO ",paste(searchPath, sep = ","))
@@ -79,13 +79,13 @@ PradaPgDatabaseUtilityClass$methods(
   }
 )
 
-PradaPgDatabaseUtilityClass$methods(
+PgxrexPgDatabaseUtilityClass$methods(
   setSearchPath.standard=function(){
     setSearchPath("\"$user\", public")
   }
 )
 
-PradaPgDatabaseUtilityClass$methods(
+PgxrexPgDatabaseUtilityClass$methods(
   getPGTempSchema=function(cohort){
     q <- dbSendQuery(connection,
                      "SELECT nspname FROM pg_namespace WHERE oid  =  pg_my_temp_schema()")
@@ -95,8 +95,8 @@ PradaPgDatabaseUtilityClass$methods(
   }
 )
 
-# PradaPgDatabaseUtilityClass$methods(
-#   getPradaChromosome=function(){
+# PgxrexPgDatabaseUtilityClass$methods(
+#   getPgxrexChromosome=function(){
 #     q <- dbSendQuery(connection,
 #                      "SELECT * FROM prada.chromosome")
 #     res<-dbFetch(q)
@@ -105,7 +105,7 @@ PradaPgDatabaseUtilityClass$methods(
 #   }
 # )
 
-PradaPgDatabaseUtilityClass$methods(
+PgxrexPgDatabaseUtilityClass$methods(
   selectHarmonisedCombinedPgxGene=function(
   ){
     q <- dbSendQuery(connection,
@@ -117,7 +117,7 @@ PradaPgDatabaseUtilityClass$methods(
 )
 
 
-PradaPgDatabaseUtilityClass$methods(
+PgxrexPgDatabaseUtilityClass$methods(
   selectApplicationCoverageRegions=function(
     paddingGeneBp=10000,
     paddingVariantCnvBp=10000,
@@ -179,7 +179,7 @@ PradaPgDatabaseUtilityClass$methods(
 )
 
 
-PradaPgDatabaseUtilityClass$methods(
+PgxrexPgDatabaseUtilityClass$methods(
   selectFilteredApplicationCoverageRegions=function(){
     qString <- "SELECT * FROM prada.filter_coverage_regions()"
     q <- dbSendQuery(connection,qString)
@@ -196,7 +196,7 @@ PradaPgDatabaseUtilityClass$methods(
 
 
 #should be used with care as it passes the data by value rather than reference
-PradaPgDatabaseUtilityClass$methods(
+PgxrexPgDatabaseUtilityClass$methods(
   importDataAsTable=function(schema_name, table_name, df, temporary = T, replace=F){
 
     if(is.null(schema_name) | temporary==T){

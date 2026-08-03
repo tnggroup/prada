@@ -1,9 +1,9 @@
-Package: prada
+Package: pgxrex
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.5.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Title: PGX Rex - A software to work with pharmacogenomics
+Version: 0.6.0
+Author: Johan Zvrskovec
+Maintainer: The package maintainer <johan.zvrskovec@kcl.ac.uk>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: What license is it under?
@@ -11,8 +11,8 @@ Encoding: UTF-8
 LazyData: true
 Collate:
   'shared.R'
-  'prada_main.R'
-  'pg_database_utility_prada.R'
+  'main.R'
+  'pg_database_utility.R'
   'genome_coverage.R'
-  'prada_analysis.R'
+  'analysis.R'
   

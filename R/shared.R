@@ -5,16 +5,16 @@
 # library(seqinr)
 
 #general shared package utilities
-pradaPackageVersion.major.minor.patch<-c()
-pradaPackageVersion.major.minor.patch[1]<-0
-pradaPackageVersion.major.minor.patch[2]<-5
-pradaPackageVersion.major.minor.patch[3]<-0
+pgxrexPackageVersion.major.minor.patch<-c()
+pgxrexPackageVersion.major.minor.patch[1]<-0
+pgxrexPackageVersion.major.minor.patch[2]<-5
+pgxrexPackageVersion.major.minor.patch[3]<-0
 
 
-pradaCentralDBDefaultHost <- "localhost"
-pradaCentralDBDefaultUsername <- "tng_prada_system"
-pradaCentralDBDefaultDbName <- "prada_local"
-pradaCentralDBDefaultPort <- 65432
+pgxrexCentralDBDefaultHost <- "localhost"
+pgxrexCentralDBDefaultUsername <- "tng_prada_system"
+pgxrexCentralDBDefaultDbName <- "prada_local"
+pgxrexCentralDBDefaultPort <- 65432
 
 filePathBed<-file.path("..","data","grch38.5k.1p3percent.bed")
 filePathFasta=file.path("..","data","GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz")

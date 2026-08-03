@@ -1,42 +1,42 @@
 #Functions to apply our custom analysis and qc routines after running previous standardised calling and qc pipelines
 
 #
-# library(prada)
+# library(pgxrex)
 # library(data.table)
 # projectFolderPath<-"/Users/jakz/Documents/work_rstudio/prada"
 #
-# pradaObj<-PradaClass()
-# #pradaObj$connectPradaDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
-# #pradaObj$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
+# pgxrexObj<-PgxrexClass()
+# #pgxrexObj$connectPgxrexDatabase(usernameToUse="tng_prada_system", dbnameToUse="prada_central")
+# #pgxrexObj$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000) #to cache the default regions
 #
-# # pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube-nobedtest",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-nobedtest",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
-# #pradaObj$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
-# pradaObj$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube")
-# pradaObj$addAnalysisSetting(settingLabel = "hg002-100",folderPathAnalysisSequencingRaw = NA,folderPathAnalysisOutputRaw = file.path(projectFolderPath,"work/pgx/downsampled-bam-runs/hg002-100"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/downsampled-bam-runs/hg002-100"))
+# # pgxrexObj$addAnalysisSetting(settingLabel = "p2-nogtube-nobedtest",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube-nobedtest",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube-nobedtest")
+# #pgxrexObj$addAnalysisSetting(settingLabel = "p2-gtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/Gtube/20250724_1536_3B_PAW94949_16dd4442",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-gtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-gtube")
+# pgxrexObj$addAnalysisSetting(settingLabel = "p2-nogtube",folderPathAnalysisSequencingRaw = "/Users/jakz/Documents/work_rstudio/prada/data/ont_raw/pilot2/No_Gtube/20250724_1536_3C_PAY03690_092497cc",folderPathAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/pgx/pilot2/p2-nogtube",folderPathDepthAnalysisOutputRaw = "/Users/jakz/Documents/work_rstudio/prada/work/mosdepth/pilot2/p2-nogtube")
+# pgxrexObj$addAnalysisSetting(settingLabel = "hg002-100",folderPathAnalysisSequencingRaw = NA,folderPathAnalysisOutputRaw = file.path(projectFolderPath,"work/pgx/downsampled-bam-runs/hg002-100"),folderPathDepthAnalysisOutputRaw = file.path(projectFolderPath,"work/mosdepth/downsampled-bam-runs/hg002-100"))
 #
-# pradaObj$addSampleSetting(analysis = "hg002-100",sampleLabel = "HG002_new")
+# pgxrexObj$addSampleSetting(analysis = "hg002-100",sampleLabel = "HG002_new")
 #
-# #pradaObj$collectAnalysisCallData("p2-nogtube-nobedtest")
-# #pradaObj$collectAnalysisCallData("p2-gtube")
-# pradaObj$collectAnalysisCallData("p2-nogtube")
-# pradaObj$collectAnalysisCallData("hg002-100")
+# #pgxrexObj$collectAnalysisCallData("p2-nogtube-nobedtest")
+# #pgxrexObj$collectAnalysisCallData("p2-gtube")
+# pgxrexObj$collectAnalysisCallData("p2-nogtube")
+# pgxrexObj$collectAnalysisCallData("hg002-100")
 #
-# #pradaObj$sampleMeta<-pradaObj$sampleMeta[pradaObj$sampleMeta$barcode=='barcode01',] #filter to barcode01 only
+# #pgxrexObj$sampleMeta<-pgxrexObj$sampleMeta[pgxrexObj$sampleMeta$barcode=='barcode01',] #filter to barcode01 only
 #
-# #pradaObj$collectAnalysisDepthData("p2-nogtube-nobedtest")
-# #pradaObj$collectAnalysisDepthData("p2-gtube")
-# pradaObj$collectAnalysisDepthData("p2-nogtube")
-# pradaObj$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed",filePathApplicationCoverageRegions = "/Users/jakz/Documents/work_rstudio/prada/applicationCoverageRegions.tsv")
-# pradaObj$computeCallStatistics(filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv"))
-# pradaObj$printData()
+# #pgxrexObj$collectAnalysisDepthData("p2-nogtube-nobedtest")
+# #pgxrexObj$collectAnalysisDepthData("p2-gtube")
+# pgxrexObj$collectAnalysisDepthData("p2-nogtube")
+# pgxrexObj$computeDepthDataStatistics(filePathBed <- "/Users/jakz/Documents/work_rstudio/prada/data/bed/pgx_cnv.grch38.5k.2p1percent.bed",filePathApplicationCoverageRegions = "/Users/jakz/Documents/work_rstudio/prada/applicationCoverageRegions.tsv")
+# pgxrexObj$computeCallStatistics(filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/applicationCoverageRegionsAsOfPilot2.tsv"))
+# pgxrexObj$printData()
 
 #check pgx calls
-#View(pradaObj$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls_table)
-#View(pradaObj$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls_table)
-# View(pradaObj$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls$results)
-# View(pradaObj$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls$results)
+#View(pgxrexObj$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls_table)
+#View(pgxrexObj$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls_table)
+# View(pgxrexObj$sampleSettingsList[["p2-nogtube-nobedtest_barcode01"]]$pgx_calls$results)
+# View(pgxrexObj$sampleSettingsList[["p2-nogtube_barcode01"]]$pgx_calls$results)
 
-PradaClass$methods(
+PgxrexClass$methods(
   addAnalysisSetting=function(
     settingLabel,
     folderPathAnalysisSequencingRaw=NA,
@@ -50,13 +50,13 @@ PradaClass$methods(
 
     #application settings
     # analysisMeta[settingLabel,"code"]<-settingLabel
-    # analysisMeta[settingLabel,"pradaPackageVersion"]<-paste(pradaPackageVersion.major.minor.patch,collapse = '.')
+    # analysisMeta[settingLabel,"pgxrexPackageVersion"]<-paste(pgxrexPackageVersion.major.minor.patch,collapse = '.')
     # analysisMeta[settingLabel,"folderPathAnalysisSequencingRaw"]<-analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw
     # analysisMeta[settingLabel,"folderPathAnalysisOutputRaw"]<-analysisSettingsList[[settingLabel]]$folderPathAnalysisOutputRaw
 
 
     analysisMeta[settingLabel,"code"]<<-settingLabel
-    analysisMeta[settingLabel,"pradaPackageVersion"]<<-paste(pradaPackageVersion.major.minor.patch,collapse = '.')
+    analysisMeta[settingLabel,"pgxrexPackageVersion"]<<-paste(pgxrexPackageVersion.major.minor.patch,collapse = '.')
     analysisMeta[settingLabel,"folderPathAnalysisSequencingRaw"]<<-folderPathAnalysisSequencingRaw
     analysisMeta[settingLabel,"folderPathAnalysisOutputRaw"]<<-folderPathAnalysisOutputRaw
     analysisMeta[settingLabel,"folderPathDepthAnalysisOutputRaw"]<<-folderPathDepthAnalysisOutputRaw
@@ -72,7 +72,7 @@ PradaClass$methods(
 
 
 #the analysis needs to exist before adding samples
-PradaClass$methods(
+PgxrexClass$methods(
   addSampleSetting=function(
     analysis,
     sampleLabel
@@ -97,17 +97,17 @@ PradaClass$methods(
 
 #this function reads metadata and small size data. large data has to be handled using the existing file formats.
 #Identifies list of barcodes
-PradaClass$methods(
+PgxrexClass$methods(
 collectAnalysisCallData=function(settingLabel,
                                  addBarcodeParticipantsFromData=TRUE #add participant entries to metadata for any barcodeXX type folders found in the pgx-pipeline output (otherwise participants have to be added manually).
                                  ){
   # settingLabel <- "p4-1"
-  # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
-  # nThread<-pradaObj$nThread
-  # analysisSettingsList<-pradaObj$analysisSettingsList
-  # sampleSettingsList<-pradaObj$sampleSettingsList
-  # analysisMeta<-pradaObj$analysisMeta
-  # sampleMeta<-pradaObj$sampleMeta
+  # pgxrexApplicationDAO<-pgxrexObj$pgxrexApplicationDAO
+  # nThread<-pgxrexObj$nThread
+  # analysisSettingsList<-pgxrexObj$analysisSettingsList
+  # sampleSettingsList<-pgxrexObj$sampleSettingsList
+  # analysisMeta<-pgxrexObj$analysisMeta
+  # sampleMeta<-pgxrexObj$sampleMeta
   # addBarcodeParticipantsFromData=TRUE #you will need to add the participants yourself for this to work
 
   # #read file content of sequencing folder
@@ -469,17 +469,17 @@ collectAnalysisCallData=function(settingLabel,
 )
 
 
-PradaClass$methods(
+PgxrexClass$methods(
   collectAnalysisDepthData=function(
     settingLabel
   ){
     # settingLabel <- "p2-nogtube-nobedtest"
-    # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
-    # nThread<-pradaObj$nThread
-    # analysisSettingsList<-pradaObj$analysisSettingsList
-    # sampleSettingsList<-pradaObj$sampleSettingsList
-    # analysisMeta<-pradaObj$analysisMeta
-    # sampleMeta<-pradaObj$sampleMeta
+    # pgxrexApplicationDAO<-pgxrexObj$pgxrexApplicationDAO
+    # nThread<-pgxrexObj$nThread
+    # analysisSettingsList<-pgxrexObj$analysisSettingsList
+    # sampleSettingsList<-pgxrexObj$sampleSettingsList
+    # analysisMeta<-pgxrexObj$analysisMeta
+    # sampleMeta<-pgxrexObj$sampleMeta
 
     if(nrow(sampleMeta>0)){
       for(iBarcode in 1:nrow(sampleMeta)){
@@ -507,19 +507,19 @@ PradaClass$methods(
 )
 
 #requires applicationCoverageRegions loaded from db or file
-#pradaObj$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000)
-PradaClass$methods(
+#pgxrexObj$computeGenomeCoverage(nPrioritisedSnp = 0, nPrioritisedTotal = 5000)
+PgxrexClass$methods(
   computeDepthDataStatistics=function(
     filePathBed=NULL,
     filePathApplicationCoverageRegions=NULL
     ){
-    # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
-    # nThread<-pradaObj$nThread
-    # analysisSettingsList<-pradaObj$analysisSettingsList
-    # sampleSettingsList<-pradaObj$sampleSettingsList
-    # analysisMeta<-pradaObj$analysisMeta
-    # sampleMeta<-pradaObj$sampleMeta
-    # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
+    # pgxrexApplicationDAO<-pgxrexObj$pgxrexApplicationDAO
+    # nThread<-pgxrexObj$nThread
+    # analysisSettingsList<-pgxrexObj$analysisSettingsList
+    # sampleSettingsList<-pgxrexObj$sampleSettingsList
+    # analysisMeta<-pgxrexObj$analysisMeta
+    # sampleMeta<-pgxrexObj$sampleMeta
+    # applicationCoverageRegions<-pgxrexObj$applicationCoverageRegions
     #
     # filePathBed <- file.path(projectFolderPath,"data/bed/pgx.grch38.5k.0p7percent.bed")
     # filePathApplicationCoverageRegions=file.path(projectFolderPath,"data/roughApplicationCoverageRegionsAsOfPilot3.tsv")
@@ -661,18 +661,18 @@ PradaClass$methods(
 
 
 #this requires the vcf-files
-PradaClass$methods(
+PgxrexClass$methods(
   computeCallStatistics=function(
     filePathApplicationCoverageRegions=NULL,
     mddPharmacogeneticsRelevantGenes=c("CYP2B6","CYP2C19","CYP2D6")
   ){
-    # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
-    # nThread<-pradaObj$nThread
-    # analysisSettingsList<-pradaObj$analysisSettingsList
-    # sampleSettingsList<-pradaObj$sampleSettingsList
-    # analysisMeta<-pradaObj$analysisMeta
-    # sampleMeta<-pradaObj$sampleMeta
-    # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
+    # pgxrexApplicationDAO<-pgxrexObj$pgxrexApplicationDAO
+    # nThread<-pgxrexObj$nThread
+    # analysisSettingsList<-pgxrexObj$analysisSettingsList
+    # sampleSettingsList<-pgxrexObj$sampleSettingsList
+    # analysisMeta<-pgxrexObj$analysisMeta
+    # sampleMeta<-pgxrexObj$sampleMeta
+    # applicationCoverageRegions<-pgxrexObj$applicationCoverageRegions
     # #filePathApplicationCoverageRegions=NULL
     # filePathApplicationCoverageRegions <- file.path(projectFolderPath,"data/roughApplicationCoverageRegionsAsOfPilot3.tsv")
     # mddPharmacogeneticsRelevantGenes<-c("CYP2B6","CYP2C19","CYP2D6")
@@ -893,16 +893,16 @@ PradaClass$methods(
 )
 
 
-PradaClass$methods(
+PgxrexClass$methods(
   printData=function(
   ){
-    # pradaApplicationDAO<-pradaObj$pradaApplicationDAO
-    # nThread<-pradaObj$nThread
-    # analysisSettingsList<-pradaObj$analysisSettingsList
-    # sampleSettingsList<-pradaObj$sampleSettingsList
-    # analysisMeta<-pradaObj$analysisMeta
-    # sampleMeta<-pradaObj$sampleMeta
-    # applicationCoverageRegions<-pradaObj$applicationCoverageRegions
+    # pgxrexApplicationDAO<-pgxrexObj$pgxrexApplicationDAO
+    # nThread<-pgxrexObj$nThread
+    # analysisSettingsList<-pgxrexObj$analysisSettingsList
+    # sampleSettingsList<-pgxrexObj$sampleSettingsList
+    # analysisMeta<-pgxrexObj$analysisMeta
+    # sampleMeta<-pgxrexObj$sampleMeta
+    # applicationCoverageRegions<-pgxrexObj$applicationCoverageRegions
 
 
     #original regions (as loaded)
