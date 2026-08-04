@@ -5,7 +5,12 @@
 
 PgxrexClass <- setRefClass("Pgxrex",
                                            fields = list(
+                                             contextDatabaseList = "ANY",
+                                             nThread = "numeric",
+                                             folderpathWork = "ANY",
                                              pgxrexApplicationDAO = "ANY",
+
+
                                              paddingPRSAnchorBp = "numeric",
                                              paddingGeneBp = "numeric",
                                              applicationCoverageRegions = 'ANY',
@@ -13,7 +18,7 @@ PgxrexClass <- setRefClass("Pgxrex",
                                              applicationCoverageRegionsFilteredPaddedStrands = 'ANY',
 
                                              #analysis settings
-                                             nThread = "numeric",
+
                                              analysisSettingsList = 'ANY',
                                              sampleSettingsList = 'ANY',
                                              analysisMeta = 'ANY',
@@ -26,6 +31,9 @@ PgxrexClass <- setRefClass("Pgxrex",
                                              {
 
                                                #defaults
+                                               contextDatabaseList<<-c()
+                                               nThread <<- 6
+                                               folderpathWork <<- file.path("")
                                                pgxrexApplicationDAO <<- NULL
 
                                                paddingPRSAnchorBp<<-10000
@@ -35,7 +43,7 @@ PgxrexClass <- setRefClass("Pgxrex",
                                                applicationCoverageRegionsFiltered <<- NULL
                                                applicationCoverageRegionsFilteredPaddedStrands <<- NULL
 
-                                               nThread <<- 6
+
                                                analysisSettingsList<<-c()
                                                sampleSettingsList<<-c()
 
@@ -52,8 +60,8 @@ PgxrexClass <- setRefClass("Pgxrex",
 #this is standardised and hard-coded - replace the dao with another for a custom connection
 #connectPgxrexDatabase("tng_prada_system")
 PgxrexClass$methods(
-  connectPgxrexDatabase=function(hostToUse=NULL,usernameToUse=NULL,passwordToUse=NULL,dbnameToUse=NULL,portToUse=NULL){
-    if(is.null(passwordToUse)) passwordToUse <- rstudioapi::askForPassword(prompt = c("Enter database password for user: ",usernameToUse))
+  connectPgxrexDatabase=function(hostToUse=NULL,usernameToUse=NULL,passwordToUse=NULL,dbnameToUse=NULL,portToUse=NULL, askForPassword=TRUE){
+    if(is.null(passwordToUse) && askForPassword) passwordToUse <- rstudioapi::askForPassword(prompt = c("Enter database password for user: ",usernameToUse))
     if(is.null(hostToUse)) hostToUse <- pgxrexCentralDBDefaultHost
     if(is.null(dbnameToUse)) dbnameToUse <- pgxrexCentralDBDefaultDbName
     if(is.null(usernameToUse)) usernameToUse <- pgxrexCentralDBDefaultUsername

@@ -7,7 +7,6 @@ library(data.table)
 
 #command line options
 optionParser <- OptionParser()
-pgxrexObj<-PgxrexClass()
 
 optionParser <- add_option(
   object = optionParser,
@@ -39,7 +38,9 @@ parsedCFOptions <- list(
   `pgxrexDbHost`="localhost",
   `pgxrexDbUsername`="tng_prada_system",
   `pgxrexDbName`="prada_local",
-  `pgxrexDbPort`=65432
+  `pgxrexDbPort`=65432,
+  `ncores`=6,
+  `folderpathWork`="" #default to current folder
   ) #defaults
 
 
@@ -63,7 +64,19 @@ if(file.exists(parsedCLOptions$protectedFilePath)){
 } else {
   if(!file.exists("protected.conf.txt")){
     dfOpts<-data.table(names=names(parsedPCFOptions), values=parsedPCFOptions)
-    fwrite(dfOpts,"proetected.conf.txt",sep = "=",row.names = FALSE,col.names = FALSE)
+    fwrite(dfOpts,"protected.conf.txt",sep = "=",row.names = FALSE,col.names = FALSE)
   }
 }
+
+
+#unify settings/options
+parsedOptions<-parsedCLOptions
+parsedOptions[names(parsedCFOptions)]<-parsedCFOptions
+parsedOptions[names(parsedPCFOptions)]<-parsedPCFOptions
+
+pgxrexObj<-PgxrexClass()
+pgxrexObj$contextDatabaseList<-parsedOptions #set context options
+pgxrexObj$automation()
+
+
 

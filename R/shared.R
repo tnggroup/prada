@@ -34,13 +34,15 @@ filePathFasta=file.path("..","data","GCA_000001405.15_GRCh38_no_alt_analysis_set
 readMetadata <- function(filePath,labelValueSeparator='='){
   toReturn<-c()
   #filePath <- file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameSummaryMetadata)
+  #filePath <- "protected.conf.txt"
   con = file(filePath,open="r")
   f <- readLines(con = con,encoding = "UTF-8")
   for(iLine in 1:length(f)){
     if(nchar(f[iLine])>2){
       #iLine<-1
       #strsplit(x = f[iLine], split = "\\s")
-      m<-gregexpr(pattern = paste0("\\s*\\w*",labelValueSeparator,"\\w*\\s*"),text = f[iLine])
+      m<-gregexpr(pattern = paste0("\\s*\\w*",labelValueSeparator,"\\w*.*$"),text = f[iLine])
+      #m<-gregexpr(pattern = paste0("\\s*\\w*",labelValueSeparator,"\\w*\\s*"),text = f[iLine])
       k<-NA
       v<-NA
       if(length(m)>0){
@@ -48,7 +50,7 @@ readMetadata <- function(filePath,labelValueSeparator='='){
           fullString <- trimws(substr(x =f[iLine], start = m[[1]][[1]],  stop = m[[1]][[1]]+(attr(x = m[[1]], which = "match.length")[[1]]-1)),which = "both")
           fullString.split<-strsplit(fullString,split = labelValueSeparator)
           k<-trimws(fullString.split[[1]][[1]], which = "both")
-          v<-trimws(fullString.split[[1]][[2]], which= "both")
+          if(length(fullString.split[[1]])>1) v<-trimws(fullString.split[[1]][[2]], which= "both",whitespace = "[ \t\r\n\"]") #Also trims double quotation characters
         }
       }
 
@@ -201,5 +203,15 @@ padStringLeft <- function(s,padding,targetLength){
 nanull <- function(x){
 x[is.null(x)]<-NA
 x
+}
+
+catl <- function(...){
+  cat(...)
+  cat("\n")
+}
+
+catl0 <- function(...){
+  cat(...,sep = "")
+  cat("\n")
 }
 
