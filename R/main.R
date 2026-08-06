@@ -3,6 +3,8 @@
 #devtools::install_github("tnggroup/prada")
 #devtools::install_github("tnggroup/prada",ref = 'jz_dev')
 
+#reference class, also called R5
+# use browser() and source to debug in RStudio
 PgxrexClass <- setRefClass("Pgxrex",
                                            fields = list(
                                              contextDatabaseList = "ANY",
@@ -18,11 +20,16 @@ PgxrexClass <- setRefClass("Pgxrex",
                                              applicationCoverageRegionsFilteredPaddedStrands = 'ANY',
 
                                              #analysis settings
-
+                                             analysisConfigurationFilepath = 'ANY',
+                                             analysisId = 'ANY',
+                                             analysisFolderpathWork = 'ANY',
                                              analysisSettingsList = 'ANY',
                                              sampleSettingsList = 'ANY',
                                              analysisMeta = 'ANY',
-                                             sampleMeta = 'ANY'
+                                             sampleMeta = 'ANY',
+
+
+                                             testFlag.offline = 'ANY'
                                            ),
                                            methods = list
                                            (
@@ -43,7 +50,9 @@ PgxrexClass <- setRefClass("Pgxrex",
                                                applicationCoverageRegionsFiltered <<- NULL
                                                applicationCoverageRegionsFilteredPaddedStrands <<- NULL
 
-
+                                               analysisConfigurationFilepath<<-NULL
+                                               analysisId<<-NULL
+                                               analysisFolderpathWork<<-NULL
                                                analysisSettingsList<<-c()
                                                sampleSettingsList<<-c()
 
@@ -51,6 +60,7 @@ PgxrexClass <- setRefClass("Pgxrex",
                                                sampleMeta<<-as.data.frame(matrix(data = NA,nrow = 0,ncol = 0))
 
 
+                                               testFlag.offline<<-FALSE
                                              }
                                            )
 )

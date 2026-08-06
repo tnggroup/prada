@@ -895,6 +895,7 @@ PgxrexClass$methods(
 
 PgxrexClass$methods(
   printData=function(
+    targetFolderpath=""
   ){
     # pgxrexApplicationDAO<-pgxrexObj$pgxrexApplicationDAO
     # nThread<-pgxrexObj$nThread
@@ -907,16 +908,16 @@ PgxrexClass$methods(
 
     #original regions (as loaded)
     if(!is.null(applicationCoverageRegions)){
-      applicationCoverageRegions.filepath<-"applicationCoverageRegions.tsv"
+      applicationCoverageRegions.filepath<-file.path.coalesce(targetFolderpath,"applicationCoverageRegions.tsv")
       fwrite(applicationCoverageRegions,file = applicationCoverageRegions.filepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
       cat("\n",applicationCoverageRegions.filepath)
     }
 
-    analysisMeta.filepath<-"analysisMeta.tsv"
+    analysisMeta.filepath<-file.path.coalesce(targetFolderpath,"analysisMeta.tsv")
     fwrite(analysisMeta,file = analysisMeta.filepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
     cat("\n",analysisMeta.filepath)
 
-    sampleMeta.filepath<-"sampleMeta.tsv"
+    sampleMeta.filepath<-file.path.coalesce(targetFolderpath,"sampleMeta.tsv")
     fwrite(sampleMeta,file = sampleMeta.filepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
     cat("\n",sampleMeta.filepath)
 
@@ -942,25 +943,26 @@ PgxrexClass$methods(
         cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
 
         if(!is.null(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom)){
-          cfilepath<-paste0("sequencingDepthRegionsTableCustom_",cUniqueSampleLabel,".tsv")
+          cfilepath<-file.path.coalesce(targetFolderpath,paste0("sequencingDepthRegionsTableCustom_",cUniqueSampleLabel,".tsv"))
           fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthRegionsTableCustom,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
           cat("\n",cfilepath)
         }
 
         if(!is.null(sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable)){
-          cfilepath<-paste0("sequencingStatsOriginalRegionsTable_",cUniqueSampleLabel,".tsv")
+          cfilepath<-file.path.coalesce(targetFolderpath,paste0("sequencingStatsOriginalRegionsTable_",cUniqueSampleLabel,".tsv"))
           fwrite(sampleSettingsList[[cUniqueSampleLabel]]$sequencingStatsOriginalRegionsTable,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
           cat("\n",cfilepath)
         }
 
         if(!is.null(sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg)){
-          cfilepath<-paste0("pgxCallsAggCustom_",cUniqueSampleLabel,".tsv")
+          cfilepath<-file.path.coalesce(targetFolderpath,paste0("pgxCallsAggCustom_",cUniqueSampleLabel,".tsv"))
           fwrite(sampleSettingsList[[cUniqueSampleLabel]]$pgx_calls_table_custom_agg,file = cfilepath,sep = "\t",row.names = F,col.names = T, append = F, nThread = nThread)
           cat("\n",cfilepath)
         }
 
 
         #IGV graphs
+        ##THESE WILL BE PUT IN THE DEPTH ANALYSIS FOLDER
 
         ##per-base
         cFPath<-file.path(analysisMeta[cAnalysisLabel,c("folderPathDepthAnalysisOutputRaw")],paste0(cBarcode,".per-base.bed.gz"))
@@ -984,6 +986,39 @@ PgxrexClass$methods(
 
       }
     }
+
+
+  }
+)
+
+
+
+PgxrexClass$methods(
+  readPrintData=function(
+    targetFolderpath=""
+  ){
+
+    #applicationCoverageRegions.tsv
+    cFilepath<-file.path.coalesce(targetFolderpath,"applicationCoverageRegions.tsv")
+    if(file.exists(cFilepath)) applicationCoverageRegions <<- fread(file = cFilepath, na.strings = c(".",
+                                                                        NA, "NA", ""), encoding = "UTF-8", check.names = T,
+                                        fill = T, blank.lines.skip = T, data.table = F, nThread = nThread,
+                                        showProgress = F)
+
+
+    cFilepath<-file.path.coalesce(targetFolderpath,"analysisMeta.tsv")
+    if(file.exists(cFilepath)) analysisMeta <<- fread(file = cFilepath, na.strings = c(".",
+                                                                                                     NA, "NA", ""), encoding = "UTF-8", check.names = T,
+                                                                    fill = T, blank.lines.skip = T, data.table = F, nThread = nThread,
+                                                                    showProgress = F)
+
+
+    cFilepath<-file.path.coalesce(targetFolderpath,"sampleMeta.tsv")
+    if(file.exists(cFilepath)) sampleMeta <<- fread(file = cFilepath, na.strings = c(".",
+                                                                                       NA, "NA", ""), encoding = "UTF-8", check.names = T,
+                                                      fill = T, blank.lines.skip = T, data.table = F, nThread = nThread,
+                                                      showProgress = F)
+
 
 
   }

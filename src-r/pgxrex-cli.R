@@ -4,6 +4,7 @@ library(optparse)
 library(pgxrex)
 library(data.table)
 
+#setwd(utils::getSrcDirectory(function(){})[1]) #force wd in case of previous changes
 
 #command line options
 optionParser <- OptionParser()
@@ -74,9 +75,17 @@ parsedOptions<-parsedCLOptions
 parsedOptions[names(parsedCFOptions)]<-parsedCFOptions
 parsedOptions[names(parsedPCFOptions)]<-parsedPCFOptions
 
+PgxrexClass$trace("automation") #DEBUG
+
 pgxrexObj<-PgxrexClass()
+
+pgxrexObj$testFlag.offline<-TRUE #TEST
+
 pgxrexObj$contextDatabaseList<-parsedOptions #set context options
+#pgxrexObj$trace("automation")
 pgxrexObj$automation()
+
+
 
 
 

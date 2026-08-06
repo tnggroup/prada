@@ -12,21 +12,39 @@ PgxrexClass$methods(
     } else if(command=="automatic_routine"){
 
       #check for analysis to run
-      analyses <- list.files(path = folderpathWork,pattern = "^.+\\.pgxrex\\.analysis\\.conf\\.txt$")
+
+      analyses <- ifelse(
+        nchar(folderpathWork)>0,
+        list.files(path = folderpathWork,pattern = ".+\\.pgxrex\\.analysis\\.conf\\.txt$"),
+        list.files(pattern = ".+\\.pgxrex\\.analysis\\.conf\\.txt$")
+      )
+
       if(length(analyses)>0){
 
-        #TODO
+        analysisConfigurationFilepath<<-ifelse(
+          nchar(folderpathWork)>0,
+          file.path(folderpathWork,analyses[1]),
+          analyses[1])
+        analysis()
+
       } else {
         #no analyses
         catl("There are no analyses to run. A template analysis config file has been created.")
         defaultAnalysiOptions <- list(
-          `analysisId`="myAnalysis",
+          #`analysisId`="myAnalysis", #this is not put in the template as default
           `folderpathSequencing`="",
           `folderpathWFPGX`=""
+          #`folderpathMosdepth`="" #if no value - assume no mosdepth has been run and run automatically
         )
-        if(!file.exists(file.path(folderpathWork,"TEMPLATE.pgxrex.analysis.conf.txt"))){
+
+        cTemplateFilePath<-ifelse(nchar(folderpathWork)>0,
+                                  file.path(folderpathWork,"TEMPLATE.pgxrex.analysis.conf.txt")
+                                  ,
+                                  "TEMPLATE.pgxrex.analysis.conf.txt"
+                                  )
+        if(!file.exists(cTemplateFilePath)){
           dfOpts<-data.table(names=names(defaultAnalysiOptions), values=defaultAnalysiOptions)
-          fwrite(dfOpts,"TEMPLATE.pgxrex.analysis.conf.txt",sep = "=",row.names = FALSE,col.names = FALSE)
+          fwrite(dfOpts,cTemplateFilePath,sep = "=",row.names = FALSE,col.names = FALSE)
           catl("A template analysis config file has been created.")
         }
 
@@ -66,5 +84,87 @@ PgxrexClass$methods(
     )
     catl("Database connected")
 
+  }
+)
+
+PgxrexClass$methods(
+  analysis=function(){
+    #contextDatabaseList<-pgxrexObj$contextDatabaseList
+    catl("Running analysis using settings from:",analysisConfigurationFilepath)
+
+    parsedAnalysisOptions <- pgxrex::readMetadata(filePath = analysisConfigurationFilepath)
+
+
+    #determine analysis id/code/name
+    analysisId<<-paste0(contextDatabaseList$pgxrexId,"_unknown")
+    if(any(names(parsedAnalysisOptions)=="analysisId")){
+      analysisId<<-parsedAnalysisOptions[["analysisId"]]
+    }
+    catl("Analysis is:",analysisId)
+
+
+    #general analysis data setup - requires the database
+    computeGenomeCoverage( #default settings
+      nPrioritisedGene=300,
+      nPrioritisedCnv=0,
+      nPrioritisedSnp=0,
+      verbose = TRUE
+    )
+    catl("Genomic regions established.")
+
+    #setup analysis working directory
+    analysisFolderpathWork<<-file.path.coalesce(folderpathWork,"analysis",analysisId) #default
+    dir.create(analysisFolderpathWork,recursive = TRUE)
+    setwd(analysisFolderpathWork)
+    browser()
+
+
+
+    #run analysis data collection - not tested!
+    addAnalysisSetting(
+      settingLabel = analysisId,
+      folderPathAnalysisSequencingRaw = parsedAnalysisOptions["folderpathSequencing"],
+      folderPathAnalysisOutputRaw = parsedAnalysisOptions["folderpathWFPGX"],
+      folderPathDepthAnalysisOutputRaw = file.path(analysisFolderpathWork,"mosdepth")
+      )
+    collectAnalysisCallData(analysisId)
+    catl("Sequencing and basecall data collected.")
+    if(testFlag.offline){
+      readPrintData(analysisFolderpathWork)
+    } else {
+      #run mosdepth for each sequenced individual in the analysis
+      sampleMeta.analysis<-sampleMeta[sampleMeta$analysis==analysisId,]
+      if(nrow(sampleMeta.analysis)>0){
+
+        analysisFolderpathWork.mosdepth<-file.path.coalesce(analysisFolderpathWork,"mosdepth")
+        dir.create(analysisFolderpathWork.mosdepth,recursive = TRUE)
+        setwd(analysisFolderpathWork.mosdepth)
+
+        for(iSample in 1:nrow(sampleMeta.analysis)){
+          #iSample<-1
+          cBarcode<-sampleMeta.analysis[iSample,c("barcode")]
+          if(file.exists(paste0(cBarcode,".per-base.bed.gz"))) next
+          wrapper.mosdepth(
+            label = cBarcode,bamFilePath = file.path(parsedAnalysisOptions["folderpathWFPGX"],"output",cBarcode,paste0(cBarcode,".haplotagged.bam")),
+            threads = nThread,
+            mosdepthPath = ""
+          )
+        }
+
+        setwd(analysisFolderpathWork)
+
+      }
+
+      collectAnalysisDepthData(analysisId)
+      catl("Sequencing depth data collected.")
+      computeDepthDataStatistics() #do we need the bed-file here?
+      catl("Sequencing depth data statistics computed.")
+      computeCallStatistics()
+      catl("Sequencing and basecall data statistics computed.")
+
+    }
+
+
+    catl("block")
   }
 )

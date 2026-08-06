@@ -31,7 +31,8 @@ computeGenomeCoverage=function(
     wGene=1e20,
     wVariantCnv=1e7,
     wVariantSnp=1,
-    useLabelIdsForGenes=TRUE
+    useLabelIdsForGenes=TRUE,
+    verbose=TRUE
     ){
   #pgxrexApplicationDAO<-pgxrexO$pgxrexApplicationDAO
   applicationCoverageRegions<<-pgxrexApplicationDAO$selectApplicationCoverageRegions(
@@ -55,7 +56,7 @@ computeGenomeCoverage=function(
     applicationCoverageRegionsFiltered[type==0,id:=label]
   }
 
-  cat("The coverage of the current selection is ",sum(applicationCoverageRegionsFiltered$coveragebp), "bp or ",sum(applicationCoverageRegionsFiltered$coveragebp/3088269832))
+  if(verbose) catl("The coverage of the current selection is ",sum(applicationCoverageRegionsFiltered$coveragebp), "bp or ",sum(applicationCoverageRegionsFiltered$coveragebp/3088269832))
 
 
   applicationCoverageRegionsFiltered[,score:=0]
@@ -78,7 +79,7 @@ computeGenomeCoverage=function(
   if(!is.null(writeToThisBedPath)){
 
     if(writePaddedStrands){
-      cat("\nWriting padded strands BED\n")
+      catl("\nWriting padded strands BED")
       bedDf<-as.data.frame(applicationCoverageRegionsFilteredPaddedStrands)
       bedDf$id<-gsub("[^a-zA-z1-9_-]","_",bedDf$id) #create safe IDs
       setDT(bedDf)
@@ -90,7 +91,7 @@ computeGenomeCoverage=function(
 
       #bedDf<-applicationCoverageRegionsFiltered[,.(chr_name,start=abp1,end=abp2,id=paste0("\"",id,"\""))]
     } else {
-      cat("\nWriting single unpadded BED\n")
+      catl("\nWriting single unpadded BED")
       bedDf<-as.data.frame(applicationCoverageRegionsFiltered)
       bedDf$id<-gsub("[^a-zA-z1-9_-]","_",bedDf$id) #create safe IDs
       setDT(bedDf)

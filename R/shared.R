@@ -215,3 +215,42 @@ catl0 <- function(...){
   cat("\n")
 }
 
+file.path.coalesce <- function(...){
+  char.arg<-lapply(FUN = function(x){
+    as.character(x)
+  }
+    ,X = list(...))
+  do.call(file.path, as.list(unlist(char.arg[nchar(char.arg)>0]))) #required to get the right behaviour of file.path
+}
+
+
+wrapper.mosdepth <- function(
+    label, #label of the analysis
+    bamFilePath,
+    threads=6,
+    mosdepthPath="mosdepth"
+){
+
+  #Set up arguments
+  args <- c(
+    paste0("-t ",threads),
+    "--fast-mode",
+    label,
+    bamFilePath
+  )
+
+  #Print the current arguments to the screen, as a reminder
+  print(paste(bcftools_filepath,paste(args, collapse=" ")))
+
+  #Run with the configured arguments and printing the output to the standard out stream (the screen).
+  output <- system2(
+    #command=normalizePath(mosdepthPath,mustWork=T),
+    command=mosdepthPath,
+    args=args,
+    stdout = T
+  )
+
+  return(read.table(text = output, header = T))
+}
+
+
