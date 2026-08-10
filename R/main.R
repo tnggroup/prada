@@ -9,8 +9,10 @@ PgxrexClass <- setRefClass("Pgxrex",
                                            fields = list(
                                              contextDatabaseList = "ANY",
                                              nThread = "numeric",
+                                             folderpathLaunch="ANY",
                                              folderpathWork = "ANY",
                                              pgxrexApplicationDAO = "ANY",
+                                             redcapDAO = "ANY",
 
 
                                              paddingPRSAnchorBp = "numeric",
@@ -40,8 +42,11 @@ PgxrexClass <- setRefClass("Pgxrex",
                                                #defaults
                                                contextDatabaseList<<-c()
                                                nThread <<- 6
+                                               folderpathLaunch <<- getwd()
                                                folderpathWork <<- file.path("")
                                                pgxrexApplicationDAO <<- NULL
+                                               redcapDAO <<- NULL
+
 
                                                paddingPRSAnchorBp<<-10000
                                                paddingGeneBp<<-10000

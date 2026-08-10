@@ -40,6 +40,7 @@ parsedCFOptions <- list(
   `pgxrexDbUsername`="tng_prada_system",
   `pgxrexDbName`="prada_local",
   `pgxrexDbPort`=65432,
+  `redcapBaseUrl`="https://redcap.medsci.ox.ac.uk/api/",
   `ncores`=6,
   `folderpathWork`="" #default to current folder
   ) #defaults
@@ -56,7 +57,8 @@ if(file.exists(parsedCLOptions$settingsFilePath)){
 
 
 parsedPCFOptions <- list(
-  `pgxrexDbPassword`="XXX_replace_with_password_XXX"
+  `pgxrexDbPassword`="XXX_replace_with_password_XXX",
+  `redcapApiToken`="XXX_replace_with_API_token_XXX"
 ) #defaults
 
 

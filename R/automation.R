@@ -84,6 +84,10 @@ PgxrexClass$methods(
     )
     catl("Database connected")
 
+    redcapDAO<<-PgxrexRedcapUtilityClass(base_url=contextDatabaseList$redcapBaseUrl, apiToken=contextDatabaseList$redcapApiToken)
+    catl("RedCap configured")
+
+
   }
 )
 
@@ -116,7 +120,6 @@ PgxrexClass$methods(
     analysisFolderpathWork<<-file.path.coalesce(folderpathWork,"analysis",analysisId) #default
     dir.create(analysisFolderpathWork,recursive = TRUE)
     setwd(analysisFolderpathWork)
-    browser()
 
 
 
@@ -162,6 +165,32 @@ PgxrexClass$methods(
       computeCallStatistics()
       catl("Sequencing and basecall data statistics computed.")
 
+    }
+
+    setwd(folderpathLaunch)
+
+
+    #reporting
+    #TODO
+
+
+    #phenoconversion
+    browser()
+    recs<-redcapDAO$exportRecords(vForms=list("concomitant_medication_log"))
+    #recs<-redcapDAO$exportRecords()
+    #resp_raw(recs)
+    lRecs <- resp_body_json(recs)
+    #length(lRecs)
+    #lRecs[1]
+    #lRecs[2]
+    dtData <- data.table::rbindlist(lRecs)
+
+
+    ##read phenoconversion data
+    if(testFlag.offline){
+
+    } else {
+      #TODO
     }
 
 
