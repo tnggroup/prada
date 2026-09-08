@@ -240,7 +240,7 @@ wrapper.mosdepth <- function(
   )
 
   #Print the current arguments to the screen, as a reminder
-  print(paste(bcftools_filepath,paste(args, collapse=" ")))
+  print(paste(mosdepthPath,paste(args, collapse=" ")))
 
   #Run with the configured arguments and printing the output to the standard out stream (the screen).
   output <- system2(
@@ -250,7 +250,8 @@ wrapper.mosdepth <- function(
     stdout = T
   )
 
-  return(read.table(text = output, header = T))
+  #return(read.table(text = output, header = T))
+  return(output)
 }
 
 
