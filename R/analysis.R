@@ -169,6 +169,7 @@ collectAnalysisCallData=function(settingLabel,
     filenameSampleSheetMetadata<-grep(pattern = "^sample_sheet.+\\.csv$",x = analysisSettingsList[[settingLabel]]$analysisSequencingFilenameList, value = T)
 
     sampleSheetMetadata<-data.table::fread(file.path(analysisSettingsList[[settingLabel]]$folderPathAnalysisSequencingRaw,filenameSampleSheetMetadata))
+    colnames(sampleSheetMetadata)<-make.unique(colnames(sampleSheetMetadata))
 
     #we use the first row as representative of the whole analysis, assume no more rows/(samples?)
     #analysisMeta[settingLabel,colnames(sampleSheetMetadata)]<-sampleSheetMetadata[1,]

@@ -171,7 +171,7 @@ PgxrexClass$methods(
 
 
     #reporting
-    #TODO
+    #TODO - when our table is set up
 
 
     #phenoconversion
