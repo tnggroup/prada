@@ -1,15 +1,15 @@
 #Truth concordance analysis with unified plotting, 13/07/2026
 
-#devtools::install_github("tnggroup/prada")
-#devtools::install_github("tnggroup/prada",ref = 'jz_dev')
-library(prada)
+#devtools::install_github("tnggroup/pgxrex")
+#devtools::install_github("tnggroup/pgxrex",ref = 'jz_dev')
+library(pgxrex)
 library(data.table)
 library(vcfR)
 
 projectFolderPath<-"/scratch/prj/sgdp_nanopore/Projects/prada_jz"
 #projectFolderPath<-"/Users/jakz/Documents/work_rstudio/prada" #local
 
-dAnalysis <- fread(file.path(projectFolderPath,"data","pradaApp","prada_sequencing_run_database.analysis.tsv.txt"))
+dAnalysis <- fread(file.path(projectFolderPath,"data","pradaApp","prada_sequencing_run_database.analysis.tsv.txt")) #these are database files containing the collected folder configurations for all runs/analyses.
 dSample <- fread(file.path(projectFolderPath,"data","pradaApp","prada_sequencing_run_database.sample.tsv.txt"))
 
 #reference H (HG002)
@@ -46,8 +46,11 @@ setkeyv(dSampleVCF.C,c("CHROM","POS","REF","ALT"))
 
 print("References read")
 
+#we could re-run the analysis and dsata collection step here if needed
+
+#this only depends on the file/database metadata and does not index existing barcodes again
 for(iSample in 1:nrow(dSample)){
-  #iSample<-1
+  #iSample<-53
   cSampleID<-dSample[iSample,c("barcode")]
   cAnalysisID<-dSample[iSample,c("analysis")]
   cPilotID<-dAnalysis[`analysis id`==eval(cAnalysisID),c("pilot id")]
@@ -80,6 +83,10 @@ for(iSample in 1:nrow(dSample)){
 
   mostCredibleReference<-"NA"
   ratioOfMostCredibleReference<-0
+  mConcordantREF.credible<-NA
+  mConcordantALT.credible<-NA
+  mDiscordantREF.credible<-NA
+  mDiscordantALT.credible<-NA
 
   if(is.na(knownReference)){
     cat(paste0(", establishing credible reference"))
@@ -106,6 +113,10 @@ for(iSample in 1:nrow(dSample)){
       if(is.finite(evaluationRatio) && evaluationRatio>ratioOfMostCredibleReference){
         mostCredibleReference<-cComparison
         ratioOfMostCredibleReference<-evaluationRatio
+        mConcordantREF.credible<-mConcordantREF
+        mConcordantALT.credible<-mConcordantALT
+        mDiscordantREF.credible<-mDiscordantREF
+        mDiscordantALT.credible<-mDiscordantALT
       }
 
       dSample[iSample,c(
@@ -124,9 +135,20 @@ for(iSample in 1:nrow(dSample)){
 
   cat(paste0(": ",mostCredibleReference))
 
-  dSample[iSample,c("mostCredibleReference")]<-mostCredibleReference
+  dSample[iSample,c("mostCredibleReference",
+                    "mVCF",
+                    "mConcordantREF.credible",
+                    "mConcordantALT.credible",
+                    "mDiscordantREF.credible",
+                    "mDiscordantALT.credible"):=list(
+                      mostCredibleReference,
+                      mVCF,
+                      mConcordantREF.credible,
+                      mConcordantALT.credible,
+                      mDiscordantREF.credible,
+                      mDiscordantALT.credible)]
 
-  filePathPGX<-file.path(projectFolderPath,"work","pradaApp", cPilotID ,paste0("pgxCallsAggCustom_",cAnalysisID,"_",cSampleID,".tsv"))
+  filePathPGX<-file.path(projectFolderPath,"work","pradaApp", cPilotID ,paste0("pgxCallsAggCustom_",cAnalysisID,"_",cSampleID,".tsv")) #the pilot folder has to have the same name as the pilot ID.
   if(file.exists(filePathPGX)){
     dSamplePGX<-fread(filePathPGX)
     dSamplePGX.REF<-dSamplePGX.H

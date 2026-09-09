@@ -337,9 +337,11 @@ sbatch --time 2:00:00 --partition cpu --job-name="pap8" --ntasks 1 --cpus-per-ta
 
 sbatch --time 2:00:00 --partition cpu --job-name="pap9" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot9.R" --output "pradaAppPilot9.$(date +%Y%m%d).out.txt"
 
+sbatch --time 2:00:00 --partition cpu --job-name="pap13" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pradaAppPilot13.R" --output "pradaAppPilot13.$(date +%Y%m%d).out.txt"
+
 sbatch --time 2:00:00 --partition interruptible_cpu --job-name="plots" --ntasks 1 --cpus-per-task 6 --mem 256G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/unified-plots.R" --output "prada-plots.$(date +%Y%m%d).out.txt"
 
-sbatch --time 2:00:00 --partition interruptible_cpu --job-name="spider" --ntasks 1 --cpus-per-task 6 --mem 64G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/pilotSpiderAnalysis.R" --output "pilotSpiderAnalysis.$(date +%Y%m%d).out.txt"
+sbatch --time 2:00:00 --partition interruptible_cpu --job-name="spider" --ntasks 1 --cpus-per-task 6 --mem 64G --wrap="Rscript /scratch/prj/sgdp_nanopore/Projects/prada_jz/src-r/truth-concordance.R" --output "truth-concordance.$(date +%Y%m%d).out.txt"
 
 
 ```
