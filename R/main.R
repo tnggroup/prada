@@ -58,8 +58,8 @@ PgxrexClass <- setRefClass("Pgxrex",
                                                analysisConfigurationFilepath<<-NULL
                                                analysisId<<-NULL
                                                analysisFolderpathWork<<-NULL
-                                               analysisSettingsList<<-c()
-                                               sampleSettingsList<<-c()
+                                               analysisSettingsList<<-list()
+                                               sampleSettingsList<<-list()
 
                                                analysisMeta<<-as.data.frame(matrix(data = NA,nrow = 0,ncol = 0))
                                                sampleMeta<<-as.data.frame(matrix(data = NA,nrow = 0,ncol = 0))

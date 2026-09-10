@@ -474,7 +474,7 @@ PgxrexClass$methods(
   collectAnalysisDepthData=function(
     settingLabel
   ){
-    # settingLabel <- "p2-nogtube-nobedtest"
+    # settingLabel <- cAnalysisID
     # pgxrexApplicationDAO<-pgxrexObj$pgxrexApplicationDAO
     # nThread<-pgxrexObj$nThread
     # analysisSettingsList<-pgxrexObj$analysisSettingsList
@@ -999,28 +999,36 @@ PgxrexClass$methods(
     targetFolderpath=""
   ){
 
-    #applicationCoverageRegions.tsv
-    cFilepath<-file.path.coalesce(targetFolderpath,"applicationCoverageRegions.tsv")
-    if(file.exists(cFilepath)) applicationCoverageRegions <<- fread(file = cFilepath, na.strings = c(".",
-                                                                        NA, "NA", ""), encoding = "UTF-8", check.names = T,
-                                        fill = T, blank.lines.skip = T, data.table = F, nThread = nThread,
-                                        showProgress = F)
+    # #applicationCoverageRegions.tsv
+    # cFilepath<-file.path.coalesce(targetFolderpath,"applicationCoverageRegions.tsv")
+    # if(file.exists(cFilepath)) applicationCoverageRegions <<- fread(file = cFilepath, na.strings = c(".",
+    #                                                                     NA, "NA", ""), encoding = "UTF-8", check.names = T,
+    #                                     fill = T, blank.lines.skip = T, data.table = F, nThread = nThread,
+    #                                     showProgress = F) #this should be read centrally
 
 
     cFilepath<-file.path.coalesce(targetFolderpath,"analysisMeta.tsv")
-    if(file.exists(cFilepath)) analysisMeta <<- fread(file = cFilepath, na.strings = c(".",
+    if(file.exists(cFilepath)) {
+      analysisMeta.toAdd <- fread(file = cFilepath, na.strings = c(".",
                                                                                                      NA, "NA", ""), encoding = "UTF-8", check.names = T,
                                                                     fill = T, blank.lines.skip = T, data.table = F, nThread = nThread,
                                                                     showProgress = F)
 
+      analysisMeta[analysisMeta.toAdd$code,colnames(analysisMeta.toAdd)] <<- analysisMeta.toAdd
+    }
+
 
     cFilepath<-file.path.coalesce(targetFolderpath,"sampleMeta.tsv")
-    if(file.exists(cFilepath)) sampleMeta <<- fread(file = cFilepath, na.strings = c(".",
+    if(file.exists(cFilepath)) {
+      sampleMeta.toAdd <- fread(file = cFilepath, na.strings = c(".",
                                                                                        NA, "NA", ""), encoding = "UTF-8", check.names = T,
                                                       fill = T, blank.lines.skip = T, data.table = F, nThread = nThread,
                                                       showProgress = F)
 
+      uniqueSampleId.toAdd <-paste0(sampleMeta.toAdd$analysis,"_",sampleMeta.toAdd$barcode)
+      sampleMeta[uniqueSampleId.toAdd,colnames(sampleMeta.toAdd)] <<- sampleMeta.toAdd
 
+    }
 
   }
 )

@@ -10,6 +10,7 @@ projectFolderPath<-"/scratch/prj/sgdp_nanopore/Projects/prada_jz"
 #projectFolderPath<-"/Users/jakz/Documents/work_rstudio/prada" #local
 
 dAnalysis <- fread(file.path(projectFolderPath,"data","pradaApp","prada_sequencing_run_database.analysis.tsv.txt")) #these are database files containing the collected folder configurations for all runs/analyses.
+dAnalysis[,code:=analysis_id] #harmonise with pgxrex naming
 dSample <- fread(file.path(projectFolderPath,"data","pradaApp","prada_sequencing_run_database.sample.tsv.txt"))
 
 #reference H (HG002)
@@ -21,7 +22,7 @@ setDT(dSampleVCF.H)
 setkeyv(dSampleVCF.H,c("CHROM","POS","REF","ALT"))
 
 #reference A
-dSampleVCF<-read.vcfR(file.path(projectFolderPath,dAnalysis[`analysis id`=="p10-wgs-A",c("pathAnalysisOutput")],"output","Prada_WGS_Sample_A",paste0("Prada_WGS_Sample_A",".filtered.vcf.gz")), verbose = F)
+dSampleVCF<-read.vcfR(file.path(projectFolderPath,dAnalysis[analysis_id=="p10-wgs-A",c("pathAnalysisOutput")],"output","Prada_WGS_Sample_A",paste0("Prada_WGS_Sample_A",".filtered.vcf.gz")), verbose = F)
 dSampleVCF.A<-as.data.frame(getFIX(dSampleVCF))
 dSampleVCF.A<-dSampleVCF.A[dSampleVCF.A$CHROM=="chr1",] #subset to chr1
 dSamplePGX.A<-fread(file.path(projectFolderPath,"work","pradaApp","pilot10","pgxCallsAggCustom_p10-wgs-A_Prada_WGS_Sample_A.tsv"))
@@ -29,7 +30,7 @@ setDT(dSampleVCF.A)
 setkeyv(dSampleVCF.A,c("CHROM","POS","REF","ALT"))
 
 #reference B
-dSampleVCF<-read.vcfR(file.path(projectFolderPath,dAnalysis[`analysis id`=="p10-wgs-B",c("pathAnalysisOutput")],"output","Prada_WGS_Sample_B",paste0("Prada_WGS_Sample_B",".filtered.vcf.gz")), verbose = F)
+dSampleVCF<-read.vcfR(file.path(projectFolderPath,dAnalysis[analysis_id=="p10-wgs-B",c("pathAnalysisOutput")],"output","Prada_WGS_Sample_B",paste0("Prada_WGS_Sample_B",".filtered.vcf.gz")), verbose = F)
 dSampleVCF.B<-as.data.frame(getFIX(dSampleVCF))
 dSampleVCF.B<-dSampleVCF.B[dSampleVCF.B$CHROM=="chr1",] #subset to chr1
 dSamplePGX.B<-fread(file.path(projectFolderPath,"work","pradaApp","pilot10","pgxCallsAggCustom_p10-wgs-B_Prada_WGS_Sample_B.tsv"))
@@ -37,7 +38,7 @@ setDT(dSampleVCF.B)
 setkeyv(dSampleVCF.B,c("CHROM","POS","REF","ALT"))
 
 #reference C
-dSampleVCF<-read.vcfR(file.path(projectFolderPath,dAnalysis[`analysis id`=="p10-wgs-C",c("pathAnalysisOutput")],"output","Prada_WGS_Sample_C",paste0("Prada_WGS_Sample_C",".filtered.vcf.gz")), verbose = F)
+dSampleVCF<-read.vcfR(file.path(projectFolderPath,dAnalysis[analysis_id=="p10-wgs-C",c("pathAnalysisOutput")],"output","Prada_WGS_Sample_C",paste0("Prada_WGS_Sample_C",".filtered.vcf.gz")), verbose = F)
 dSampleVCF.C<-as.data.frame(getFIX(dSampleVCF))
 dSampleVCF.C<-dSampleVCF.C[dSampleVCF.C$CHROM=="chr1",] #subset to chr1
 dSamplePGX.C<-fread(file.path(projectFolderPath,"work","pradaApp","pilot10","pgxCallsAggCustom_p10-wgs-C_Prada_WGS_Sample_C.tsv"))
@@ -46,7 +47,60 @@ setkeyv(dSampleVCF.C,c("CHROM","POS","REF","ALT"))
 
 print("References read")
 
-#we could re-run the analysis and dsata collection step here if needed
+#we could re-run the analysis and data collection step here if needed
+pgxrexObj<-PgxrexClass()
+pgxrexObj$folderpathWork<-file.path(projectFolderPath,"work","pradaApp","pilot13") #the folder where this is executed
+pgxrexObj$applicationCoverageRegions <- fread(file = file.path(projectFolderPath,"data","roughApplicationCoverageRegionsAsOfPilot3.tsv"), na.strings = c(".",
+                                                                               NA, "NA", ""), encoding = "UTF-8", check.names = T,
+                                              fill = T, blank.lines.skip = T, data.table = F, nThread = 6,
+                                              showProgress = F)
+
+
+origWD<-getwd()
+
+#sync database and object representations
+pgxrexObj$analysisMeta<-as.data.frame(dAnalysis)
+rownames(pgxrexObj$analysisMeta)<-pgxrexObj$analysisMeta$code
+pgxrexObj$sampleMeta<-as.data.frame(dSample)
+rownames(pgxrexObj$sampleMeta)<-paste0(pgxrexObj$sampleMeta$analysis,"_",pgxrexObj$sampleMeta$barcode)
+
+if(is.null(pgxrexObj$analysisSettingsList)) pgxrexObj$analysisSettingsList<-list() #in case these are null due to not reading in the raw data
+if(is.null(pgxrexObj$sampleSettingsList)) pgxrexObj$sampleSettingsList<-list()
+
+#read in previous results
+for(iAnalysis in 1:nrow(pgxrexObj$analysisMeta)){
+  #iAnalysis<-2
+  #cAnalysisID<-dAnalysis[iAnalysis,c("analysis_id")] #not used
+  cPilotID<-pgxrexObj$analysisMeta[iAnalysis,c("pilot_id")]
+  if(is.null(cPilotID)) next
+  if(nchar(cPilotID)<1) next
+  #file.exists(file.path(projectFolderPath,"work","pradaApp",cPilotID,"analysisMeta.tsv"))
+
+  #test
+  # targetFolderpath <- file.path(projectFolderPath,"work","pradaApp",cPilotID)
+  # cFilepath<-file.path.coalesce(targetFolderpath,"analysisMeta.tsv")
+  # analysisMeta.toAdd <- fread(file = cFilepath, na.strings = c(".",
+  #                                                              NA, "NA", ""), encoding = "UTF-8", check.names = T,
+  #                             fill = T, blank.lines.skip = T, data.table = F, nThread = 6,
+  #                             showProgress = F)
+  #
+  # analysisMeta<-pgxrexObj$analysisMeta
+  # analysisMeta[analysisMeta.toAdd$code,colnames(analysisMeta.toAdd)] <- analysisMeta.toAdd
+
+
+  pgxrexObj$readPrintData(file.path(projectFolderPath,"work","pradaApp",cPilotID))
+}
+
+#complementary analyses - per analysis
+for(iAnalysis in 1:nrow(pgxrexObj$analysisMeta)){
+  #iAnalysis<-2
+  cAnalysisID<-pgxrexObj$analysisMeta[iAnalysis,c("code")]
+  if(is.null(cAnalysisID)) next
+  if(nchar(cAnalysisID)<1) next
+
+  pgxrexObj$collectAnalysisDepthData(cAnalysisID)
+
+}
 
 #this only depends on the file/database metadata and does not index existing barcodes again
 for(iSample in 1:nrow(dSample)){
@@ -63,6 +117,8 @@ for(iSample in 1:nrow(dSample)){
 
   knownReference<-NA
 
+  folderPathSample <- file.path(projectFolderPath,cPathAnalysisOutput,"output",cSampleID)
+  if(!file.exists(folderPathSample)) warning("Sample folder does not exist. May be due to a folder naming issue.")
   filePathVCF <- file.path(projectFolderPath,cPathAnalysisOutput,"output",cSampleID,paste0(cSampleID,".filtered.vcf.gz"))
   if(file.exists(filePathVCF)){
     dSampleVCF<-read.vcfR(filePathVCF, verbose = F)
@@ -136,12 +192,14 @@ for(iSample in 1:nrow(dSample)){
   cat(paste0(": ",mostCredibleReference))
 
   dSample[iSample,c("mostCredibleReference",
+                    "evaluationRatio",
                     "mVCF",
                     "mConcordantREF.credible",
                     "mConcordantALT.credible",
                     "mDiscordantREF.credible",
                     "mDiscordantALT.credible"):=list(
                       mostCredibleReference,
+                      ratioOfMostCredibleReference,
                       mVCF,
                       mConcordantREF.credible,
                       mConcordantALT.credible,
@@ -182,11 +240,11 @@ for(iSample in 1:nrow(dSample)){
 ##read back samples
 dSample<-fread(file.path(projectFolderPath,"work","pradaApp","per-sample-analysis","samples.tsv"))
 
-#add back evaluationRatio
-dSample[mostCredibleReference=="H",evaluationRatio:=(mConcordantREF.H+1000*mConcordantALT.H-mDiscordantREF.H-1000*mDiscordantALT.H)/mVCF.H]
-dSample[mostCredibleReference=="A",evaluationRatio:=(mConcordantREF.A+1000*mConcordantALT.A-mDiscordantREF.A-1000*mDiscordantALT.A)/mVCF.A]
-dSample[mostCredibleReference=="B",evaluationRatio:=(mConcordantREF.B+1000*mConcordantALT.B-mDiscordantREF.B-1000*mDiscordantALT.B)/mVCF.B]
-dSample[mostCredibleReference=="C",evaluationRatio:=(mConcordantREF.C+1000*mConcordantALT.C-mDiscordantREF.C-1000*mDiscordantALT.C)/mVCF.C]
+##add back evaluationRatio - this is added in above now
+# dSample[mostCredibleReference=="H",evaluationRatio:=(mConcordantREF.H+1000*mConcordantALT.H-mDiscordantREF.H-1000*mDiscordantALT.H)/mVCF.H]
+# dSample[mostCredibleReference=="A",evaluationRatio:=(mConcordantREF.A+1000*mConcordantALT.A-mDiscordantREF.A-1000*mDiscordantALT.A)/mVCF.A]
+# dSample[mostCredibleReference=="B",evaluationRatio:=(mConcordantREF.B+1000*mConcordantALT.B-mDiscordantREF.B-1000*mDiscordantALT.B)/mVCF.B]
+# dSample[mostCredibleReference=="C",evaluationRatio:=(mConcordantREF.C+1000*mConcordantALT.C-mDiscordantREF.C-1000*mDiscordantALT.C)/mVCF.C]
 dSample[is.na(evaluationRatio),evaluationRatio:=1]
 
 

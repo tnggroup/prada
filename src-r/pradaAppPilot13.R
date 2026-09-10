@@ -6,7 +6,7 @@ library(data.table)
 
 projectFolderPath<-"/scratch/prj/sgdp_nanopore/Projects/prada_jz"
 pgxrexObj<-PgxrexClass()
-pgxrexObj$folderpathWork<-file.path(projectFolderPath,"work","pradaApp","pilot13_promplus") #the folder where this is executed
+pgxrexObj$folderpathWork<-file.path(projectFolderPath,"work","pradaApp","pilot13") #the folder where this is executed
 origWD<-getwd()
 
 #wgs
