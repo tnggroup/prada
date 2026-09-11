@@ -79,7 +79,7 @@ pgxrexObj$collectAnalysisDepthData("p13-wgs")
 pgxrexObj$collectAnalysisDepthData("p13-8kb")
 pgxrexObj$collectAnalysisDepthData("p13-15kb")
 
-pgxrexObj$computeDepthDataStatistics(filePathBed <- file.path(projectFolderPath,"data/bed/pgx.grch38.5k.0p7percent.bed"),filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/roughApplicationCoverageRegionsAsOfPilot3.tsv"))
+pgxrexObj$computeDepthDataStatistics(filePathBed = file.path(projectFolderPath,"data/bed/pgx.grch38.5k.0p7percent.bed"),filePathApplicationCoverageRegions = file.path(projectFolderPath,"data/roughApplicationCoverageRegionsAsOfPilot3.tsv"))
 
 #for test
 # settingLabel <- "p13-wgs"

@@ -1,7 +1,7 @@
 #Truth concordance analysis with unified plotting, 13/07/2026
 
-#devtools::install_github("tnggroup/pgxrex")
-#devtools::install_github("tnggroup/pgxrex",ref = 'jz_dev')
+#remotes::install_github("tnggroup/pgxrex")
+#remotes::install_github("tnggroup/pgxrex",ref = 'jz_dev')
 library(pgxrex)
 library(data.table)
 library(vcfR)
@@ -99,6 +99,9 @@ for(iAnalysis in 1:nrow(pgxrexObj$analysisMeta)){
   if(nchar(cAnalysisID)<1) next
 
   pgxrexObj$collectAnalysisDepthData(cAnalysisID)
+  pgxrexObj$computeDepthDataStatistics(filePathBed = file.path(projectFolderPath,"data/bed/pgx.grch38.5k.0p7percent.bed"))
+
+  #pgxrexObj$sampleSettingsList[["p2-gtube_barcode01"]]$sequencingDepthRegionsTable
 
 }
 

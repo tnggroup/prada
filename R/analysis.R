@@ -523,7 +523,7 @@ PgxrexClass$methods(
     # applicationCoverageRegions<-pgxrexObj$applicationCoverageRegions
     #
     # filePathBed <- file.path(projectFolderPath,"data/bed/pgx.grch38.5k.0p7percent.bed")
-    # filePathApplicationCoverageRegions=file.path(projectFolderPath,"data/roughApplicationCoverageRegionsAsOfPilot3.tsv")
+    # filePathApplicationCoverageRegions=NULL #file.path(projectFolderPath,"data/roughApplicationCoverageRegionsAsOfPilot3.tsv")
 
     if(!is.null(filePathApplicationCoverageRegions)){
       dApplicationCoverageRegions<-data.table::fread(file = filePathApplicationCoverageRegions)
@@ -551,6 +551,8 @@ PgxrexClass$methods(
         cUniqueSampleLabel <- paste0(cAnalysisLabel,"_",cBarcode)
 
         dDepth<-sampleSettingsList[[cUniqueSampleLabel]]$sequencingDepthTable
+        if(is.null(dDepth)) next
+        if(nrow(dDepth)<1) next
         colnames(dDepth)<-c("chr","bp1","bp2","v")
         setDT(dDepth)
         setkeyv(dDepth,cols = c("chr","bp1","bp2"))
